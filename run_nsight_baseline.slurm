@@ -1,11 +1,12 @@
 #!/bin/bash
 #SBATCH --job-name=wan2-nsight-base
+#SBATCH --account=155924932299
 #SBATCH --partition=gpu
 #SBATCH --gres=gpu:h100:4
 #SBATCH --nodes=1
-#SBATCH --ntasks=1
-#SBATCH --cpus-per-task=64
-#SBATCH --mem=500G
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=96
+#SBATCH --mem=488G
 #SBATCH --time=00:15:00
 #SBATCH --output=results/nsight_baseline_%j.log
 
