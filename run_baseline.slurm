@@ -6,7 +6,7 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=64
 #SBATCH --mem=500G
-#SBATCH --time=04:00:00
+#SBATCH --time=00:15:00
 #SBATCH --output=results/baseline_%j.log
 
 # Baseline benchmark: No layerwise offloading
@@ -63,7 +63,7 @@ echo "Running benchmark..."
 python scripts/benchmark_client.py \
     --base-url http://localhost:30010 \
     --num-warmup 1 \
-    --num-runs 3 \
+    --num-runs 1 \
     --config-name "baseline_${SLURM_JOB_ID}" \
     --output-dir ./results
 

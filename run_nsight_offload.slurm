@@ -6,7 +6,7 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=64
 #SBATCH --mem=500G
-#SBATCH --time=04:00:00
+#SBATCH --time=00:15:00
 #SBATCH --output=results/nsight_offload_%j.log
 
 # NSight profiling: WITH layerwise offloading
