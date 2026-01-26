@@ -9,7 +9,7 @@
 #SBATCH --time=00:15:00
 #SBATCH --output=results/nsight_baseline_%j.log
 
-# NSight profiling: BASELINE (no offloading)
+# NSight profiling: BASELINE (no offloading - pure GPU)
 
 set -e
 
@@ -95,8 +95,6 @@ nsys profile \
     --duration=600 \
     sglang serve \
         --model-path ./models/wan2.2 \
-        --text-encoder-cpu-offload \
-        --pin-cpu-memory \
         --num-gpus 4 \
         --ulysses-degree 2 \
         --ring-degree 2 \

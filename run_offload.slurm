@@ -64,7 +64,7 @@ echo "Running benchmark..."
 python scripts/benchmark_client.py \
     --base-url http://localhost:30010 \
     --num-warmup 1 \
-    --num-runs 1 \
+    --num-runs 3 \
     --config-name "offload_${SLURM_JOB_ID}" \
     --output-dir ./results
 

@@ -9,7 +9,7 @@
 #SBATCH --time=00:15:00
 #SBATCH --output=results/baseline_%j.log
 
-# Baseline benchmark: No layerwise offloading
+# Baseline benchmark: NO offloading (pure GPU)
 
 set -e
 
@@ -25,7 +25,7 @@ eval "$(conda shell.bash hook)"
 conda activate ./venv
 
 echo "=========================================="
-echo "BASELINE BENCHMARK (No Layerwise Offload)"
+echo "BASELINE BENCHMARK (No Offloading - Pure GPU)"
 echo "=========================================="
 echo "Timestamp: $(date)"
 echo "Job ID: $SLURM_JOB_ID"
@@ -40,12 +40,10 @@ echo ""
 python -c "import torch; print(f'PyTorch: {torch.__version__}'); print(f'CUDA available: {torch.cuda.is_available()}'); print(f'GPU count: {torch.cuda.device_count()}')"
 echo ""
 
-# Start SGLang server in background - BASELINE (no layerwise offload)
-echo "Starting SGLang server (baseline)..."
+# Start SGLang server in background - BASELINE (no offloading)
+echo "Starting SGLang server (baseline - no offloading)..."
 sglang serve \
     --model-path ./models/wan2.2 \
-    --text-encoder-cpu-offload \
-    --pin-cpu-memory \
     --num-gpus 4 \
     --ulysses-degree 2 \
     --ring-degree 2 \
@@ -63,7 +61,7 @@ echo "Running benchmark..."
 python scripts/benchmark_client.py \
     --base-url http://localhost:30010 \
     --num-warmup 1 \
-    --num-runs 1 \
+    --num-runs 3 \
     --config-name "baseline_${SLURM_JOB_ID}" \
     --output-dir ./results
 
