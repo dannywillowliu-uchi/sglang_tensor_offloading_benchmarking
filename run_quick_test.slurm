@@ -1,16 +1,16 @@
 #!/bin/bash
-#SBATCH --job-name=wan2-offload
+#SBATCH --job-name=wan2-quicktest
 #SBATCH --account=155924932299
-#SBATCH --partition=gpu
-#SBATCH --gres=gpu:h100:2
+#SBATCH --partition=gpu_debug
+#SBATCH --gres=gpu:h100:1
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=96
-#SBATCH --mem=488G
+#SBATCH --cpus-per-task=48
+#SBATCH --mem=244G
 #SBATCH --time=00:15:00
-#SBATCH --output=results/offload_%j.log
+#SBATCH --output=results/quicktest_%j.log
 
-# Offloading benchmark: WITH layerwise offloading
+# Quick test: 1 H100 with offloading to verify setup works
 
 set -e
 
@@ -26,7 +26,7 @@ eval "$(conda shell.bash hook)"
 conda activate ./venv
 
 echo "=========================================="
-echo "OFFLOAD BENCHMARK (With Layerwise Offload)"
+echo "QUICK TEST (1 H100, with offloading)"
 echo "=========================================="
 echo "Timestamp: $(date)"
 echo "Job ID: $SLURM_JOB_ID"
@@ -41,16 +41,14 @@ echo ""
 python -c "import torch; print(f'PyTorch: {torch.__version__}'); print(f'CUDA available: {torch.cuda.is_available()}'); print(f'GPU count: {torch.cuda.device_count()}')"
 echo ""
 
-# Start SGLang server in background - WITH layerwise offload
-echo "Starting SGLang server (with offloading)..."
+# Start SGLang server with offloading (1 GPU)
+echo "Starting SGLang server (1 GPU, with offloading)..."
 sglang serve \
     --model-path ./models/wan2.2 \
     --text-encoder-cpu-offload \
     --pin-cpu-memory \
     --dit-layerwise-offload true \
-    --num-gpus 2 \
-    --ulysses-degree 1 \
-    --ring-degree 2 \
+    --num-gpus 1 \
     --port 30010 &
 
 SERVER_PID=$!
@@ -59,14 +57,14 @@ echo "Server PID: $SERVER_PID"
 # Wait for server to be ready
 sleep 60
 
-# Run benchmark client
+# Quick single inference test
 echo ""
-echo "Running benchmark..."
+echo "Running quick test (1 inference)..."
 python scripts/benchmark_client.py \
     --base-url http://localhost:30010 \
-    --num-warmup 1 \
-    --num-runs 3 \
-    --config-name "offload_${SLURM_JOB_ID}" \
+    --num-warmup 0 \
+    --num-runs 1 \
+    --config-name "quicktest_${SLURM_JOB_ID}" \
     --output-dir ./results
 
 # Stop server
@@ -76,5 +74,5 @@ kill $SERVER_PID 2>/dev/null || true
 wait $SERVER_PID 2>/dev/null || true
 
 echo ""
-echo "Benchmark complete!"
+echo "Quick test complete!"
 echo "Timestamp: $(date)"

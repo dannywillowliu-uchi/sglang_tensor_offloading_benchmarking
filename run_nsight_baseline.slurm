@@ -2,7 +2,7 @@
 #SBATCH --job-name=wan2-nsight-base
 #SBATCH --account=155924932299
 #SBATCH --partition=gpu
-#SBATCH --gres=gpu:h100:4
+#SBATCH --gres=gpu:h100:2
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=96
@@ -96,8 +96,8 @@ nsys profile \
     --duration=600 \
     sglang serve \
         --model-path ./models/wan2.2 \
-        --num-gpus 4 \
-        --ulysses-degree 2 \
+        --num-gpus 2 \
+        --ulysses-degree 1 \
         --ring-degree 2 \
         --port 30010 &
 
