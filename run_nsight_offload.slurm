@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=wan2-nsight-offload
 #SBATCH --partition=gpu
-#SBATCH --gres=gpu:h100:8
+#SBATCH --gres=gpu:h100:4
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=64
@@ -95,9 +95,9 @@ nsys profile \
         --text-encoder-cpu-offload \
         --pin-cpu-memory \
         --dit-layerwise-offload true \
-        --num-gpus 8 \
+        --num-gpus 4 \
         --ulysses-degree 2 \
-        --ring-degree 4 \
+        --ring-degree 2 \
         --port 30010 &
 
 NSYS_PID=$!
