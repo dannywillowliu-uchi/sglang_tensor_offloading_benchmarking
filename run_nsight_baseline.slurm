@@ -104,7 +104,7 @@ NSYS_PID=$!
 echo "NSight profile PID: $NSYS_PID"
 
 # Wait for server startup
-sleep 180
+sleep 60
 
 # Run generation
 python /tmp/generate_once.py

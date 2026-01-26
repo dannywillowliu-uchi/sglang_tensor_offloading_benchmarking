@@ -56,7 +56,7 @@ SERVER_PID=$!
 echo "Server PID: $SERVER_PID"
 
 # Wait for server to be ready
-sleep 120
+sleep 60
 
 # Run benchmark client
 echo ""
