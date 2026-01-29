@@ -2,12 +2,12 @@
 #SBATCH --job-name=wan2-pure-gpu
 #SBATCH --account=155924932299
 #SBATCH --partition=gpu
-#SBATCH --gres=gpu:h100:4
+#SBATCH --gres=gpu:h100:8
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=48
 #SBATCH --mem=488G
-#SBATCH --time=00:20:00
+#SBATCH --time=00:30:00
 #SBATCH --output=results/pure_gpu_%j.log
 
 # PURE GPU: No offloading at all - everything stays on GPU
@@ -21,7 +21,7 @@ cd $SCRATCH/sglang-offload-research
 # Load modules
 module purge
 module load Miniforge3/25.3.0-3
-module load CUDA/12.4.0
+module load CUDA/12.8.0  # Matches PyTorch CUDA 12.8, provides nsys 2024.6
 module load GCC/12.3.0  # Required for FlashInfer JIT compilation
 
 # Activate environment
@@ -37,7 +37,7 @@ echo "Node: $(hostname)"
 echo ""
 echo "Command: sglang generate (matching PR setup)"
 echo "Config: All offloading disabled"
-echo "        --num-gpus 4 --ulysses-degree 4 --attention-backend sage_attn --enable-torch-compile"
+echo "        --num-gpus 8 --ulysses-degree 8 --attention-backend sage_attn --enable-torch-compile"
 echo "Expected: May OOM (14B model is large) or work with high VRAM usage"
 echo ""
 
@@ -69,8 +69,8 @@ time nsys profile \
     --dit-cpu-offload false \
     --dit-layerwise-offload false \
     --text-encoder-cpu-offload false \
-    --num-gpus 4 \
-    --ulysses-degree 4 \
+    --num-gpus 8 \
+    --ulysses-degree 8 \
     --attention-backend sage_attn \
     --enable-torch-compile \
     --prompt "A cat walks on the grass, realistic" \

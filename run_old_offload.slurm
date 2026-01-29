@@ -7,7 +7,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=48
 #SBATCH --mem=488G
-#SBATCH --time=00:20:00
+#SBATCH --time=00:30:00
 #SBATCH --output=results/old_offload_%j.log
 
 # OLD OFFLOAD: PR #15511 "before" config (main branch behavior)
@@ -21,7 +21,7 @@ cd $SCRATCH/sglang-offload-research
 # Load modules
 module purge
 module load Miniforge3/25.3.0-3
-module load CUDA/12.4.0
+module load CUDA/12.8.0  # Matches PyTorch CUDA 12.8, provides nsys 2024.6
 module load GCC/12.3.0  # Required for FlashInfer JIT compilation
 
 # Activate environment
