@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=nsys-demo
 #SBATCH --account=155924932299
-#SBATCH --partition=gpu_debug
+#SBATCH --partition=gpu
 #SBATCH --gres=gpu:h100:1
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1

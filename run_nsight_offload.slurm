@@ -1,16 +1,19 @@
 #!/bin/bash
-#SBATCH --job-name=wan2-nsight-offload
+#SBATCH --job-name=wan2-nsys-offload
 #SBATCH --account=155924932299
 #SBATCH --partition=gpu
-#SBATCH --gres=gpu:h100:2
+#SBATCH --gres=gpu:h100:4
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=96
+#SBATCH --cpus-per-task=48
 #SBATCH --mem=488G
-#SBATCH --time=00:15:00
-#SBATCH --output=results/nsight_offload_%j.log
+#SBATCH --time=00:45:00
+#SBATCH --output=results/nsys_offload_%j.log
 
-# NSight profiling: WITH layerwise offloading
+# NSYS PROFILING: NEW layerwise offload
+# Captures CUPTI-level events: Memcpy HtoD/DtoH with bytes, GPU kernels, NCCL
+# Uses sglang generate (CLI mode) for simpler profiling
+# 2 iterations: warmup + nsys-profiled run
 
 set -e
 
@@ -19,14 +22,15 @@ cd $SCRATCH/sglang-offload-research
 # Load modules
 module purge
 module load Miniforge3/25.3.0-3
-module load CUDA/12.4.0
+module load CUDA/12.8.0
+module load GCC/12.3.0
 
 # Activate environment
 eval "$(conda shell.bash hook)"
 conda activate ./venv
 
 echo "=========================================="
-echo "NSIGHT PROFILING - WITH OFFLOADING"
+echo "NSYS PROFILING - NEW OFFLOAD (layerwise)"
 echo "=========================================="
 echo "Timestamp: $(date)"
 echo "Job ID: $SLURM_JOB_ID"
@@ -37,88 +41,84 @@ echo ""
 nvidia-smi
 echo ""
 
-# Create output directory for profiles
-mkdir -p ./results/profiles
-
-# Verify nsys is available
+# Verify nsys
 which nsys
 nsys --version
 echo ""
 
-# Create a one-shot generation script
-cat > /tmp/generate_once.py << 'PYSCRIPT'
-import requests
-import time
-import sys
+# Verify environment
+python -c "import torch; print(f'PyTorch: {torch.__version__}'); print(f'CUDA available: {torch.cuda.is_available()}'); print(f'GPU count: {torch.cuda.device_count()}')"
+echo ""
 
-base_url = "http://localhost:30010"
+COMMON_FLAGS=(
+    --model-path Wan-AI/Wan2.2-T2V-A14B-Diffusers
+    --text-encoder-cpu-offload
+    --pin-cpu-memory
+    --dit-layerwise-offload true
+    --num-gpus 4
+    --ulysses-degree 4
+    --attention-backend sage_attn
+    --enable-torch-compile
+    --prompt "A cat walks on the grass, realistic"
+    --num-frames 81
+    --height 720
+    --width 1280
+    --num-inference-steps 27
+    --guidance-scale 3.5
+    --guidance-scale-2 4.0
+)
 
-# Wait for server
-print("Waiting for server...")
-for i in range(60):
-    try:
-        resp = requests.get(f"{base_url}/health", timeout=5)
-        if resp.status_code == 200:
-            print("Server ready!")
-            break
-    except:
-        pass
-    time.sleep(5)
-else:
-    print("Server not ready after 5 minutes")
-    sys.exit(1)
+export PYTHONUNBUFFERED=1
 
-# Generate one video
-print("Generating video...")
-payload = {
-    "prompt": "A serene lake with mountains in the background at sunset",
-    "size": "1280x720",
-    "num_frames": 81,
-    "num_inference_steps": 27,
-}
-start = time.perf_counter()
-resp = requests.post(f"{base_url}/v1/videos", json=payload, timeout=600)
-elapsed = time.perf_counter() - start
-print(f"Generation complete in {elapsed:.2f}s")
-print(f"Status: {resp.status_code}")
-PYSCRIPT
+mkdir -p ./results/profiles
 
-# Start profiled server WITH offloading
-echo "Starting NSight profiling (with offloading)..."
-nsys profile \
+# ==========================================
+# RUN 1: Warmup (torch.compile JIT, no profiling)
+# ==========================================
+echo "=========================================="
+echo "RUN 1/2: Warmup (torch.compile JIT)"
+echo "=========================================="
+echo "Start: $(date)"
+
+time sglang generate "${COMMON_FLAGS[@]}" \
+    --output-path ./results/nsys_offload_${SLURM_JOB_ID}_warmup.mp4
+
+echo "End: $(date)"
+echo ""
+
+# ==========================================
+# RUN 2: nsys-profiled run (CUPTI events)
+# ==========================================
+echo "=========================================="
+echo "RUN 2/2: nsys profiled run"
+echo "=========================================="
+echo "Start: $(date)"
+
+export SGLANG_DIFFUSION_STAGE_LOGGING=1
+export SGLANG_DIFFUSION_SYNC_STAGE_PROFILING=1
+
+time nsys profile \
     --trace=cuda,nvtx,osrt \
     --cuda-memory-usage=true \
-    --output=./results/profiles/offload_profile_${SLURM_JOB_ID} \
+    --trace-fork-before-exec=true \
+    --kill=none \
     --force-overwrite=true \
-    --duration=600 \
-    sglang serve \
-        --model-path ./models/wan2.2 \
-        --text-encoder-cpu-offload \
-        --pin-cpu-memory \
-        --dit-layerwise-offload true \
-        --num-gpus 2 \
-        --ulysses-degree 1 \
-        --ring-degree 2 \
-        --port 30010 &
+    --output=./results/profiles/new_offload_nsys_${SLURM_JOB_ID} \
+    sglang generate "${COMMON_FLAGS[@]}" \
+    --output-path ./results/nsys_offload_${SLURM_JOB_ID}_profiled.mp4
 
-NSYS_PID=$!
-echo "NSight profile PID: $NSYS_PID"
-
-# Wait for server startup
-sleep 60
-
-# Run generation
-python /tmp/generate_once.py
-
-# Give nsys time to capture
-sleep 30
-
-# Stop profiling
-kill -SIGINT $NSYS_PID 2>/dev/null || true
-wait $NSYS_PID 2>/dev/null || true
-
+echo "End: $(date)"
 echo ""
-echo "Profiling complete!"
-echo "Profile saved to: ./results/profiles/offload_profile_${SLURM_JOB_ID}.nsys-rep"
-ls -lh ./results/profiles/
+
+echo "=========================================="
+echo "nsys profiling complete!"
+echo "=========================================="
 echo "Timestamp: $(date)"
+echo ""
+echo "Outputs:"
+echo "  - Warmup: results/nsys_offload_${SLURM_JOB_ID}_warmup.mp4"
+echo "  - Profiled: results/nsys_offload_${SLURM_JOB_ID}_profiled.mp4"
+echo "  - nsys profile: results/profiles/new_offload_nsys_${SLURM_JOB_ID}.nsys-rep"
+echo ""
+echo "To analyze: nsys stats results/profiles/new_offload_nsys_${SLURM_JOB_ID}.nsys-rep"
+ls -lh ./results/profiles/

@@ -1,17 +1,17 @@
 #!/bin/bash
-#SBATCH --job-name=wan2-pure-gpu
+#SBATCH --job-name=wan2-old-6gpu
 #SBATCH --account=155924932299
 #SBATCH --partition=gpu
-#SBATCH --gres=gpu:h100:4
+#SBATCH --gres=gpu:h100:6
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=48
+#SBATCH --cpus-per-task=72
 #SBATCH --mem=488G
 #SBATCH --time=00:45:00
-#SBATCH --output=results/pure_gpu_%j.log
+#SBATCH --output=results/old_offload_6gpu_%j.log
 
-# PURE GPU: No offloading - everything stays on GPU VRAM
-# Uses --dit-cpu-offload false --dit-layerwise-offload false
+# OLD OFFLOAD 6-GPU: PR #15511 "before" config (full-model FSDP CPU offload)
+# Uses --text-encoder-cpu-offload --pin-cpu-memory --dit-layerwise-offload false
 # 3 iterations: warmup (torch.compile), clean timing, profiled run
 
 set -e
@@ -29,15 +29,14 @@ eval "$(conda shell.bash hook)"
 conda activate ./venv
 
 echo "=========================================="
-echo "PURE GPU BENCHMARK (3 iterations)"
+echo "OLD OFFLOAD BENCHMARK - 6 GPU (3 iterations)"
 echo "=========================================="
 echo "Timestamp: $(date)"
 echo "Job ID: $SLURM_JOB_ID"
 echo "Node: $(hostname)"
 echo ""
-echo "Config: --dit-cpu-offload false --dit-layerwise-offload false"
-echo "        --num-gpus 4 --ulysses-degree 4 --attention-backend sage_attn --enable-torch-compile"
-echo "NOTE: May OOM if 14B model cannot fit in 4x H100 VRAM without offloading"
+echo "Config: --text-encoder-cpu-offload --pin-cpu-memory --dit-layerwise-offload false"
+echo "        --num-gpus 6 --ulysses-degree 6 --attention-backend sage_attn --enable-torch-compile"
 echo ""
 
 # GPU info
@@ -51,11 +50,11 @@ echo ""
 # Common generation flags
 COMMON_FLAGS=(
     --model-path Wan-AI/Wan2.2-T2V-A14B-Diffusers
-    --dit-cpu-offload false
+    --text-encoder-cpu-offload
+    --pin-cpu-memory
     --dit-layerwise-offload false
-    --text-encoder-cpu-offload false
-    --num-gpus 4
-    --ulysses-degree 4
+    --num-gpus 6
+    --ulysses-degree 6
     --attention-backend sage_attn
     --enable-torch-compile
     --prompt "A cat walks on the grass, realistic"
@@ -78,7 +77,7 @@ echo "=========================================="
 echo "Start: $(date)"
 
 time sglang generate "${COMMON_FLAGS[@]}" \
-    --output-path ./results/pure_gpu_${SLURM_JOB_ID}_run1.mp4
+    --output-path ./results/old_offload_6gpu_${SLURM_JOB_ID}_run1.mp4
 
 echo "End: $(date)"
 echo ""
@@ -87,19 +86,12 @@ echo ""
 # RUN 2: Clean timing (no profiling overhead)
 # ==========================================
 echo "=========================================="
-echo "RUN 2/3: Clean timing (per-step logging, no profiler)"
+echo "RUN 2/3: Clean timing (no profiling)"
 echo "=========================================="
 echo "Start: $(date)"
 
-# Enable per-step logging for timing breakdown (minimal overhead, no profiler)
-export SGLANG_DIFFUSION_STAGE_LOGGING=1
-export SGLANG_DIFFUSION_SYNC_STAGE_PROFILING=1
-
 time sglang generate "${COMMON_FLAGS[@]}" \
-    --output-path ./results/pure_gpu_${SLURM_JOB_ID}_run2.mp4
-
-unset SGLANG_DIFFUSION_STAGE_LOGGING
-unset SGLANG_DIFFUSION_SYNC_STAGE_PROFILING
+    --output-path ./results/old_offload_6gpu_${SLURM_JOB_ID}_run2.mp4
 
 echo "End: $(date)"
 echo ""
@@ -120,8 +112,8 @@ time sglang generate "${COMMON_FLAGS[@]}" \
     --profile \
     --profile-all-stages \
     --num-profiled-timesteps -1 \
-    --perf-dump-path ./results/perf_pure_gpu_${SLURM_JOB_ID}.json \
-    --output-path ./results/pure_gpu_${SLURM_JOB_ID}_run3.mp4
+    --perf-dump-path ./results/perf_old_offload_6gpu_${SLURM_JOB_ID}.json \
+    --output-path ./results/old_offload_6gpu_${SLURM_JOB_ID}_run3.mp4
 
 echo "End: $(date)"
 echo ""
@@ -132,9 +124,9 @@ echo "=========================================="
 echo "Timestamp: $(date)"
 echo ""
 echo "Outputs:"
-echo "  - Run 1 (warmup): results/pure_gpu_${SLURM_JOB_ID}_run1.mp4"
-echo "  - Run 2 (clean):  results/pure_gpu_${SLURM_JOB_ID}_run2.mp4  <-- USE THIS TIMING"
-echo "  - Run 3 (profiled): results/pure_gpu_${SLURM_JOB_ID}_run3.mp4"
+echo "  - Run 1 (warmup): results/old_offload_6gpu_${SLURM_JOB_ID}_run1.mp4"
+echo "  - Run 2 (clean):  results/old_offload_6gpu_${SLURM_JOB_ID}_run2.mp4  <-- USE THIS TIMING"
+echo "  - Run 3 (profiled): results/old_offload_6gpu_${SLURM_JOB_ID}_run3.mp4"
 echo "  - Profiler traces: logs/*.trace.json.gz"
 echo ""
 echo "NOTE: Use Run 2 timing for fair comparison (no profiling overhead)"

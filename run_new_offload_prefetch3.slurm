@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=wan2-pure-gpu
+#SBATCH --job-name=wan2-new-pf3
 #SBATCH --account=155924932299
 #SBATCH --partition=gpu
 #SBATCH --gres=gpu:h100:4
@@ -8,10 +8,10 @@
 #SBATCH --cpus-per-task=48
 #SBATCH --mem=488G
 #SBATCH --time=00:45:00
-#SBATCH --output=results/pure_gpu_%j.log
+#SBATCH --output=results/new_offload_pf3_%j.log
 
-# PURE GPU: No offloading - everything stays on GPU VRAM
-# Uses --dit-cpu-offload false --dit-layerwise-offload false
+# NEW OFFLOAD with PREFETCH_SIZE=3: Tests if prefetching 3 layers ahead reduces stalls
+# Compared to default prefetch_size=1, adds ~1.3 GB VRAM but may improve overlap
 # 3 iterations: warmup (torch.compile), clean timing, profiled run
 
 set -e
@@ -29,15 +29,14 @@ eval "$(conda shell.bash hook)"
 conda activate ./venv
 
 echo "=========================================="
-echo "PURE GPU BENCHMARK (3 iterations)"
+echo "NEW OFFLOAD + PREFETCH=3 BENCHMARK (3 iterations)"
 echo "=========================================="
 echo "Timestamp: $(date)"
 echo "Job ID: $SLURM_JOB_ID"
 echo "Node: $(hostname)"
 echo ""
-echo "Config: --dit-cpu-offload false --dit-layerwise-offload false"
+echo "Config: --dit-layerwise-offload true --dit-offload-prefetch-size 3"
 echo "        --num-gpus 4 --ulysses-degree 4 --attention-backend sage_attn --enable-torch-compile"
-echo "NOTE: May OOM if 14B model cannot fit in 4x H100 VRAM without offloading"
 echo ""
 
 # GPU info
@@ -51,9 +50,10 @@ echo ""
 # Common generation flags
 COMMON_FLAGS=(
     --model-path Wan-AI/Wan2.2-T2V-A14B-Diffusers
-    --dit-cpu-offload false
-    --dit-layerwise-offload false
-    --text-encoder-cpu-offload false
+    --text-encoder-cpu-offload
+    --pin-cpu-memory
+    --dit-layerwise-offload true
+    --dit-offload-prefetch-size 3
     --num-gpus 4
     --ulysses-degree 4
     --attention-backend sage_attn
@@ -78,7 +78,7 @@ echo "=========================================="
 echo "Start: $(date)"
 
 time sglang generate "${COMMON_FLAGS[@]}" \
-    --output-path ./results/pure_gpu_${SLURM_JOB_ID}_run1.mp4
+    --output-path ./results/new_offload_pf3_${SLURM_JOB_ID}_run1.mp4
 
 echo "End: $(date)"
 echo ""
@@ -91,12 +91,12 @@ echo "RUN 2/3: Clean timing (per-step logging, no profiler)"
 echo "=========================================="
 echo "Start: $(date)"
 
-# Enable per-step logging for timing breakdown (minimal overhead, no profiler)
+# Enable per-step logging for timing breakdown
 export SGLANG_DIFFUSION_STAGE_LOGGING=1
 export SGLANG_DIFFUSION_SYNC_STAGE_PROFILING=1
 
 time sglang generate "${COMMON_FLAGS[@]}" \
-    --output-path ./results/pure_gpu_${SLURM_JOB_ID}_run2.mp4
+    --output-path ./results/new_offload_pf3_${SLURM_JOB_ID}_run2.mp4
 
 unset SGLANG_DIFFUSION_STAGE_LOGGING
 unset SGLANG_DIFFUSION_SYNC_STAGE_PROFILING
@@ -112,7 +112,6 @@ echo "RUN 3/3: Profiled run (torch.profiler)"
 echo "=========================================="
 echo "Start: $(date)"
 
-# Enable sync profiling for accurate per-step timing
 export SGLANG_DIFFUSION_SYNC_STAGE_PROFILING=1
 export SGLANG_DIFFUSION_STAGE_LOGGING=1
 
@@ -120,8 +119,8 @@ time sglang generate "${COMMON_FLAGS[@]}" \
     --profile \
     --profile-all-stages \
     --num-profiled-timesteps -1 \
-    --perf-dump-path ./results/perf_pure_gpu_${SLURM_JOB_ID}.json \
-    --output-path ./results/pure_gpu_${SLURM_JOB_ID}_run3.mp4
+    --perf-dump-path ./results/perf_new_offload_pf3_${SLURM_JOB_ID}.json \
+    --output-path ./results/new_offload_pf3_${SLURM_JOB_ID}_run3.mp4
 
 echo "End: $(date)"
 echo ""
@@ -132,9 +131,8 @@ echo "=========================================="
 echo "Timestamp: $(date)"
 echo ""
 echo "Outputs:"
-echo "  - Run 1 (warmup): results/pure_gpu_${SLURM_JOB_ID}_run1.mp4"
-echo "  - Run 2 (clean):  results/pure_gpu_${SLURM_JOB_ID}_run2.mp4  <-- USE THIS TIMING"
-echo "  - Run 3 (profiled): results/pure_gpu_${SLURM_JOB_ID}_run3.mp4"
-echo "  - Profiler traces: logs/*.trace.json.gz"
+echo "  - Run 1 (warmup): results/new_offload_pf3_${SLURM_JOB_ID}_run1.mp4"
+echo "  - Run 2 (clean):  results/new_offload_pf3_${SLURM_JOB_ID}_run2.mp4  <-- USE THIS TIMING"
+echo "  - Run 3 (profiled): results/new_offload_pf3_${SLURM_JOB_ID}_run3.mp4"
 echo ""
-echo "NOTE: Use Run 2 timing for fair comparison (no profiling overhead)"
+echo "NOTE: Compare Run 2 timing with default prefetch_size=1 (run_new_offload.slurm)"

@@ -1,12 +1,12 @@
 #!/bin/bash
 #SBATCH --job-name=wan2-baseline
 #SBATCH --account=155924932299
-#SBATCH --partition=gpu
+#SBATCH --partition=gpu_debug
 #SBATCH --gres=gpu:h100:2
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=96
-#SBATCH --mem=488G
+#SBATCH --cpus-per-task=48
+#SBATCH --mem=244G
 #SBATCH --time=00:15:00
 #SBATCH --output=results/baseline_%j.log
 
@@ -44,7 +44,7 @@ echo ""
 # Start SGLang server in background - BASELINE (no offloading)
 echo "Starting SGLang server (baseline - no offloading)..."
 sglang serve \
-    --model-path ./models/wan2.2 \
+    --model-path Wan-AI/Wan2.2-T2V-A14B-Diffusers \
     --num-gpus 2 \
     --ulysses-degree 1 \
     --ring-degree 2 \
@@ -61,8 +61,8 @@ echo ""
 echo "Running benchmark..."
 python scripts/benchmark_client.py \
     --base-url http://localhost:30010 \
-    --num-warmup 1 \
-    --num-runs 3 \
+    --num-warmup 0 \
+    --num-runs 1 \
     --config-name "baseline_${SLURM_JOB_ID}" \
     --output-dir ./results
 

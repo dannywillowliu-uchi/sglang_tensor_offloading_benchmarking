@@ -1,0 +1,104 @@
+==========================================
+PROFILE: NEW OFFLOAD (PR #15511 'after')
+==========================================
+Timestamp: Fri Jan 30 22:44:04 CST 2026
+Job ID: 1422882
+Node: ac045
+
+Fri Jan 30 22:44:04 2026       
++---------------------------------------------------------------------------------------+
+| NVIDIA-SMI 535.288.01             Driver Version: 535.288.01   CUDA Version: 12.2     |
+|-----------------------------------------+----------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |         Memory-Usage | GPU-Util  Compute M. |
+|                                         |                      |               MIG M. |
+|=========================================+======================+======================|
+|   0  NVIDIA H100 PCIe               On  | 00000000:10:00.0 Off |                    0 |
+| N/A   20C    P0              48W / 350W |      0MiB / 81559MiB |      0%      Default |
+|                                         |                      |             Disabled |
++-----------------------------------------+----------------------+----------------------+
+|   1  NVIDIA H100 PCIe               On  | 00000000:11:00.0 Off |                    0 |
+| N/A   20C    P0              47W / 350W |      0MiB / 81559MiB |      0%      Default |
+|                                         |                      |             Disabled |
++-----------------------------------------+----------------------+----------------------+
+|   2  NVIDIA H100 PCIe               On  | 00000000:12:00.0 Off |                    0 |
+| N/A   18C    P0              46W / 350W |      0MiB / 81559MiB |      0%      Default |
+|                                         |                      |             Disabled |
++-----------------------------------------+----------------------+----------------------+
+|   3  NVIDIA H100 PCIe               On  | 00000000:13:00.0 Off |                    0 |
+| N/A   20C    P0              46W / 350W |      0MiB / 81559MiB |      0%      Default |
+|                                         |                      |             Disabled |
++-----------------------------------------+----------------------+----------------------+
+|   4  NVIDIA H100 PCIe               On  | 00000000:14:00.0 Off |                    0 |
+| N/A   19C    P0              46W / 350W |      0MiB / 81559MiB |      0%      Default |
+|                                         |                      |             Disabled |
++-----------------------------------------+----------------------+----------------------+
+|   5  NVIDIA H100 PCIe               On  | 00000000:15:00.0 Off |                    0 |
+| N/A   19C    P0              46W / 350W |      0MiB / 81559MiB |      0%      Default |
+|                                         |                      |             Disabled |
++-----------------------------------------+----------------------+----------------------+
+|   6  NVIDIA H100 PCIe               On  | 00000000:16:00.0 Off |                    0 |
+| N/A   22C    P0              47W / 350W |      0MiB / 81559MiB |      0%      Default |
+|                                         |                      |             Disabled |
++-----------------------------------------+----------------------+----------------------+
+|   7  NVIDIA H100 PCIe               On  | 00000000:17:00.0 Off |                    0 |
+| N/A   20C    P0              48W / 350W |      0MiB / 81559MiB |      0%      Default |
+|                                         |                      |             Disabled |
++-----------------------------------------+----------------------+----------------------+
+                                                                                         
++---------------------------------------------------------------------------------------+
+| Processes:                                                                            |
+|  GPU   GI   CI        PID   Type   Process name                            GPU Memory |
+|        ID   ID                                                             Usage      |
+|=======================================================================================|
+|  No running processes found                                                           |
++---------------------------------------------------------------------------------------+
+
+PyTorch: 2.9.1+cu128
+CUDA: 12.8
+GPUs: 8
+
+Running nsys profile + sglang generate (new offload)...
+
+[01-30 22:46:47] dit_layerwise_offload is enabled, automatically disabling dit_cpu_offload.
+[01-30 22:46:47] server_args: {"model_path": "./models/wan2.2", "backend": "auto", "attention_backend": "sage_attn", "diffusers_attention_backend": null, "nccl_port": null, "trust_remote_code": false, "revision": null, "num_gpus": 8, "tp_size": 1, "sp_degree": 8, "ulysses_degree": 8, "ring_degree": 1, "dp_size": 1, "dp_degree": 1, "enable_cfg_parallel": false, "hsdp_replicate_dim": 1, "hsdp_shard_dim": 8, "dist_timeout": null, "pipeline_class_name": null, "lora_path": null, "lora_nickname": "default", "vae_path": null, "lora_target_modules": null, "dit_cpu_offload": false, "dit_layerwise_offload": true, "text_encoder_cpu_offload": true, "image_encoder_cpu_offload": true, "vae_cpu_offload": true, "use_fsdp_inference": false, "pin_cpu_memory": true, "comfyui_mode": false, "mask_strategy_file_path": null, "STA_mode": "STA_inference", "skip_time_steps": 15, "enable_torch_compile": true, "warmup": false, "warmup_resolutions": null, "disable_autocast": false, "VSA_sparsity": 0.0, "moba_config_path": null, "moba_config": {}, "master_port": 30058, "host": "127.0.0.1", "port": 30000, "webui": false, "webui_port": 12312, "scheduler_port": 5591, "output_path": "./results/new_offload_1422882.mp4", "prompt_file_path": null, "model_paths": {}, "model_loaded": {"transformer": true, "vae": true}, "boundary_ratio": null, "log_level": "info"}
+[01-30 22:46:47] Local mode: True
+[01-30 22:46:47] Starting server...
+[01-30 22:46:58] Scheduler bind at endpoint: tcp://127.0.0.1:5591
+[01-30 22:46:59] Initializing distributed environment with world_size=8, device=cuda:0
+[01-30 22:47:03] Found nccl from library libnccl.so.2
+[01-30 22:47:03] sglang-diffusion is using nccl==2.27.5
+[01-30 22:47:05] Found nccl from library libnccl.so.2
+[01-30 22:47:05] sglang-diffusion is using nccl==2.27.5
+[01-30 22:47:05] No pipeline_class_name specified, using model_index.json
+[01-30 22:47:05] Diffusers version: 0.35.0.dev0
+[01-30 22:47:05] Diffusers version: 0.35.0.dev0
+[01-30 22:47:05] Using native sglang backend for model './models/wan2.2'
+[01-30 22:47:05] Found model info: ModelInfo(pipeline_cls=<class 'sglang.multimodal_gen.runtime.pipelines.wan_pipeline.WanPipeline'>, sampling_param_cls=<class 'sglang.multimodal_gen.configs.sample.wan.WanT2V_1_3B_SamplingParams'>, pipeline_config_cls=<class 'sglang.multimodal_gen.configs.pipeline_configs.wan.WanT2V480PConfig'>)
+[01-30 22:47:05] Using pipeline from model_index.json: WanPipeline
+[01-30 22:47:05] Loading pipeline modules...
+[01-30 22:47:05] Model already exists locally and is complete
+[01-30 22:47:05] Model path: ./models/wan2.2
+[01-30 22:47:05] Diffusers version: 0.35.0.dev0
+[01-30 22:47:05] Loading pipeline modules from config: {'_class_name': 'WanPipeline', '_diffusers_version': '0.35.0.dev0', 'boundary_ratio': 0.875, 'scheduler': ['diffusers', 'UniPCMultistepScheduler'], 'text_encoder': ['transformers', 'UMT5EncoderModel'], 'tokenizer': ['transformers', 'T5TokenizerFast'], 'transformer': ['diffusers', 'WanTransformer3DModel'], 'transformer_2': ['diffusers', 'WanTransformer3DModel'], 'vae': ['diffusers', 'AutoencoderKLWan']}
+[01-30 22:47:05] MoE pipeline detected. Adding transformer_2 to self.required_config_modules...
+[01-30 22:47:05] MoE pipeline detected. Setting boundary ratio to 0.875
+[01-30 22:47:05] Loading required components: ['text_encoder', 'tokenizer', 'vae', 'transformer', 'scheduler', 'transformer_2']
+Loading required modules:   0%|          | 0/6 [00:00<?, ?it/s]Loading required modules:   0%|          | 0/6 [00:00<?, ?it/s]Loading required modules:   0%|          | 0/6 [00:00<?, ?it/s]Loading required modules:   0%|          | 0/6 [00:00<?, ?it/s]Loading required modules:   0%|          | 0/6 [00:00<?, ?it/s]Loading required modules:   0%|          | 0/6 [00:00<?, ?it/s]Loading required modules:   0%|          | 0/6 [00:00<?, ?it/s]Loading required modules:   0%|          | 0/6 [00:00<?, ?it/s][01-30 22:47:05] Loading text_encoder from ./models/wan2.2/text_encoder. avail mem: 75.29 GB
+[01-30 22:47:20] [RunAI Streamer] Overall time to stream 10.6 GiB of all files to cpu: 14.08s, 769.3 MiB/s
+[01-30 22:47:20] [RunAI Streamer] Overall time to stream 10.6 GiB of all files to cpu: 12.95s, 836.7 MiB/s
+[01-30 22:47:20] [RunAI Streamer] Overall time to stream 10.6 GiB of all files to cpu: 13.04s, 831.2 MiB/s
+[01-30 22:47:20] [RunAI Streamer] Overall time to stream 10.6 GiB of all files to cpu: 13.02s, 832.4 MiB/s
+[01-30 22:47:20] [RunAI Streamer] Overall time to stream 10.6 GiB of all files to cpu: 13.02s, 832.3 MiB/s
+[01-30 22:47:20] [RunAI Streamer] Overall time to stream 10.6 GiB of all files to cpu: 13.06s, 829.5 MiB/s
+[01-30 22:47:20] [RunAI Streamer] Overall time to stream 10.6 GiB of all files to cpu: 13.07s, 829.2 MiB/s
+[01-30 22:47:20] [RunAI Streamer] Overall time to stream 10.6 GiB of all files to cpu: 13.08s, 828.4 MiB/s
+[01-30 22:47:45] Loaded text_encoder: FSDPUMT5EncoderModel (sgl-diffusion version). model size: 21.16 GB, avail mem: 71.27 GB
+Loading required modules:  17%|█▋        | 1/6 [00:39<03:18, 39.65s/it][01-30 22:47:45] Loading tokenizer from ./models/wan2.2/tokenizer. avail mem: 71.27 GB
+[01-30 22:47:47] Loaded tokenizer: T5TokenizerFast (sgl-diffusion version). model size: 0.02 GB, avail mem: 71.25 GB
+Loading required modules:  33%|███▎      | 2/6 [00:41<01:08, 17.23s/it][01-30 22:47:47] Loading vae from ./models/wan2.2/vae. avail mem: 71.24 GB
+Loading required modules:  17%|█▋        | 1/6 [00:41<03:26, 41.31s/it][01-30 22:47:47] Loaded vae: AutoencoderKLWan (sgl-diffusion version). model size: 0.27 GB, avail mem: 71.23 GB
+Loading required modules:  50%|█████     | 3/6 [00:41<00:28,  9.58s/it][01-30 22:47:47] Loading transformer from ./models/wan2.2/transformer. avail mem: 71.23 GB
+[01-30 22:47:47] Loading WanTransformer3DModel from 12 safetensors files, default_dtype: torch.bfloat16
+[01-30 22:47:47] Using Sage Attention backend
+Loading required modules:  33%|███▎      | 2/6 [00:41<01:09, 17.35s/it]Loading required modules:  50%|█████     | 3/6 [00:42<00:28,  9.51s/it]Loading required modules:  17%|█▋        | 1/6 [00:42<03:30, 42.11s/it]Loading required modules:  17%|█▋        | 1/6 [00:42<03:31, 42.29s/it]Loading required modules:  17%|█▋        | 1/6 [00:42<03:32, 42.54s/it]Loading required modules:  17%|█▋        | 1/6 [00:42<03:32, 42.54s/it]Loading required modules:  33%|███▎      | 2/6 [00:42<01:10, 17.62s/it]Loading required modules:  50%|█████     | 3/6 [00:42<00:28,  9.65s/it]Loading required modules:  33%|███▎      | 2/6 [00:42<01:10, 17.69s/it]Loading required modules:  17%|█▋        | 1/6 [00:42<03:33, 42.76s/it]Loading required modules:  17%|█▋        | 1/6 [00:42<03:34, 42.88s/it]Loading required modules:  50%|█████     | 3/6 [00:42<00:29,  9.68s/it]Loading required modules:  33%|███▎      | 2/6 [00:42<01:11, 17.78s/it]Loading required modules:  33%|███▎      | 2/6 [00:42<01:11, 17.78s/it]Loading required modules:  50%|█████     | 3/6 [00:43<00:29,  9.73s/it]Loading required modules:  50%|█████     | 3/6 [00:43<00:29,  9.74s/it]Loading required modules:  33%|███▎      | 2/6 [00:43<01:11, 17.87s/it]Loading required modules:  33%|███▎      | 2/6 [00:43<01:11, 17.91s/it]Loading required modules:  50%|█████     | 3/6 [00:43<00:29,  9.78s/it]Loading required modules:  50%|█████     | 3/6 [00:43<00:29,  9.91s/it][2026-01-30T23:14:08.004] error: *** JOB 1422882 ON ac045 CANCELLED AT 2026-01-30T23:14:08 DUE TO TIME LIMIT ***

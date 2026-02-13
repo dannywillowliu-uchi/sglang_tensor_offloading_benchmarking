@@ -1,0 +1,778 @@
+==========================================
+PROFILE: PURE GPU (No Offloading)
+==========================================
+Timestamp: Fri Jan 30 23:45:20 CST 2026
+Job ID: 1422884
+Node: ac045
+
+Fri Jan 30 23:45:20 2026       
++---------------------------------------------------------------------------------------+
+| NVIDIA-SMI 535.288.01             Driver Version: 535.288.01   CUDA Version: 12.2     |
+|-----------------------------------------+----------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |         Memory-Usage | GPU-Util  Compute M. |
+|                                         |                      |               MIG M. |
+|=========================================+======================+======================|
+|   0  NVIDIA H100 PCIe               On  | 00000000:10:00.0 Off |                    0 |
+| N/A   21C    P0              48W / 350W |      0MiB / 81559MiB |      0%      Default |
+|                                         |                      |             Disabled |
++-----------------------------------------+----------------------+----------------------+
+|   1  NVIDIA H100 PCIe               On  | 00000000:11:00.0 Off |                    0 |
+| N/A   21C    P0              47W / 350W |      0MiB / 81559MiB |      0%      Default |
+|                                         |                      |             Disabled |
++-----------------------------------------+----------------------+----------------------+
+|   2  NVIDIA H100 PCIe               On  | 00000000:12:00.0 Off |                    0 |
+| N/A   19C    P0              46W / 350W |      0MiB / 81559MiB |      0%      Default |
+|                                         |                      |             Disabled |
++-----------------------------------------+----------------------+----------------------+
+|   3  NVIDIA H100 PCIe               On  | 00000000:13:00.0 Off |                    0 |
+| N/A   21C    P0              46W / 350W |      0MiB / 81559MiB |      0%      Default |
+|                                         |                      |             Disabled |
++-----------------------------------------+----------------------+----------------------+
+|   4  NVIDIA H100 PCIe               On  | 00000000:14:00.0 Off |                    0 |
+| N/A   20C    P0              47W / 350W |      0MiB / 81559MiB |      0%      Default |
+|                                         |                      |             Disabled |
++-----------------------------------------+----------------------+----------------------+
+|   5  NVIDIA H100 PCIe               On  | 00000000:15:00.0 Off |                    0 |
+| N/A   20C    P0              46W / 350W |      0MiB / 81559MiB |      0%      Default |
+|                                         |                      |             Disabled |
++-----------------------------------------+----------------------+----------------------+
+|   6  NVIDIA H100 PCIe               On  | 00000000:16:00.0 Off |                    0 |
+| N/A   22C    P0              47W / 350W |      0MiB / 81559MiB |      0%      Default |
+|                                         |                      |             Disabled |
++-----------------------------------------+----------------------+----------------------+
+|   7  NVIDIA H100 PCIe               On  | 00000000:17:00.0 Off |                    0 |
+| N/A   20C    P0              48W / 350W |      0MiB / 81559MiB |      0%      Default |
+|                                         |                      |             Disabled |
++-----------------------------------------+----------------------+----------------------+
+                                                                                         
++---------------------------------------------------------------------------------------+
+| Processes:                                                                            |
+|  GPU   GI   CI        PID   Type   Process name                            GPU Memory |
+|        ID   ID                                                             Usage      |
+|=======================================================================================|
+|  No running processes found                                                           |
++---------------------------------------------------------------------------------------+
+
+PyTorch: 2.9.1+cu128
+CUDA: 12.8
+GPUs: 8
+
+Running nsys profile + sglang generate (pure GPU)...
+
+[01-30 23:45:43] server_args: {"model_path": "./models/wan2.2", "backend": "auto", "attention_backend": "sage_attn", "diffusers_attention_backend": null, "nccl_port": null, "trust_remote_code": false, "revision": null, "num_gpus": 8, "tp_size": 1, "sp_degree": 8, "ulysses_degree": 8, "ring_degree": 1, "dp_size": 1, "dp_degree": 1, "enable_cfg_parallel": false, "hsdp_replicate_dim": 1, "hsdp_shard_dim": 8, "dist_timeout": null, "pipeline_class_name": null, "lora_path": null, "lora_nickname": "default", "vae_path": null, "lora_target_modules": null, "dit_cpu_offload": false, "dit_layerwise_offload": false, "text_encoder_cpu_offload": false, "image_encoder_cpu_offload": true, "vae_cpu_offload": true, "use_fsdp_inference": false, "pin_cpu_memory": true, "comfyui_mode": false, "mask_strategy_file_path": null, "STA_mode": "STA_inference", "skip_time_steps": 15, "enable_torch_compile": true, "warmup": false, "warmup_resolutions": null, "disable_autocast": false, "VSA_sparsity": 0.0, "moba_config_path": null, "moba_config": {}, "master_port": 30031, "host": "127.0.0.1", "port": 30000, "webui": false, "webui_port": 12312, "scheduler_port": 5568, "output_path": "./results/pure_gpu_1422884.mp4", "prompt_file_path": null, "model_paths": {}, "model_loaded": {"transformer": true, "vae": true}, "boundary_ratio": null, "log_level": "info"}
+[01-30 23:45:43] Local mode: True
+[01-30 23:45:43] Starting server...
+[01-30 23:45:54] Scheduler bind at endpoint: tcp://127.0.0.1:5568
+[01-30 23:45:55] Initializing distributed environment with world_size=8, device=cuda:0
+[01-30 23:45:57] Found nccl from library libnccl.so.2
+[01-30 23:45:57] sglang-diffusion is using nccl==2.27.5
+[01-30 23:45:58] Found nccl from library libnccl.so.2
+[01-30 23:45:58] sglang-diffusion is using nccl==2.27.5
+[01-30 23:45:59] No pipeline_class_name specified, using model_index.json
+[01-30 23:45:59] Diffusers version: 0.35.0.dev0
+[01-30 23:45:59] Diffusers version: 0.35.0.dev0
+[01-30 23:45:59] Using native sglang backend for model './models/wan2.2'
+[01-30 23:45:59] Found model info: ModelInfo(pipeline_cls=<class 'sglang.multimodal_gen.runtime.pipelines.wan_pipeline.WanPipeline'>, sampling_param_cls=<class 'sglang.multimodal_gen.configs.sample.wan.WanT2V_1_3B_SamplingParams'>, pipeline_config_cls=<class 'sglang.multimodal_gen.configs.pipeline_configs.wan.WanT2V480PConfig'>)
+[01-30 23:45:59] Using pipeline from model_index.json: WanPipeline
+[01-30 23:45:59] Loading pipeline modules...
+[01-30 23:45:59] Model already exists locally and is complete
+[01-30 23:45:59] Model path: ./models/wan2.2
+[01-30 23:45:59] Diffusers version: 0.35.0.dev0
+[01-30 23:45:59] Loading pipeline modules from config: {'_class_name': 'WanPipeline', '_diffusers_version': '0.35.0.dev0', 'boundary_ratio': 0.875, 'scheduler': ['diffusers', 'UniPCMultistepScheduler'], 'text_encoder': ['transformers', 'UMT5EncoderModel'], 'tokenizer': ['transformers', 'T5TokenizerFast'], 'transformer': ['diffusers', 'WanTransformer3DModel'], 'transformer_2': ['diffusers', 'WanTransformer3DModel'], 'vae': ['diffusers', 'AutoencoderKLWan']}
+[01-30 23:45:59] MoE pipeline detected. Adding transformer_2 to self.required_config_modules...
+[01-30 23:45:59] MoE pipeline detected. Setting boundary ratio to 0.875
+[01-30 23:45:59] Loading required components: ['text_encoder', 'tokenizer', 'vae', 'transformer', 'scheduler', 'transformer_2']
+Loading required modules:   0%|          | 0/6 [00:00<?, ?it/s]Loading required modules:   0%|          | 0/6 [00:00<?, ?it/s]Loading required modules:   0%|          | 0/6 [00:00<?, ?it/s]Loading required modules:   0%|          | 0/6 [00:00<?, ?it/s]Loading required modules:   0%|          | 0/6 [00:00<?, ?it/s]Loading required modules:   0%|          | 0/6 [00:00<?, ?it/s]Loading required modules:   0%|          | 0/6 [00:00<?, ?it/s]Loading required modules:   0%|          | 0/6 [00:00<?, ?it/s][01-30 23:45:59] Loading text_encoder from ./models/wan2.2/text_encoder. avail mem: 75.27 GB
+[01-30 23:46:04] [RunAI Streamer] Overall time to stream 10.6 GiB of all files to cpu: 3.15s, 3.4 GiB/s
+Loading required modules:  17%|█▋        | 1/6 [00:04<00:22,  4.57s/it][01-30 23:46:04] [RunAI Streamer] Overall time to stream 10.6 GiB of all files to cpu: 3.58s, 3.0 GiB/s
+Loading required modules:  17%|█▋        | 1/6 [00:04<00:24,  4.99s/it][01-30 23:46:04] [RunAI Streamer] Overall time to stream 10.6 GiB of all files to cpu: 3.68s, 2.9 GiB/s
+Loading required modules:  17%|█▋        | 1/6 [00:05<00:25,  5.10s/it][01-30 23:46:04] [RunAI Streamer] Overall time to stream 10.6 GiB of all files to cpu: 3.92s, 2.7 GiB/s
+Loading required modules:  33%|███▎      | 2/6 [00:05<00:08,  2.22s/it][01-30 23:46:04] [RunAI Streamer] Overall time to stream 10.6 GiB of all files to cpu: 3.78s, 2.8 GiB/s
+[01-30 23:46:04] Loaded text_encoder: UMT5EncoderModel (sgl-diffusion version). model size: 21.16 GB, avail mem: 50.92 GB
+Loading required modules:  17%|█▋        | 1/6 [00:05<00:25,  5.16s/it][01-30 23:46:04] Loading tokenizer from ./models/wan2.2/tokenizer. avail mem: 50.92 GB
+Loading required modules:  17%|█▋        | 1/6 [00:05<00:25,  5.19s/it][01-30 23:46:04] [RunAI Streamer] Overall time to stream 10.6 GiB of all files to cpu: 3.81s, 2.8 GiB/s
+Loading required modules:  17%|█▋        | 1/6 [00:05<00:26,  5.22s/it][01-30 23:46:04] [RunAI Streamer] Overall time to stream 10.6 GiB of all files to cpu: 3.91s, 2.7 GiB/s
+Loading required modules:  17%|█▋        | 1/6 [00:05<00:26,  5.32s/it][01-30 23:46:04] [RunAI Streamer] Overall time to stream 10.6 GiB of all files to cpu: 4.01s, 2.6 GiB/s
+Loading required modules:  50%|█████     | 3/6 [00:05<00:03,  1.32s/it]Loading required modules:  17%|█▋        | 1/6 [00:05<00:27,  5.41s/it]Loading required modules:  33%|███▎      | 2/6 [00:05<00:09,  2.35s/it]Loading required modules:  33%|███▎      | 2/6 [00:05<00:09,  2.38s/it][01-30 23:46:05] Loaded tokenizer: T5TokenizerFast (sgl-diffusion version). model size: 0.00 GB, avail mem: 50.92 GB
+Loading required modules:  33%|███▎      | 2/6 [00:05<00:09,  2.40s/it][01-30 23:46:05] Loading vae from ./models/wan2.2/vae. avail mem: 50.92 GB
+Loading required modules:  33%|███▎      | 2/6 [00:05<00:09,  2.41s/it]Loading required modules:  50%|█████     | 3/6 [00:05<00:04,  1.35s/it]Loading required modules:  33%|███▎      | 2/6 [00:05<00:09,  2.42s/it]Loading required modules:  50%|█████     | 3/6 [00:05<00:04,  1.37s/it]Loading required modules:  33%|███▎      | 2/6 [00:05<00:09,  2.46s/it][01-30 23:46:05] Loaded vae: AutoencoderKLWan (sgl-diffusion version). model size: 0.27 GB, avail mem: 50.92 GB
+Loading required modules:  50%|█████     | 3/6 [00:05<00:04,  1.39s/it][01-30 23:46:05] Loading transformer from ./models/wan2.2/transformer. avail mem: 50.92 GB
+[01-30 23:46:05] Loading WanTransformer3DModel from 12 safetensors files, default_dtype: torch.bfloat16
+Loading required modules:  50%|█████     | 3/6 [00:05<00:04,  1.39s/it][01-30 23:46:05] Using Sage Attention backend
+Loading required modules:  50%|█████     | 3/6 [00:05<00:04,  1.40s/it]Loading required modules:  33%|███▎      | 2/6 [00:05<00:09,  2.49s/it]Loading required modules:  50%|█████     | 3/6 [00:05<00:04,  1.41s/it]Loading required modules:  50%|█████     | 3/6 [00:06<00:04,  1.43s/it][01-30 23:47:15] Rank 0 scheduler is dead. Please check if there are relevant logs.
+[rank7]:[W130 23:47:15.490439114 TCPStore.cpp:125] [c10d] recvValue failed on SocketImpl(fd=109, addr=[localhost]:43042, remote=[localhost]:30031): Connection reset by peer
+Exception raised from recvBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:679 (most recent call first):
+frame #0: <unknown function> + 0x9c278 (0x149e6f709278 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x80 (0x149e6f70ab80 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #2: <unknown function> + 0x5ffc5b1 (0x149eb1b135b1 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: <unknown function> + 0x5ffda13 (0x149eb1b14a13 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: <unknown function> + 0x5ffe55a (0x149eb1b1555a in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x31e (0x149eb1b1027e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #6: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x3c8 (0x149e7068e868 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #7: <unknown function> + 0xef5e4 (0x149ee435e5e4 in /scratch/user/u.dl344013/sglang-offload-research/venv/bin/../lib/libstdc++.so.6)
+frame #8: <unknown function> + 0x50119d (0x149ee647619d in /sw/eb/sw/CUDA/12.8.0/nsight-systems-2024.6.2/target-linux-x64/libToolsInjection64.so)
+frame #9: <unknown function> + 0x81ca (0x149ee7b381ca in /lib64/libpthread.so.0)
+frame #10: clone + 0x43 (0x149ee7009953 in /lib64/libc.so.6)
+
+[rank2]:[W130 23:47:15.490645697 TCPStore.cpp:125] [c10d] recvValue failed on SocketImpl(fd=111, addr=[localhost]:43058, remote=[localhost]:30031): Connection reset by peer
+Exception raised from recvBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:679 (most recent call first):
+frame #0: <unknown function> + 0x9c278 (0x151ff642a278 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x80 (0x151ff642bb80 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #2: <unknown function> + 0x5ffc5b1 (0x1520388345b1 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: <unknown function> + 0x5ffda13 (0x152038835a13 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: <unknown function> + 0x5ffe55a (0x15203883655a in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x31e (0x15203883127e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #6: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x3c8 (0x151ff73af868 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #7: <unknown function> + 0xef5e4 (0x15205d86d5e4 in /scratch/user/u.dl344013/sglang-offload-research/venv/bin/../lib/libstdc++.so.6)
+frame #8: <unknown function> + 0x50119d (0x15206d09819d in /sw/eb/sw/CUDA/12.8.0/nsight-systems-2024.6.2/target-linux-x64/libToolsInjection64.so)
+frame #9: <unknown function> + 0x81ca (0x15206e75a1ca in /lib64/libpthread.so.0)
+frame #10: clone + 0x43 (0x15206dc2b953 in /lib64/libc.so.6)
+
+[rank3]:[W130 23:47:15.490532581 TCPStore.cpp:125] [c10d] recvValue failed on SocketImpl(fd=110, addr=[localhost]:43026, remote=[localhost]:30031): Connection reset by peer
+Exception raised from recvBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:679 (most recent call first):
+frame #0: <unknown function> + 0x9c278 (0x1460acdc7278 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x80 (0x1460acdc8b80 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #2: <unknown function> + 0x5ffc5b1 (0x1460ef1d15b1 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: <unknown function> + 0x5ffda13 (0x1460ef1d2a13 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: <unknown function> + 0x5ffe55a (0x1460ef1d355a in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x31e (0x1460ef1ce27e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #6: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x3c8 (0x1460add4c868 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #7: <unknown function> + 0xef5e4 (0x14612030d5e4 in /scratch/user/u.dl344013/sglang-offload-research/venv/bin/../lib/libstdc++.so.6)
+frame #8: <unknown function> + 0x50119d (0x146123b3719d in /sw/eb/sw/CUDA/12.8.0/nsight-systems-2024.6.2/target-linux-x64/libToolsInjection64.so)
+frame #9: <unknown function> + 0x81ca (0x1461251f91ca in /lib64/libpthread.so.0)
+frame #10: clone + 0x43 (0x1461246ca953 in /lib64/libc.so.6)
+
+[rank6]:[W130 23:47:15.490438823 TCPStore.cpp:125] [c10d] recvValue failed on SocketImpl(fd=110, addr=[localhost]:43060, remote=[localhost]:30031): Connection reset by peer
+Exception raised from recvBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:679 (most recent call first):
+frame #0: <unknown function> + 0x9c278 (0x147ffe96e278 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x80 (0x147ffe96fb80 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #2: <unknown function> + 0x5ffc5b1 (0x148040d785b1 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: <unknown function> + 0x5ffda13 (0x148040d79a13 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: <unknown function> + 0x5ffe55a (0x148040d7a55a in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x31e (0x148040d7527e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #6: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x3c8 (0x147fff8f3868 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #7: <unknown function> + 0xef5e4 (0x148065d725e4 in /scratch/user/u.dl344013/sglang-offload-research/venv/bin/../lib/libstdc++.so.6)
+frame #8: <unknown function> + 0x50119d (0x1480756dd19d in /sw/eb/sw/CUDA/12.8.0/nsight-systems-2024.6.2/target-linux-x64/libToolsInjection64.so)
+frame #9: <unknown function> + 0x81ca (0x148076d9f1ca in /lib64/libpthread.so.0)
+frame #10: clone + 0x43 (0x148076270953 in /lib64/libc.so.6)
+
+[rank1]:[W130 23:47:15.490537219 TCPStore.cpp:125] [c10d] recvValue failed on SocketImpl(fd=111, addr=[localhost]:43054, remote=[localhost]:30031): Connection reset by peer
+Exception raised from recvBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:679 (most recent call first):
+frame #0: <unknown function> + 0x9c278 (0x146939ac7278 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x80 (0x146939ac8b80 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #2: <unknown function> + 0x5ffc5b1 (0x14697bed15b1 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: <unknown function> + 0x5ffda13 (0x14697bed2a13 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: <unknown function> + 0x5ffe55a (0x14697bed355a in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x31e (0x14697bece27e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #6: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x3c8 (0x14693aa4c868 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #7: <unknown function> + 0xef5e4 (0x1469ad00b5e4 in /scratch/user/u.dl344013/sglang-offload-research/venv/bin/../lib/libstdc++.so.6)
+frame #8: <unknown function> + 0x50119d (0x1469b083519d in /sw/eb/sw/CUDA/12.8.0/nsight-systems-2024.6.2/target-linux-x64/libToolsInjection64.so)
+frame #9: <unknown function> + 0x81ca (0x1469b1ef71ca in /lib64/libpthread.so.0)
+frame #10: clone + 0x43 (0x1469b13c8953 in /lib64/libc.so.6)
+
+[rank5]:[W130 23:47:15.490534805 TCPStore.cpp:125] [c10d] recvValue failed on SocketImpl(fd=110, addr=[localhost]:43056, remote=[localhost]:30031): Connection reset by peer
+Exception raised from recvBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:679 (most recent call first):
+frame #0: <unknown function> + 0x9c278 (0x149974a2b278 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x80 (0x149974a2cb80 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #2: <unknown function> + 0x5ffc5b1 (0x1499b6e355b1 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: <unknown function> + 0x5ffda13 (0x1499b6e36a13 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: <unknown function> + 0x5ffe55a (0x1499b6e3755a in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x31e (0x1499b6e3227e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #6: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x3c8 (0x1499759b0868 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #7: <unknown function> + 0xef5e4 (0x1499dbe705e4 in /scratch/user/u.dl344013/sglang-offload-research/venv/bin/../lib/libstdc++.so.6)
+frame #8: <unknown function> + 0x50119d (0x1499eb79819d in /sw/eb/sw/CUDA/12.8.0/nsight-systems-2024.6.2/target-linux-x64/libToolsInjection64.so)
+frame #9: <unknown function> + 0x81ca (0x1499ece5a1ca in /lib64/libpthread.so.0)
+frame #10: clone + 0x43 (0x1499ec32b953 in /lib64/libc.so.6)
+
+[rank3]:[W130 23:47:15.548278624 ProcessGroupNCCL.cpp:1771] [PG ID 0 PG GUID 0(default_pg) Rank 3] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Connection reset by peer
+[rank5]:[W130 23:47:15.548282425 ProcessGroupNCCL.cpp:1771] [PG ID 0 PG GUID 0(default_pg) Rank 5] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Connection reset by peer
+[rank2]:[W130 23:47:15.548286555 ProcessGroupNCCL.cpp:1771] [PG ID 0 PG GUID 0(default_pg) Rank 2] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Connection reset by peer
+[rank7]:[W130 23:47:15.548284416 ProcessGroupNCCL.cpp:1771] [PG ID 0 PG GUID 0(default_pg) Rank 7] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Connection reset by peer
+[rank1]:[W130 23:47:15.548292390 ProcessGroupNCCL.cpp:1771] [PG ID 0 PG GUID 0(default_pg) Rank 1] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Connection reset by peer
+[rank6]:[W130 23:47:15.548293962 ProcessGroupNCCL.cpp:1771] [PG ID 0 PG GUID 0(default_pg) Rank 6] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Connection reset by peer
+[01-30 23:47:15] Exit code: -9
+Traceback (most recent call last):
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/bin/sglang", line 7, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/cli/main.py", line 42, in main
+    args.func(args, extra_argv)
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/cli/generate.py", line 29, in generate
+    generate_cmd(parsed_args)
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/entrypoints/cli/generate.py", line 116, in generate_cmd
+    generator = DiffGenerator.from_pretrained(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/entrypoints/diffusion_generator.py", line 102, in from_pretrained
+    return cls.from_server_args(server_args, local_mode=local_mode)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/entrypoints/diffusion_generator.py", line 122, in from_server_args
+    instance.local_scheduler_process = instance._start_local_server_if_needed()
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/entrypoints/diffusion_generator.py", line 139, in _start_local_server_if_needed
+    processes = launch_server(self.server_args, launch_http_server=False)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/launch_server.py", line 153, in launch_server
+    data = reader.recv()
+           ^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/multiprocessing/connection.py", line 250, in recv
+    buf = self._recv_bytes()
+          ^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/multiprocessing/connection.py", line 430, in _recv_bytes
+    buf = self._recv(4)
+          ^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/multiprocessing/connection.py", line 399, in _recv
+    raise EOFError
+EOFError
+[rank3]:[W130 23:47:16.549489044 TCPStore.cpp:106] [c10d] sendBytes failed on SocketImpl(fd=110, addr=[localhost]:43026, remote=[localhost]:30031): Broken pipe
+Exception raised from sendBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:653 (most recent call first):
+frame #0: <unknown function> + 0x9c278 (0x1460acdc7278 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x80 (0x1460acdc8b80 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #2: <unknown function> + 0x5ffc5b1 (0x1460ef1d15b1 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: <unknown function> + 0x5ffce42 (0x1460ef1d1e42 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: <unknown function> + 0x5ffe94e (0x1460ef1d394e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x30e (0x1460ef1ce26e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #6: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x3c8 (0x1460add4c868 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #7: <unknown function> + 0xef5e4 (0x14612030d5e4 in /scratch/user/u.dl344013/sglang-offload-research/venv/bin/../lib/libstdc++.so.6)
+frame #8: <unknown function> + 0x50119d (0x146123b3719d in /sw/eb/sw/CUDA/12.8.0/nsight-systems-2024.6.2/target-linux-x64/libToolsInjection64.so)
+frame #9: <unknown function> + 0x81ca (0x1461251f91ca in /lib64/libpthread.so.0)
+frame #10: clone + 0x43 (0x1461246ca953 in /lib64/libc.so.6)
+
+[rank6]:[W130 23:47:16.549489479 TCPStore.cpp:106] [c10d] sendBytes failed on SocketImpl(fd=110, addr=[localhost]:43060, remote=[localhost]:30031): Broken pipe
+Exception raised from sendBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:653 (most recent call first):
+frame #0: <unknown function> + 0x9c278 (0x147ffe96e278 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x80 (0x147ffe96fb80 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #2: <unknown function> + 0x5ffc5b1 (0x148040d785b1 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: <unknown function> + 0x5ffce42 (0x148040d78e42 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: <unknown function> + 0x5ffe94e (0x148040d7a94e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x30e (0x148040d7526e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #6: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x3c8 (0x147fff8f3868 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #7: <unknown function> + 0xef5e4 (0x148065d725e4 in /scratch/user/u.dl344013/sglang-offload-research/venv/bin/../lib/libstdc++.so.6)
+frame #8: <unknown function> + 0x50119d (0x1480756dd19d in /sw/eb/sw/CUDA/12.8.0/nsight-systems-2024.6.2/target-linux-x64/libToolsInjection64.so)
+frame #9: <unknown function> + 0x81ca (0x148076d9f1ca in /lib64/libpthread.so.0)
+frame #10: clone + 0x43 (0x148076270953 in /lib64/libc.so.6)
+
+[rank3]:[W130 23:47:16.553451416 ProcessGroupNCCL.cpp:1771] [PG ID 0 PG GUID 0(default_pg) Rank 3] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Broken pipe
+[rank6]:[W130 23:47:16.553456631 ProcessGroupNCCL.cpp:1771] [PG ID 0 PG GUID 0(default_pg) Rank 6] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Broken pipe
+[rank1]:[W130 23:47:16.549489456 TCPStore.cpp:106] [c10d] sendBytes failed on SocketImpl(fd=111, addr=[localhost]:43054, remote=[localhost]:30031): Broken pipe
+Exception raised from sendBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:653 (most recent call first):
+frame #0: <unknown function> + 0x9c278 (0x146939ac7278 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x80 (0x146939ac8b80 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #2: <unknown function> + 0x5ffc5b1 (0x14697bed15b1 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: <unknown function> + 0x5ffce42 (0x14697bed1e42 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: <unknown function> + 0x5ffe94e (0x14697bed394e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x30e (0x14697bece26e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #6: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x3c8 (0x14693aa4c868 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #7: <unknown function> + 0xef5e4 (0x1469ad00b5e4 in /scratch/user/u.dl344013/sglang-offload-research/venv/bin/../lib/libstdc++.so.6)
+frame #8: <unknown function> + 0x50119d (0x1469b083519d in /sw/eb/sw/CUDA/12.8.0/nsight-systems-2024.6.2/target-linux-x64/libToolsInjection64.so)
+frame #9: <unknown function> + 0x81ca (0x1469b1ef71ca in /lib64/libpthread.so.0)
+frame #10: clone + 0x43 (0x1469b13c8953 in /lib64/libc.so.6)
+
+[rank1]:[W130 23:47:16.553630743 ProcessGroupNCCL.cpp:1771] [PG ID 0 PG GUID 0(default_pg) Rank 1] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Broken pipe
+[rank7]:[W130 23:47:16.553240828 TCPStore.cpp:106] [c10d] sendBytes failed on SocketImpl(fd=109, addr=[localhost]:43042, remote=[localhost]:30031): Broken pipe
+Exception raised from sendBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:653 (most recent call first):
+frame #0: <unknown function> + 0x9c278 (0x149e6f709278 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x80 (0x149e6f70ab80 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #2: <unknown function> + 0x5ffc5b1 (0x149eb1b135b1 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: <unknown function> + 0x5ffce42 (0x149eb1b13e42 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: <unknown function> + 0x5ffe94e (0x149eb1b1594e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x30e (0x149eb1b1026e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #6: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x3c8 (0x149e7068e868 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #7: <unknown function> + 0xef5e4 (0x149ee435e5e4 in /scratch/user/u.dl344013/sglang-offload-research/venv/bin/../lib/libstdc++.so.6)
+frame #8: <unknown function> + 0x50119d (0x149ee647619d in /sw/eb/sw/CUDA/12.8.0/nsight-systems-2024.6.2/target-linux-x64/libToolsInjection64.so)
+frame #9: <unknown function> + 0x81ca (0x149ee7b381ca in /lib64/libpthread.so.0)
+frame #10: clone + 0x43 (0x149ee7009953 in /lib64/libc.so.6)
+
+[rank7]:[W130 23:47:16.556757559 ProcessGroupNCCL.cpp:1771] [PG ID 0 PG GUID 0(default_pg) Rank 7] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Broken pipe
+[rank5]:[W130 23:47:16.554890470 TCPStore.cpp:106] [c10d] sendBytes failed on SocketImpl(fd=110, addr=[localhost]:43056, remote=[localhost]:30031): Broken pipe
+Exception raised from sendBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:653 (most recent call first):
+frame #0: <unknown function> + 0x9c278 (0x149974a2b278 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x80 (0x149974a2cb80 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #2: <unknown function> + 0x5ffc5b1 (0x1499b6e355b1 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: <unknown function> + 0x5ffce42 (0x1499b6e35e42 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: <unknown function> + 0x5ffe94e (0x1499b6e3794e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x30e (0x1499b6e3226e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #6: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x3c8 (0x1499759b0868 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #7: <unknown function> + 0xef5e4 (0x1499dbe705e4 in /scratch/user/u.dl344013/sglang-offload-research/venv/bin/../lib/libstdc++.so.6)
+frame #8: <unknown function> + 0x50119d (0x1499eb79819d in /sw/eb/sw/CUDA/12.8.0/nsight-systems-2024.6.2/target-linux-x64/libToolsInjection64.so)
+frame #9: <unknown function> + 0x81ca (0x1499ece5a1ca in /lib64/libpthread.so.0)
+frame #10: clone + 0x43 (0x1499ec32b953 in /lib64/libc.so.6)
+
+[rank5]:[W130 23:47:16.558449164 ProcessGroupNCCL.cpp:1771] [PG ID 0 PG GUID 0(default_pg) Rank 5] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Broken pipe
+[rank2]:[W130 23:47:16.556282556 TCPStore.cpp:106] [c10d] sendBytes failed on SocketImpl(fd=111, addr=[localhost]:43058, remote=[localhost]:30031): Broken pipe
+Exception raised from sendBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:653 (most recent call first):
+frame #0: <unknown function> + 0x9c278 (0x151ff642a278 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x80 (0x151ff642bb80 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #2: <unknown function> + 0x5ffc5b1 (0x1520388345b1 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: <unknown function> + 0x5ffce42 (0x152038834e42 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: <unknown function> + 0x5ffe94e (0x15203883694e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x30e (0x15203883126e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #6: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x3c8 (0x151ff73af868 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #7: <unknown function> + 0xef5e4 (0x15205d86d5e4 in /scratch/user/u.dl344013/sglang-offload-research/venv/bin/../lib/libstdc++.so.6)
+frame #8: <unknown function> + 0x50119d (0x15206d09819d in /sw/eb/sw/CUDA/12.8.0/nsight-systems-2024.6.2/target-linux-x64/libToolsInjection64.so)
+frame #9: <unknown function> + 0x81ca (0x15206e75a1ca in /lib64/libpthread.so.0)
+frame #10: clone + 0x43 (0x15206dc2b953 in /lib64/libc.so.6)
+
+[rank2]:[W130 23:47:16.559849828 ProcessGroupNCCL.cpp:1771] [PG ID 0 PG GUID 0(default_pg) Rank 2] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Broken pipe
+[rank1]:[W130 23:47:17.568431061 TCPStore.cpp:106] [c10d] sendBytes failed on SocketImpl(fd=111, addr=[localhost]:43054, remote=[localhost]:30031): Broken pipe
+Exception raised from sendBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:653 (most recent call first):
+frame #0: <unknown function> + 0x9c278 (0x146939ac7278 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x80 (0x146939ac8b80 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #2: <unknown function> + 0x5ffc5b1 (0x14697bed15b1 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: <unknown function> + 0x5ffce42 (0x14697bed1e42 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: <unknown function> + 0x5ffe94e (0x14697bed394e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x30e (0x14697bece26e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #6: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x3c8 (0x14693aa4c868 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #7: <unknown function> + 0xef5e4 (0x1469ad00b5e4 in /scratch/user/u.dl344013/sglang-offload-research/venv/bin/../lib/libstdc++.so.6)
+frame #8: <unknown function> + 0x50119d (0x1469b083519d in /sw/eb/sw/CUDA/12.8.0/nsight-systems-2024.6.2/target-linux-x64/libToolsInjection64.so)
+frame #9: <unknown function> + 0x81ca (0x1469b1ef71ca in /lib64/libpthread.so.0)
+frame #10: clone + 0x43 (0x1469b13c8953 in /lib64/libc.so.6)
+
+[rank2]:[W130 23:47:17.568418394 TCPStore.cpp:106] [c10d] sendBytes failed on SocketImpl(fd=111, addr=[localhost]:43058, remote=[localhost]:30031): Broken pipe
+Exception raised from sendBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:653 (most recent call first):
+frame #0: <unknown function> + 0x9c278 (0x151ff642a278 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x80 (0x151ff642bb80 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #2: <unknown function> + 0x5ffc5b1 (0x1520388345b1 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: <unknown function> + 0x5ffce42 (0x152038834e42 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: <unknown function> + 0x5ffe94e (0x15203883694e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x30e (0x15203883126e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #6: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x3c8 (0x151ff73af868 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #7: <unknown function> + 0xef5e4 (0x15205d86d5e4 in /scratch/user/u.dl344013/sglang-offload-research/venv/bin/../lib/libstdc++.so.6)
+frame #8: <unknown function> + 0x50119d (0x15206d09819d in /sw/eb/sw/CUDA/12.8.0/nsight-systems-2024.6.2/target-linux-x64/libToolsInjection64.so)
+frame #9: <unknown function> + 0x81ca (0x15206e75a1ca in /lib64/libpthread.so.0)
+frame #10: clone + 0x43 (0x15206dc2b953 in /lib64/libc.so.6)
+
+[rank7]:[W130 23:47:17.568425960 TCPStore.cpp:106] [c10d] sendBytes failed on SocketImpl(fd=109, addr=[localhost]:43042, remote=[localhost]:30031): Broken pipe
+Exception raised from sendBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:653 (most recent call first):
+frame #0: <unknown function> + 0x9c278 (0x149e6f709278 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x80 (0x149e6f70ab80 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #2: <unknown function> + 0x5ffc5b1 (0x149eb1b135b1 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: <unknown function> + 0x5ffce42 (0x149eb1b13e42 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: <unknown function> + 0x5ffe94e (0x149eb1b1594e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x30e (0x149eb1b1026e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #6: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x3c8 (0x149e7068e868 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #7: <unknown function> + 0xef5e4 (0x149ee435e5e4 in /scratch/user/u.dl344013/sglang-offload-research/venv/bin/../lib/libstdc++.so.6)
+frame #8: <unknown function> + 0x50119d (0x149ee647619d in /sw/eb/sw/CUDA/12.8.0/nsight-systems-2024.6.2/target-linux-x64/libToolsInjection64.so)
+frame #9: <unknown function> + 0x81ca (0x149ee7b381ca in /lib64/libpthread.so.0)
+frame #10: clone + 0x43 (0x149ee7009953 in /lib64/libc.so.6)
+
+[rank5]:[W130 23:47:17.574705613 TCPStore.cpp:106] [c10d] sendBytes failed on SocketImpl(fd=110, addr=[localhost]:43056, remote=[localhost]:30031): Broken pipe
+Exception raised from sendBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:653 (most recent call first):
+frame #0: <unknown function> + 0x9c278 (0x149974a2b278 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x80 (0x149974a2cb80 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #2: <unknown function> + 0x5ffc5b1 (0x1499b6e355b1 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: <unknown function> + 0x5ffce42 (0x1499b6e35e42 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: <unknown function> + 0x5ffe94e (0x1499b6e3794e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x30e (0x1499b6e3226e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #6: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x3c8 (0x1499759b0868 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #7: <unknown function> + 0xef5e4 (0x1499dbe705e4 in /scratch/user/u.dl344013/sglang-offload-research/venv/bin/../lib/libstdc++.so.6)
+frame #8: <unknown function> + 0x50119d (0x1499eb79819d in /sw/eb/sw/CUDA/12.8.0/nsight-systems-2024.6.2/target-linux-x64/libToolsInjection64.so)
+frame #9: <unknown function> + 0x81ca (0x1499ece5a1ca in /lib64/libpthread.so.0)
+frame #10: clone + 0x43 (0x1499ec32b953 in /lib64/libc.so.6)
+
+[rank6]:[W130 23:47:17.568432216 TCPStore.cpp:106] [c10d] sendBytes failed on SocketImpl(fd=110, addr=[localhost]:43060, remote=[localhost]:30031): Broken pipe
+Exception raised from sendBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:653 (most recent call first):
+frame #0: <unknown function> + 0x9c278 (0x147ffe96e278 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x80 (0x147ffe96fb80 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #2: <unknown function> + 0x5ffc5b1 (0x148040d785b1 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: <unknown function> + 0x5ffce42 (0x148040d78e42 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: <unknown function> + 0x5ffe94e (0x148040d7a94e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x30e (0x148040d7526e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #6: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x3c8 (0x147fff8f3868 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #7: <unknown function> + 0xef5e4 (0x148065d725e4 in /scratch/user/u.dl344013/sglang-offload-research/venv/bin/../lib/libstdc++.so.6)
+frame #8: <unknown function> + 0x50119d (0x1480756dd19d in /sw/eb/sw/CUDA/12.8.0/nsight-systems-2024.6.2/target-linux-x64/libToolsInjection64.so)
+frame #9: <unknown function> + 0x81ca (0x148076d9f1ca in /lib64/libpthread.so.0)
+frame #10: clone + 0x43 (0x148076270953 in /lib64/libc.so.6)
+
+[rank3]:[W130 23:47:17.568440169 TCPStore.cpp:106] [c10d] sendBytes failed on SocketImpl(fd=110, addr=[localhost]:43026, remote=[localhost]:30031): Broken pipe
+Exception raised from sendBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:653 (most recent call first):
+frame #0: <unknown function> + 0x9c278 (0x1460acdc7278 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x80 (0x1460acdc8b80 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #2: <unknown function> + 0x5ffc5b1 (0x1460ef1d15b1 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: <unknown function> + 0x5ffce42 (0x1460ef1d1e42 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: <unknown function> + 0x5ffe94e (0x1460ef1d394e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x30e (0x1460ef1ce26e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #6: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x3c8 (0x1460add4c868 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #7: <unknown function> + 0xef5e4 (0x14612030d5e4 in /scratch/user/u.dl344013/sglang-offload-research/venv/bin/../lib/libstdc++.so.6)
+frame #8: <unknown function> + 0x50119d (0x146123b3719d in /sw/eb/sw/CUDA/12.8.0/nsight-systems-2024.6.2/target-linux-x64/libToolsInjection64.so)
+frame #9: <unknown function> + 0x81ca (0x1461251f91ca in /lib64/libpthread.so.0)
+frame #10: clone + 0x43 (0x1461246ca953 in /lib64/libc.so.6)
+
+[rank7]:[W130 23:47:17.626789665 ProcessGroupNCCL.cpp:1771] [PG ID 0 PG GUID 0(default_pg) Rank 7] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Broken pipe
+[rank1]:[W130 23:47:17.626792724 ProcessGroupNCCL.cpp:1771] [PG ID 0 PG GUID 0(default_pg) Rank 1] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Broken pipe
+[rank5]:[W130 23:47:17.626803918 ProcessGroupNCCL.cpp:1771] [PG ID 0 PG GUID 0(default_pg) Rank 5] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Broken pipe
+[rank2]:[W130 23:47:17.626806335 ProcessGroupNCCL.cpp:1771] [PG ID 0 PG GUID 0(default_pg) Rank 2] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Broken pipe
+[rank6]:[W130 23:47:17.626798525 ProcessGroupNCCL.cpp:1771] [PG ID 0 PG GUID 0(default_pg) Rank 6] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Broken pipe
+[rank3]:[W130 23:47:17.626809120 ProcessGroupNCCL.cpp:1771] [PG ID 0 PG GUID 0(default_pg) Rank 3] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Broken pipe
+[rank3]:[W130 23:47:18.640649290 TCPStore.cpp:106] [c10d] sendBytes failed on SocketImpl(fd=110, addr=[localhost]:43026, remote=[localhost]:30031): Broken pipe
+Exception raised from sendBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:653 (most recent call first):
+frame #0: <unknown function> + 0x9c278 (0x1460acdc7278 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x80 (0x1460acdc8b80 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #2: <unknown function> + 0x5ffc5b1 (0x1460ef1d15b1 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: <unknown function> + 0x5ffce42 (0x1460ef1d1e42 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: <unknown function> + 0x5ffe94e (0x1460ef1d394e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x30e (0x1460ef1ce26e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #6: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x3c8 (0x1460add4c868 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #7: <unknown function> + 0xef5e4 (0x14612030d5e4 in /scratch/user/u.dl344013/sglang-offload-research/venv/bin/../lib/libstdc++.so.6)
+frame #8: <unknown function> + 0x50119d (0x146123b3719d in /sw/eb/sw/CUDA/12.8.0/nsight-systems-2024.6.2/target-linux-x64/libToolsInjection64.so)
+frame #9: <unknown function> + 0x81ca (0x1461251f91ca in /lib64/libpthread.so.0)
+frame #10: clone + 0x43 (0x1461246ca953 in /lib64/libc.so.6)
+
+[rank6]:[W130 23:47:18.640633937 TCPStore.cpp:106] [c10d] sendBytes failed on SocketImpl(fd=110, addr=[localhost]:43060, remote=[localhost]:30031): Broken pipe
+Exception raised from sendBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:653 (most recent call first):
+frame #0: <unknown function> + 0x9c278 (0x147ffe96e278 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x80 (0x147ffe96fb80 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #2: <unknown function> + 0x5ffc5b1 (0x148040d785b1 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: <unknown function> + 0x5ffce42 (0x148040d78e42 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: <unknown function> + 0x5ffe94e (0x148040d7a94e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x30e (0x148040d7526e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #6: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x3c8 (0x147fff8f3868 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #7: <unknown function> + 0xef5e4 (0x148065d725e4 in /scratch/user/u.dl344013/sglang-offload-research/venv/bin/../lib/libstdc++.so.6)
+frame #8: <unknown function> + 0x50119d (0x1480756dd19d in /sw/eb/sw/CUDA/12.8.0/nsight-systems-2024.6.2/target-linux-x64/libToolsInjection64.so)
+frame #9: <unknown function> + 0x81ca (0x148076d9f1ca in /lib64/libpthread.so.0)
+frame #10: clone + 0x43 (0x148076270953 in /lib64/libc.so.6)
+
+[rank5]:[W130 23:47:18.640636927 TCPStore.cpp:106] [c10d] sendBytes failed on SocketImpl(fd=110, addr=[localhost]:43056, remote=[localhost]:30031): Broken pipe
+Exception raised from sendBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:653 (most recent call first):
+frame #0: <unknown function> + 0x9c278 (0x149974a2b278 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x80 (0x149974a2cb80 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #2: <unknown function> + 0x5ffc5b1 (0x1499b6e355b1 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: <unknown function> + 0x5ffce42 (0x1499b6e35e42 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: <unknown function> + 0x5ffe94e (0x1499b6e3794e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x30e (0x1499b6e3226e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #6: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x3c8 (0x1499759b0868 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #7: <unknown function> + 0xef5e4 (0x1499dbe705e4 in /scratch/user/u.dl344013/sglang-offload-research/venv/bin/../lib/libstdc++.so.6)
+frame #8: <unknown function> + 0x50119d (0x1499eb79819d in /sw/eb/sw/CUDA/12.8.0/nsight-systems-2024.6.2/target-linux-x64/libToolsInjection64.so)
+frame #9: <unknown function> + 0x81ca (0x1499ece5a1ca in /lib64/libpthread.so.0)
+frame #10: clone + 0x43 (0x1499ec32b953 in /lib64/libc.so.6)
+
+[rank7]:[W130 23:47:18.640641436 TCPStore.cpp:106] [c10d] sendBytes failed on SocketImpl(fd=109, addr=[localhost]:43042, remote=[localhost]:30031): Broken pipe
+Exception raised from sendBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:653 (most recent call first):
+frame #0: <unknown function> + 0x9c278 (0x149e6f709278 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x80 (0x149e6f70ab80 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #2: <unknown function> + 0x5ffc5b1 (0x149eb1b135b1 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: <unknown function> + 0x5ffce42 (0x149eb1b13e42 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: <unknown function> + 0x5ffe94e (0x149eb1b1594e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x30e (0x149eb1b1026e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #6: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x3c8 (0x149e7068e868 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #7: <unknown function> + 0xef5e4 (0x149ee435e5e4 in /scratch/user/u.dl344013/sglang-offload-research/venv/bin/../lib/libstdc++.so.6)
+frame #8: <unknown function> + 0x50119d (0x149ee647619d in /sw/eb/sw/CUDA/12.8.0/nsight-systems-2024.6.2/target-linux-x64/libToolsInjection64.so)
+frame #9: <unknown function> + 0x81ca (0x149ee7b381ca in /lib64/libpthread.so.0)
+frame #10: clone + 0x43 (0x149ee7009953 in /lib64/libc.so.6)
+
+[rank1]:[W130 23:47:18.640646812 TCPStore.cpp:106] [c10d] sendBytes failed on SocketImpl(fd=111, addr=[localhost]:43054, remote=[localhost]:30031): Broken pipe
+Exception raised from sendBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:653 (most recent call first):
+frame #0: <unknown function> + 0x9c278 (0x146939ac7278 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x80 (0x146939ac8b80 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #2: <unknown function> + 0x5ffc5b1 (0x14697bed15b1 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: <unknown function> + 0x5ffce42 (0x14697bed1e42 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: <unknown function> + 0x5ffe94e (0x14697bed394e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x30e (0x14697bece26e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #6: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x3c8 (0x14693aa4c868 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #7: <unknown function> + 0xef5e4 (0x1469ad00b5e4 in /scratch/user/u.dl344013/sglang-offload-research/venv/bin/../lib/libstdc++.so.6)
+frame #8: <unknown function> + 0x50119d (0x1469b083519d in /sw/eb/sw/CUDA/12.8.0/nsight-systems-2024.6.2/target-linux-x64/libToolsInjection64.so)
+frame #9: <unknown function> + 0x81ca (0x1469b1ef71ca in /lib64/libpthread.so.0)
+frame #10: clone + 0x43 (0x1469b13c8953 in /lib64/libc.so.6)
+
+[rank2]:[W130 23:47:18.640644940 TCPStore.cpp:106] [c10d] sendBytes failed on SocketImpl(fd=111, addr=[localhost]:43058, remote=[localhost]:30031): Broken pipe
+Exception raised from sendBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:653 (most recent call first):
+frame #0: <unknown function> + 0x9c278 (0x151ff642a278 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x80 (0x151ff642bb80 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #2: <unknown function> + 0x5ffc5b1 (0x1520388345b1 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: <unknown function> + 0x5ffce42 (0x152038834e42 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: <unknown function> + 0x5ffe94e (0x15203883694e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x30e (0x15203883126e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #6: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x3c8 (0x151ff73af868 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #7: <unknown function> + 0xef5e4 (0x15205d86d5e4 in /scratch/user/u.dl344013/sglang-offload-research/venv/bin/../lib/libstdc++.so.6)
+frame #8: <unknown function> + 0x50119d (0x15206d09819d in /sw/eb/sw/CUDA/12.8.0/nsight-systems-2024.6.2/target-linux-x64/libToolsInjection64.so)
+frame #9: <unknown function> + 0x81ca (0x15206e75a1ca in /lib64/libpthread.so.0)
+frame #10: clone + 0x43 (0x15206dc2b953 in /lib64/libc.so.6)
+
+[rank2]:[W130 23:47:18.693648713 ProcessGroupNCCL.cpp:1771] [PG ID 0 PG GUID 0(default_pg) Rank 2] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Broken pipe
+[rank1]:[W130 23:47:18.693655365 ProcessGroupNCCL.cpp:1771] [PG ID 0 PG GUID 0(default_pg) Rank 1] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Broken pipe
+[rank6]:[W130 23:47:18.693656564 ProcessGroupNCCL.cpp:1771] [PG ID 0 PG GUID 0(default_pg) Rank 6] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Broken pipe
+[rank7]:[W130 23:47:18.693652345 ProcessGroupNCCL.cpp:1771] [PG ID 0 PG GUID 0(default_pg) Rank 7] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Broken pipe
+[rank3]:[W130 23:47:18.693664940 ProcessGroupNCCL.cpp:1771] [PG ID 0 PG GUID 0(default_pg) Rank 3] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Broken pipe
+[rank5]:[W130 23:47:18.693659868 ProcessGroupNCCL.cpp:1771] [PG ID 0 PG GUID 0(default_pg) Rank 5] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Broken pipe
+[rank5]:[W130 23:47:19.708494010 TCPStore.cpp:106] [c10d] sendBytes failed on SocketImpl(fd=110, addr=[localhost]:43056, remote=[localhost]:30031): Broken pipe
+Exception raised from sendBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:653 (most recent call first):
+frame #0: <unknown function> + 0x9c278 (0x149974a2b278 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x80 (0x149974a2cb80 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #2: <unknown function> + 0x5ffc5b1 (0x1499b6e355b1 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: <unknown function> + 0x5ffce42 (0x1499b6e35e42 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: <unknown function> + 0x5ffe94e (0x1499b6e3794e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x30e (0x1499b6e3226e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #6: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x3c8 (0x1499759b0868 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #7: <unknown function> + 0xef5e4 (0x1499dbe705e4 in /scratch/user/u.dl344013/sglang-offload-research/venv/bin/../lib/libstdc++.so.6)
+frame #8: <unknown function> + 0x50119d (0x1499eb79819d in /sw/eb/sw/CUDA/12.8.0/nsight-systems-2024.6.2/target-linux-x64/libToolsInjection64.so)
+frame #9: <unknown function> + 0x81ca (0x1499ece5a1ca in /lib64/libpthread.so.0)
+frame #10: clone + 0x43 (0x1499ec32b953 in /lib64/libc.so.6)
+
+[rank3]:[W130 23:47:19.708501086 TCPStore.cpp:106] [c10d] sendBytes failed on SocketImpl(fd=110, addr=[localhost]:43026, remote=[localhost]:30031): Broken pipe
+Exception raised from sendBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:653 (most recent call first):
+frame #0: <unknown function> + 0x9c278 (0x1460acdc7278 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x80 (0x1460acdc8b80 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #2: <unknown function> + 0x5ffc5b1 (0x1460ef1d15b1 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: <unknown function> + 0x5ffce42 (0x1460ef1d1e42 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: <unknown function> + 0x5ffe94e (0x1460ef1d394e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x30e (0x1460ef1ce26e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #6: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x3c8 (0x1460add4c868 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #7: <unknown function> + 0xef5e4 (0x14612030d5e4 in /scratch/user/u.dl344013/sglang-offload-research/venv/bin/../lib/libstdc++.so.6)
+frame #8: <unknown function> + 0x50119d (0x146123b3719d in /sw/eb/sw/CUDA/12.8.0/nsight-systems-2024.6.2/target-linux-x64/libToolsInjection64.so)
+frame #9: <unknown function> + 0x81ca (0x1461251f91ca in /lib64/libpthread.so.0)
+frame #10: clone + 0x43 (0x1461246ca953 in /lib64/libc.so.6)
+
+[rank2]:[W130 23:47:19.708505542 TCPStore.cpp:106] [c10d] sendBytes failed on SocketImpl(fd=111, addr=[localhost]:43058, remote=[localhost]:30031): Broken pipe
+Exception raised from sendBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:653 (most recent call first):
+frame #0: <unknown function> + 0x9c278 (0x151ff642a278 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x80 (0x151ff642bb80 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #2: <unknown function> + 0x5ffc5b1 (0x1520388345b1 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: <unknown function> + 0x5ffce42 (0x152038834e42 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: <unknown function> + 0x5ffe94e (0x15203883694e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x30e (0x15203883126e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #6: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x3c8 (0x151ff73af868 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #7: <unknown function> + 0xef5e4 (0x15205d86d5e4 in /scratch/user/u.dl344013/sglang-offload-research/venv/bin/../lib/libstdc++.so.6)
+frame #8: <unknown function> + 0x50119d (0x15206d09819d in /sw/eb/sw/CUDA/12.8.0/nsight-systems-2024.6.2/target-linux-x64/libToolsInjection64.so)
+frame #9: <unknown function> + 0x81ca (0x15206e75a1ca in /lib64/libpthread.so.0)
+frame #10: clone + 0x43 (0x15206dc2b953 in /lib64/libc.so.6)
+
+[rank7]:[W130 23:47:19.708502229 TCPStore.cpp:106] [c10d] sendBytes failed on SocketImpl(fd=109, addr=[localhost]:43042, remote=[localhost]:30031): Broken pipe
+Exception raised from sendBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:653 (most recent call first):
+frame #0: <unknown function> + 0x9c278 (0x149e6f709278 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x80 (0x149e6f70ab80 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #2: <unknown function> + 0x5ffc5b1 (0x149eb1b135b1 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: <unknown function> + 0x5ffce42 (0x149eb1b13e42 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: <unknown function> + 0x5ffe94e (0x149eb1b1594e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x30e (0x149eb1b1026e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #6: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x3c8 (0x149e7068e868 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #7: <unknown function> + 0xef5e4 (0x149ee435e5e4 in /scratch/user/u.dl344013/sglang-offload-research/venv/bin/../lib/libstdc++.so.6)
+frame #8: <unknown function> + 0x50119d (0x149ee647619d in /sw/eb/sw/CUDA/12.8.0/nsight-systems-2024.6.2/target-linux-x64/libToolsInjection64.so)
+frame #9: <unknown function> + 0x81ca (0x149ee7b381ca in /lib64/libpthread.so.0)
+frame #10: clone + 0x43 (0x149ee7009953 in /lib64/libc.so.6)
+
+[rank6]:[W130 23:47:19.709694612 TCPStore.cpp:106] [c10d] sendBytes failed on SocketImpl(fd=110, addr=[localhost]:43060, remote=[localhost]:30031): Broken pipe
+Exception raised from sendBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:653 (most recent call first):
+frame #0: <unknown function> + 0x9c278 (0x147ffe96e278 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x80 (0x147ffe96fb80 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #2: <unknown function> + 0x5ffc5b1 (0x148040d785b1 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: <unknown function> + 0x5ffce42 (0x148040d78e42 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: <unknown function> + 0x5ffe94e (0x148040d7a94e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x30e (0x148040d7526e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #6: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x3c8 (0x147fff8f3868 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #7: <unknown function> + 0xef5e4 (0x148065d725e4 in /scratch/user/u.dl344013/sglang-offload-research/venv/bin/../lib/libstdc++.so.6)
+frame #8: <unknown function> + 0x50119d (0x1480756dd19d in /sw/eb/sw/CUDA/12.8.0/nsight-systems-2024.6.2/target-linux-x64/libToolsInjection64.so)
+frame #9: <unknown function> + 0x81ca (0x148076d9f1ca in /lib64/libpthread.so.0)
+frame #10: clone + 0x43 (0x148076270953 in /lib64/libc.so.6)
+
+[rank1]:[W130 23:47:19.708498849 TCPStore.cpp:106] [c10d] sendBytes failed on SocketImpl(fd=111, addr=[localhost]:43054, remote=[localhost]:30031): Broken pipe
+Exception raised from sendBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:653 (most recent call first):
+frame #0: <unknown function> + 0x9c278 (0x146939ac7278 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x80 (0x146939ac8b80 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #2: <unknown function> + 0x5ffc5b1 (0x14697bed15b1 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: <unknown function> + 0x5ffce42 (0x14697bed1e42 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: <unknown function> + 0x5ffe94e (0x14697bed394e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x30e (0x14697bece26e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #6: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x3c8 (0x14693aa4c868 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #7: <unknown function> + 0xef5e4 (0x1469ad00b5e4 in /scratch/user/u.dl344013/sglang-offload-research/venv/bin/../lib/libstdc++.so.6)
+frame #8: <unknown function> + 0x50119d (0x1469b083519d in /sw/eb/sw/CUDA/12.8.0/nsight-systems-2024.6.2/target-linux-x64/libToolsInjection64.so)
+frame #9: <unknown function> + 0x81ca (0x1469b1ef71ca in /lib64/libpthread.so.0)
+frame #10: clone + 0x43 (0x1469b13c8953 in /lib64/libc.so.6)
+
+[rank5]:[W130 23:47:19.762636322 ProcessGroupNCCL.cpp:1771] [PG ID 0 PG GUID 0(default_pg) Rank 5] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Broken pipe
+[rank1]:[W130 23:47:19.762638391 ProcessGroupNCCL.cpp:1771] [PG ID 0 PG GUID 0(default_pg) Rank 1] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Broken pipe
+[rank6]:[W130 23:47:19.762642690 ProcessGroupNCCL.cpp:1771] [PG ID 0 PG GUID 0(default_pg) Rank 6] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Broken pipe
+[rank2]:[W130 23:47:19.762650722 ProcessGroupNCCL.cpp:1771] [PG ID 0 PG GUID 0(default_pg) Rank 2] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Broken pipe
+[rank3]:[W130 23:47:19.762651841 ProcessGroupNCCL.cpp:1771] [PG ID 0 PG GUID 0(default_pg) Rank 3] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Broken pipe
+[rank7]:[W130 23:47:19.762654784 ProcessGroupNCCL.cpp:1771] [PG ID 0 PG GUID 0(default_pg) Rank 7] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Broken pipe
+[rank7]:[W130 23:47:20.776177782 TCPStore.cpp:106] [c10d] sendBytes failed on SocketImpl(fd=109, addr=[localhost]:43042, remote=[localhost]:30031): Broken pipe
+Exception raised from sendBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:653 (most recent call first):
+frame #0: <unknown function> + 0x9c278 (0x149e6f709278 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x80 (0x149e6f70ab80 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #2: <unknown function> + 0x5ffc5b1 (0x149eb1b135b1 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: <unknown function> + 0x5ffce42 (0x149eb1b13e42 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: <unknown function> + 0x5ffe94e (0x149eb1b1594e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x30e (0x149eb1b1026e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #6: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x3c8 (0x149e7068e868 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #7: <unknown function> + 0xef5e4 (0x149ee435e5e4 in /scratch/user/u.dl344013/sglang-offload-research/venv/bin/../lib/libstdc++.so.6)
+frame #8: <unknown function> + 0x50119d (0x149ee647619d in /sw/eb/sw/CUDA/12.8.0/nsight-systems-2024.6.2/target-linux-x64/libToolsInjection64.so)
+frame #9: <unknown function> + 0x81ca (0x149ee7b381ca in /lib64/libpthread.so.0)
+frame #10: clone + 0x43 (0x149ee7009953 in /lib64/libc.so.6)
+
+[rank2]:[W130 23:47:20.776176946 TCPStore.cpp:106] [c10d] sendBytes failed on SocketImpl(fd=111, addr=[localhost]:43058, remote=[localhost]:30031): Broken pipe
+Exception raised from sendBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:653 (most recent call first):
+frame #0: <unknown function> + 0x9c278 (0x151ff642a278 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x80 (0x151ff642bb80 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #2: <unknown function> + 0x5ffc5b1 (0x1520388345b1 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: <unknown function> + 0x5ffce42 (0x152038834e42 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: <unknown function> + 0x5ffe94e (0x15203883694e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x30e (0x15203883126e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #6: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x3c8 (0x151ff73af868 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #7: <unknown function> + 0xef5e4 (0x15205d86d5e4 in /scratch/user/u.dl344013/sglang-offload-research/venv/bin/../lib/libstdc++.so.6)
+frame #8: <unknown function> + 0x50119d (0x15206d09819d in /sw/eb/sw/CUDA/12.8.0/nsight-systems-2024.6.2/target-linux-x64/libToolsInjection64.so)
+frame #9: <unknown function> + 0x81ca (0x15206e75a1ca in /lib64/libpthread.so.0)
+frame #10: clone + 0x43 (0x15206dc2b953 in /lib64/libc.so.6)
+
+[rank3]:[W130 23:47:20.776171629 TCPStore.cpp:106] [c10d] sendBytes failed on SocketImpl(fd=110, addr=[localhost]:43026, remote=[localhost]:30031): Broken pipe
+Exception raised from sendBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:653 (most recent call first):
+frame #0: <unknown function> + 0x9c278 (0x1460acdc7278 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x80 (0x1460acdc8b80 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #2: <unknown function> + 0x5ffc5b1 (0x1460ef1d15b1 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: <unknown function> + 0x5ffce42 (0x1460ef1d1e42 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: <unknown function> + 0x5ffe94e (0x1460ef1d394e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x30e (0x1460ef1ce26e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #6: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x3c8 (0x1460add4c868 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #7: <unknown function> + 0xef5e4 (0x14612030d5e4 in /scratch/user/u.dl344013/sglang-offload-research/venv/bin/../lib/libstdc++.so.6)
+frame #8: <unknown function> + 0x50119d (0x146123b3719d in /sw/eb/sw/CUDA/12.8.0/nsight-systems-2024.6.2/target-linux-x64/libToolsInjection64.so)
+frame #9: <unknown function> + 0x81ca (0x1461251f91ca in /lib64/libpthread.so.0)
+frame #10: clone + 0x43 (0x1461246ca953 in /lib64/libc.so.6)
+
+[rank6]:[W130 23:47:20.776174293 TCPStore.cpp:106] [c10d] sendBytes failed on SocketImpl(fd=110, addr=[localhost]:43060, remote=[localhost]:30031): Broken pipe
+Exception raised from sendBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:653 (most recent call first):
+frame #0: <unknown function> + 0x9c278 (0x147ffe96e278 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x80 (0x147ffe96fb80 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #2: <unknown function> + 0x5ffc5b1 (0x148040d785b1 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: <unknown function> + 0x5ffce42 (0x148040d78e42 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: <unknown function> + 0x5ffe94e (0x148040d7a94e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x30e (0x148040d7526e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #6: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x3c8 (0x147fff8f3868 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #7: <unknown function> + 0xef5e4 (0x148065d725e4 in /scratch/user/u.dl344013/sglang-offload-research/venv/bin/../lib/libstdc++.so.6)
+frame #8: <unknown function> + 0x50119d (0x1480756dd19d in /sw/eb/sw/CUDA/12.8.0/nsight-systems-2024.6.2/target-linux-x64/libToolsInjection64.so)
+frame #9: <unknown function> + 0x81ca (0x148076d9f1ca in /lib64/libpthread.so.0)
+frame #10: clone + 0x43 (0x148076270953 in /lib64/libc.so.6)
+
+[rank5]:[W130 23:47:20.776741436 TCPStore.cpp:106] [c10d] sendBytes failed on SocketImpl(fd=110, addr=[localhost]:43056, remote=[localhost]:30031): Broken pipe
+Exception raised from sendBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:653 (most recent call first):
+frame #0: <unknown function> + 0x9c278 (0x149974a2b278 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x80 (0x149974a2cb80 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #2: <unknown function> + 0x5ffc5b1 (0x1499b6e355b1 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: <unknown function> + 0x5ffce42 (0x1499b6e35e42 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: <unknown function> + 0x5ffe94e (0x1499b6e3794e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x30e (0x1499b6e3226e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #6: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x3c8 (0x1499759b0868 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #7: <unknown function> + 0xef5e4 (0x1499dbe705e4 in /scratch/user/u.dl344013/sglang-offload-research/venv/bin/../lib/libstdc++.so.6)
+frame #8: <unknown function> + 0x50119d (0x1499eb79819d in /sw/eb/sw/CUDA/12.8.0/nsight-systems-2024.6.2/target-linux-x64/libToolsInjection64.so)
+frame #9: <unknown function> + 0x81ca (0x1499ece5a1ca in /lib64/libpthread.so.0)
+frame #10: clone + 0x43 (0x1499ec32b953 in /lib64/libc.so.6)
+
+[rank3]:[W130 23:47:20.833423745 ProcessGroupNCCL.cpp:1771] [PG ID 0 PG GUID 0(default_pg) Rank 3] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Broken pipe
+[rank7]:[W130 23:47:20.833427848 ProcessGroupNCCL.cpp:1771] [PG ID 0 PG GUID 0(default_pg) Rank 7] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Broken pipe
+[rank6]:[W130 23:47:20.833429249 ProcessGroupNCCL.cpp:1771] [PG ID 0 PG GUID 0(default_pg) Rank 6] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Broken pipe
+[rank2]:[W130 23:47:20.833437275 ProcessGroupNCCL.cpp:1771] [PG ID 0 PG GUID 0(default_pg) Rank 2] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Broken pipe
+[rank5]:[W130 23:47:20.833444440 ProcessGroupNCCL.cpp:1771] [PG ID 0 PG GUID 0(default_pg) Rank 5] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Broken pipe
+[rank1]:[W130 23:47:20.776180838 TCPStore.cpp:106] [c10d] sendBytes failed on SocketImpl(fd=111, addr=[localhost]:43054, remote=[localhost]:30031): Broken pipe
+Exception raised from sendBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:653 (most recent call first):
+frame #0: <unknown function> + 0x9c278 (0x146939ac7278 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x80 (0x146939ac8b80 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #2: <unknown function> + 0x5ffc5b1 (0x14697bed15b1 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: <unknown function> + 0x5ffce42 (0x14697bed1e42 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: <unknown function> + 0x5ffe94e (0x14697bed394e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x30e (0x14697bece26e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #6: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x3c8 (0x14693aa4c868 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #7: <unknown function> + 0xef5e4 (0x1469ad00b5e4 in /scratch/user/u.dl344013/sglang-offload-research/venv/bin/../lib/libstdc++.so.6)
+frame #8: <unknown function> + 0x50119d (0x1469b083519d in /sw/eb/sw/CUDA/12.8.0/nsight-systems-2024.6.2/target-linux-x64/libToolsInjection64.so)
+frame #9: <unknown function> + 0x81ca (0x1469b1ef71ca in /lib64/libpthread.so.0)
+frame #10: clone + 0x43 (0x1469b13c8953 in /lib64/libc.so.6)
+
+[rank1]:[W130 23:47:20.869475730 ProcessGroupNCCL.cpp:1771] [PG ID 0 PG GUID 0(default_pg) Rank 1] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Broken pipe
+[rank2]:[W130 23:47:21.849172228 TCPStore.cpp:106] [c10d] sendBytes failed on SocketImpl(fd=111, addr=[localhost]:43058, remote=[localhost]:30031): Broken pipe
+Exception raised from sendBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:653 (most recent call first):
+frame #0: <unknown function> + 0x9c278 (0x151ff642a278 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x80 (0x151ff642bb80 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #2: <unknown function> + 0x5ffc5b1 (0x1520388345b1 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: <unknown function> + 0x5ffce42 (0x152038834e42 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: <unknown function> + 0x5ffe94e (0x15203883694e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x30e (0x15203883126e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #6: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x3c8 (0x151ff73af868 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #7: <unknown function> + 0xef5e4 (0x15205d86d5e4 in /scratch/user/u.dl344013/sglang-offload-research/venv/bin/../lib/libstdc++.so.6)
+frame #8: <unknown function> + 0x50119d (0x15206d09819d in /sw/eb/sw/CUDA/12.8.0/nsight-systems-2024.6.2/target-linux-x64/libToolsInjection64.so)
+frame #9: <unknown function> + 0x81ca (0x15206e75a1ca in /lib64/libpthread.so.0)
+frame #10: clone + 0x43 (0x15206dc2b953 in /lib64/libc.so.6)
+
+[rank3]:[W130 23:47:21.850198699 TCPStore.cpp:106] [c10d] sendBytes failed on SocketImpl(fd=110, addr=[localhost]:43026, remote=[localhost]:30031): Broken pipe
+Exception raised from sendBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:653 (most recent call first):
+frame #0: <unknown function> + 0x9c278 (0x1460acdc7278 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x80 (0x1460acdc8b80 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #2: <unknown function> + 0x5ffc5b1 (0x1460ef1d15b1 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: <unknown function> + 0x5ffce42 (0x1460ef1d1e42 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: <unknown function> + 0x5ffe94e (0x1460ef1d394e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x30e (0x1460ef1ce26e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #6: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x3c8 (0x1460add4c868 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #7: <unknown function> + 0xef5e4 (0x14612030d5e4 in /scratch/user/u.dl344013/sglang-offload-research/venv/bin/../lib/libstdc++.so.6)
+frame #8: <unknown function> + 0x50119d (0x146123b3719d in /sw/eb/sw/CUDA/12.8.0/nsight-systems-2024.6.2/target-linux-x64/libToolsInjection64.so)
+frame #9: <unknown function> + 0x81ca (0x1461251f91ca in /lib64/libpthread.so.0)
+frame #10: clone + 0x43 (0x1461246ca953 in /lib64/libc.so.6)
+
+[rank7]:[W130 23:47:21.849549000 TCPStore.cpp:106] [c10d] sendBytes failed on SocketImpl(fd=109, addr=[localhost]:43042, remote=[localhost]:30031): Broken pipe
+Exception raised from sendBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:653 (most recent call first):
+frame #0: <unknown function> + 0x9c278 (0x149e6f709278 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x80 (0x149e6f70ab80 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #2: <unknown function> + 0x5ffc5b1 (0x149eb1b135b1 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: <unknown function> + 0x5ffce42 (0x149eb1b13e42 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: <unknown function> + 0x5ffe94e (0x149eb1b1594e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x30e (0x149eb1b1026e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #6: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x3c8 (0x149e7068e868 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #7: <unknown function> + 0xef5e4 (0x149ee435e5e4 in /scratch/user/u.dl344013/sglang-offload-research/venv/bin/../lib/libstdc++.so.6)
+frame #8: <unknown function> + 0x50119d (0x149ee647619d in /sw/eb/sw/CUDA/12.8.0/nsight-systems-2024.6.2/target-linux-x64/libToolsInjection64.so)
+frame #9: <unknown function> + 0x81ca (0x149ee7b381ca in /lib64/libpthread.so.0)
+frame #10: clone + 0x43 (0x149ee7009953 in /lib64/libc.so.6)
+
+[rank6]:[W130 23:47:21.847423559 TCPStore.cpp:106] [c10d] sendBytes failed on SocketImpl(fd=110, addr=[localhost]:43060, remote=[localhost]:30031): Broken pipe
+Exception raised from sendBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:653 (most recent call first):
+frame #0: <unknown function> + 0x9c278 (0x147ffe96e278 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x80 (0x147ffe96fb80 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #2: <unknown function> + 0x5ffc5b1 (0x148040d785b1 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: <unknown function> + 0x5ffce42 (0x148040d78e42 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: <unknown function> + 0x5ffe94e (0x148040d7a94e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x30e (0x148040d7526e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #6: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x3c8 (0x147fff8f3868 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #7: <unknown function> + 0xef5e4 (0x148065d725e4 in /scratch/user/u.dl344013/sglang-offload-research/venv/bin/../lib/libstdc++.so.6)
+frame #8: <unknown function> + 0x50119d (0x1480756dd19d in /sw/eb/sw/CUDA/12.8.0/nsight-systems-2024.6.2/target-linux-x64/libToolsInjection64.so)
+frame #9: <unknown function> + 0x81ca (0x148076d9f1ca in /lib64/libpthread.so.0)
+frame #10: clone + 0x43 (0x148076270953 in /lib64/libc.so.6)
+
+[rank1]:[W130 23:47:21.869892882 TCPStore.cpp:106] [c10d] sendBytes failed on SocketImpl(fd=111, addr=[localhost]:43054, remote=[localhost]:30031): Broken pipe
+Exception raised from sendBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:653 (most recent call first):
+frame #0: <unknown function> + 0x9c278 (0x146939ac7278 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x80 (0x146939ac8b80 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #2: <unknown function> + 0x5ffc5b1 (0x14697bed15b1 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: <unknown function> + 0x5ffce42 (0x14697bed1e42 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: <unknown function> + 0x5ffe94e (0x14697bed394e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x30e (0x14697bece26e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #6: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x3c8 (0x14693aa4c868 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #7: <unknown function> + 0xef5e4 (0x1469ad00b5e4 in /scratch/user/u.dl344013/sglang-offload-research/venv/bin/../lib/libstdc++.so.6)
+frame #8: <unknown function> + 0x50119d (0x1469b083519d in /sw/eb/sw/CUDA/12.8.0/nsight-systems-2024.6.2/target-linux-x64/libToolsInjection64.so)
+frame #9: <unknown function> + 0x81ca (0x1469b1ef71ca in /lib64/libpthread.so.0)
+frame #10: clone + 0x43 (0x1469b13c8953 in /lib64/libc.so.6)
+
+[rank5]:[W130 23:47:21.849094520 TCPStore.cpp:106] [c10d] sendBytes failed on SocketImpl(fd=110, addr=[localhost]:43056, remote=[localhost]:30031): Broken pipe
+Exception raised from sendBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:653 (most recent call first):
+frame #0: <unknown function> + 0x9c278 (0x149974a2b278 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x80 (0x149974a2cb80 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #2: <unknown function> + 0x5ffc5b1 (0x1499b6e355b1 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: <unknown function> + 0x5ffce42 (0x1499b6e35e42 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: <unknown function> + 0x5ffe94e (0x1499b6e3794e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x30e (0x1499b6e3226e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #6: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x3c8 (0x1499759b0868 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #7: <unknown function> + 0xef5e4 (0x1499dbe705e4 in /scratch/user/u.dl344013/sglang-offload-research/venv/bin/../lib/libstdc++.so.6)
+frame #8: <unknown function> + 0x50119d (0x1499eb79819d in /sw/eb/sw/CUDA/12.8.0/nsight-systems-2024.6.2/target-linux-x64/libToolsInjection64.so)
+frame #9: <unknown function> + 0x81ca (0x1499ece5a1ca in /lib64/libpthread.so.0)
+frame #10: clone + 0x43 (0x1499ec32b953 in /lib64/libc.so.6)
+
+[rank3]:[W130 23:47:21.903339373 ProcessGroupNCCL.cpp:1771] [PG ID 0 PG GUID 0(default_pg) Rank 3] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Broken pipe
+[rank7]:[W130 23:47:21.903343064 ProcessGroupNCCL.cpp:1771] [PG ID 0 PG GUID 0(default_pg) Rank 7] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Broken pipe
+[rank1]:[W130 23:47:21.903355549 ProcessGroupNCCL.cpp:1771] [PG ID 0 PG GUID 0(default_pg) Rank 1] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Broken pipe
+[rank5]:[W130 23:47:21.903348077 ProcessGroupNCCL.cpp:1771] [PG ID 0 PG GUID 0(default_pg) Rank 5] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Broken pipe
+[rank2]:[W130 23:47:21.903349441 ProcessGroupNCCL.cpp:1771] [PG ID 0 PG GUID 0(default_pg) Rank 2] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Broken pipe
+[rank6]:[W130 23:47:21.906091775 ProcessGroupNCCL.cpp:1771] [PG ID 0 PG GUID 0(default_pg) Rank 6] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Broken pipe
+/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 8 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+Collecting data...
+Generating '/tmp/job.1422884/nsys-report-51f1.qdstrm'
+[1/1] [0%                          ] pure_gpu_1422884.nsys-rep[1/1] [0%                          ] pure_gpu_1422884.nsys-rep[1/1] [6%                          ] pure_gpu_1422884.nsys-rep[1/1] [7%                          ] pure_gpu_1422884.nsys-rep[1/1] [8%                          ] pure_gpu_1422884.nsys-rep[1/1] [9%                          ] pure_gpu_1422884.nsys-rep[1/1] [10%                         ] pure_gpu_1422884.nsys-rep[1/1] [11%                         ] pure_gpu_1422884.nsys-rep[1/1] [12%                         ] pure_gpu_1422884.nsys-rep[1/1] [13%                         ] pure_gpu_1422884.nsys-rep[1/1] [12%                         ] pure_gpu_1422884.nsys-rep[1/1] [13%                         ] pure_gpu_1422884.nsys-rep[1/1] [14%                         ] pure_gpu_1422884.nsys-rep[1/1] [=16%                        ] pure_gpu_1422884.nsys-rep[1/1] [=17%                        ] pure_gpu_1422884.nsys-rep[1/1] [==18%                       ] pure_gpu_1422884.nsys-rep[1/1] [==19%                       ] pure_gpu_1422884.nsys-rep[1/1] [==20%                       ] pure_gpu_1422884.nsys-rep[1/1] [===22%                      ] pure_gpu_1422884.nsys-rep[1/1] [===23%                      ] pure_gpu_1422884.nsys-rep[1/1] [===24%                      ] pure_gpu_1422884.nsys-rep[1/1] [====25%                     ] pure_gpu_1422884.nsys-rep[1/1] [====26%                     ] pure_gpu_1422884.nsys-rep[1/1] [====27%                     ] pure_gpu_1422884.nsys-rep[1/1] [====28%                     ] pure_gpu_1422884.nsys-rep[1/1] [=====29%                    ] pure_gpu_1422884.nsys-rep[1/1] [=====30%                    ] pure_gpu_1422884.nsys-rep[1/1] [=====31%                    ] pure_gpu_1422884.nsys-rep[1/1] [=====32%                    ] pure_gpu_1422884.nsys-rep[1/1] [======33%                   ] pure_gpu_1422884.nsys-rep[1/1] [======34%                   ] pure_gpu_1422884.nsys-rep[1/1] [======35%                   ] pure_gpu_1422884.nsys-rep[1/1] [=======36%                  ] pure_gpu_1422884.nsys-rep[1/1] [=======37%                  ] pure_gpu_1422884.nsys-rep[1/1] [=======38%                  ] pure_gpu_1422884.nsys-rep[1/1] [=======39%                  ] pure_gpu_1422884.nsys-rep[1/1] [========40%                 ] pure_gpu_1422884.nsys-rep[1/1] [========41%                 ] pure_gpu_1422884.nsys-rep[1/1] [========42%                 ] pure_gpu_1422884.nsys-rep[1/1] [=========43%                ] pure_gpu_1422884.nsys-rep[1/1] [=========44%                ] pure_gpu_1422884.nsys-rep[1/1] [=========45%                ] pure_gpu_1422884.nsys-rep[1/1] [=========46%                ] pure_gpu_1422884.nsys-rep[1/1] [==========47%               ] pure_gpu_1422884.nsys-rep[1/1] [==========48%               ] pure_gpu_1422884.nsys-rep[1/1] [==========49%               ] pure_gpu_1422884.nsys-rep[1/1] [===========50%              ] pure_gpu_1422884.nsys-rep[1/1] [===========51%              ] pure_gpu_1422884.nsys-rep[1/1] [===========52%              ] pure_gpu_1422884.nsys-rep[1/1] [===========53%              ] pure_gpu_1422884.nsys-rep[1/1] [============54%             ] pure_gpu_1422884.nsys-rep[1/1] [============55%             ] pure_gpu_1422884.nsys-rep[1/1] [============56%             ] pure_gpu_1422884.nsys-rep[1/1] [============57%             ] pure_gpu_1422884.nsys-rep[1/1] [=============58%            ] pure_gpu_1422884.nsys-rep[1/1] [=============59%            ] pure_gpu_1422884.nsys-rep[1/1] [=============60%            ] pure_gpu_1422884.nsys-rep[1/1] [==============61%           ] pure_gpu_1422884.nsys-rep[1/1] [==============62%           ] pure_gpu_1422884.nsys-rep[1/1] [==============63%           ] pure_gpu_1422884.nsys-rep[1/1] [==============64%           ] pure_gpu_1422884.nsys-rep[1/1] [===============65%          ] pure_gpu_1422884.nsys-rep[1/1] [===============66%          ] pure_gpu_1422884.nsys-rep[1/1] [===============67%          ] pure_gpu_1422884.nsys-rep[1/1] [================68%         ] pure_gpu_1422884.nsys-rep[1/1] [================69%         ] pure_gpu_1422884.nsys-rep[1/1] [================70%         ] pure_gpu_1422884.nsys-rep[1/1] [================71%         ] pure_gpu_1422884.nsys-rep[1/1] [=================72%        ] pure_gpu_1422884.nsys-rep[1/1] [=================73%        ] pure_gpu_1422884.nsys-rep[1/1] [=================74%        ] pure_gpu_1422884.nsys-rep[1/1] [==================75%       ] pure_gpu_1422884.nsys-rep[1/1] [==================76%       ] pure_gpu_1422884.nsys-rep[1/1] [==================77%       ] pure_gpu_1422884.nsys-rep[1/1] [==================78%       ] pure_gpu_1422884.nsys-rep[1/1] [===================79%      ] pure_gpu_1422884.nsys-rep[1/1] [===================80%      ] pure_gpu_1422884.nsys-rep[1/1] [===================81%      ] pure_gpu_1422884.nsys-rep[1/1] [===================82%      ] pure_gpu_1422884.nsys-rep[1/1] [====================83%     ] pure_gpu_1422884.nsys-rep[1/1] [====================84%     ] pure_gpu_1422884.nsys-rep[1/1] [========================100%] pure_gpu_1422884.nsys-rep[1/1] [========================100%] pure_gpu_1422884.nsys-rep
+Generated:
+    /scratch/user/u.dl344013/sglang-offload-research/./results/profiles/pure_gpu_1422884.nsys-rep
+
+real	3m12.762s
+user	0m0.030s
+sys	0m1.923s
+[2026-01-30T23:48:39.206] error: Detected 2 oom_kill events in StepId=1422884.batch. Some of the step tasks have been OOM Killed.

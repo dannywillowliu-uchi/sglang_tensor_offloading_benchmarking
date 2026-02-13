@@ -44,7 +44,7 @@ echo ""
 # Start SGLang server with offloading (1 GPU)
 echo "Starting SGLang server (1 GPU, with offloading)..."
 sglang serve \
-    --model-path ./models/wan2.2 \
+    --model-path Wan-AI/Wan2.2-T2V-A14B-Diffusers \
     --text-encoder-cpu-offload \
     --pin-cpu-memory \
     --dit-layerwise-offload true \
