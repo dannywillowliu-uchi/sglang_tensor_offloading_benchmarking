@@ -6,8 +6,8 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=72
-#SBATCH --mem=488G
-#SBATCH --time=00:45:00
+#SBATCH --mem=0
+#SBATCH --time=01:30:00
 #SBATCH --output=results/old_offload_6gpu_%j.log
 
 # OLD OFFLOAD 6-GPU: PR #15511 "before" config (full-model FSDP CPU offload)

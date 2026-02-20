@@ -1,0 +1,27 @@
+# macOS
+.DS_Store
+
+# Workflow state
+.work/
+
+# SSH keys/certs (should never be in repo)
+id_aces_tamu
+id_aces_tamu-cert.pub
+*.pem
+*.key
+
+# Office temp files
+~$*
+
+# Local data and outputs
+data/
+outputs/
+docs_*.pdf
+
+# Profiling results (large binaries)
+results/.Rhistory
+results/*.nsys-rep
+results/traces/
+
+# Cloned repos
+sglang-src/

@@ -7,7 +7,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=48
 #SBATCH --mem=488G
-#SBATCH --time=00:45:00
+#SBATCH --time=01:30:00
 #SBATCH --output=results/pure_gpu_%j.log
 
 # PURE GPU: No offloading - everything stays on GPU VRAM

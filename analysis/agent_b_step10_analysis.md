@@ -6,7 +6,7 @@
 
 ## Summary
 
-**PARTIALLY RESOLVED.** The mathematical analysis with current source code shows the boundary switch occurs at **step index 18** (0-indexed) with `flow_shift=12.0` and `boundary_ratio=0.875`. However, benchmark profiler data clearly shows a spike at **step 10** (1-indexed in tqdm, likely step index 9). This discrepancy remains unresolved and requires timestep logging during a live run.
+**FULLY RESOLVED.** The benchmark spike at step 10 (tqdm) is correct and explained by config misresolution. Benchmarks used local model path `./models/wan2.2` which resolved to base `WanT2V480PConfig` (flow_shift=3.0) instead of the intended `Wan2_2_T2V_A14B_Config` (flow_shift=12.0). With flow_shift=3.0, the boundary switch occurs at step index 9 (tqdm 10), matching observations exactly. With the correct flow_shift=12.0, it occurs at step index 18 (tqdm 19). New benchmark jobs (1443732-1443737) use the HF path `Wan-AI/Wan2.2-T2V-A14B-Diffusers` which correctly maps to flow_shift=12.0 via `registry.py:542-543`.
 
 ---
 

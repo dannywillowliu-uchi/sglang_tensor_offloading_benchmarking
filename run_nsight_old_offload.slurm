@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=wan2-nsys-offload
+#SBATCH --job-name=wan2-nsys-old
 #SBATCH --account=155924932299
 #SBATCH --partition=gpu
 #SBATCH --gres=gpu:h100:4
@@ -8,11 +8,10 @@
 #SBATCH --cpus-per-task=48
 #SBATCH --mem=488G
 #SBATCH --time=01:30:00
-#SBATCH --output=results/nsys_offload_%j.log
+#SBATCH --output=results/nsys_old_offload_%j.log
 
-# NSYS PROFILING: NEW layerwise offload
+# NSYS PROFILING: OLD FSDP offload
 # Captures CUPTI-level events: Memcpy HtoD/DtoH with bytes, GPU kernels, NCCL
-# Uses sglang generate (CLI mode) for simpler profiling
 # 2 iterations: warmup + nsys-profiled run
 
 set -e
@@ -30,7 +29,7 @@ eval "$(conda shell.bash hook)"
 conda activate ./venv
 
 echo "=========================================="
-echo "NSYS PROFILING - NEW OFFLOAD (layerwise)"
+echo "NSYS PROFILING - OLD OFFLOAD (FSDP)"
 echo "=========================================="
 echo "Timestamp: $(date)"
 echo "Job ID: $SLURM_JOB_ID"
@@ -54,7 +53,7 @@ COMMON_FLAGS=(
     --model-path Wan-AI/Wan2.2-T2V-A14B-Diffusers
     --text-encoder-cpu-offload
     --pin-cpu-memory
-    --dit-layerwise-offload true
+    --dit-layerwise-offload false
     --num-gpus 4
     --ulysses-degree 4
     --attention-backend sage_attn
@@ -81,7 +80,7 @@ echo "=========================================="
 echo "Start: $(date)"
 
 time sglang generate "${COMMON_FLAGS[@]}" \
-    --output-path ./results/nsys_offload_${SLURM_JOB_ID}_warmup.mp4
+    --output-path ./results/nsys_old_offload_${SLURM_JOB_ID}_warmup.mp4
 
 echo "End: $(date)"
 echo ""
@@ -103,9 +102,9 @@ time nsys profile \
     --trace-fork-before-exec=true \
     --kill=none \
     --force-overwrite=true \
-    --output=./results/profiles/new_offload_nsys_${SLURM_JOB_ID} \
+    --output=./results/profiles/old_offload_nsys_${SLURM_JOB_ID} \
     sglang generate "${COMMON_FLAGS[@]}" \
-    --output-path ./results/nsys_offload_${SLURM_JOB_ID}_profiled.mp4
+    --output-path ./results/nsys_old_offload_${SLURM_JOB_ID}_profiled.mp4
 
 echo "End: $(date)"
 echo ""
@@ -116,9 +115,9 @@ echo "=========================================="
 echo "Timestamp: $(date)"
 echo ""
 echo "Outputs:"
-echo "  - Warmup: results/nsys_offload_${SLURM_JOB_ID}_warmup.mp4"
-echo "  - Profiled: results/nsys_offload_${SLURM_JOB_ID}_profiled.mp4"
-echo "  - nsys profile: results/profiles/new_offload_nsys_${SLURM_JOB_ID}.nsys-rep"
+echo "  - Warmup: results/nsys_old_offload_${SLURM_JOB_ID}_warmup.mp4"
+echo "  - Profiled: results/nsys_old_offload_${SLURM_JOB_ID}_profiled.mp4"
+echo "  - nsys profile: results/profiles/old_offload_nsys_${SLURM_JOB_ID}.nsys-rep"
 echo ""
-echo "To analyze: nsys stats results/profiles/new_offload_nsys_${SLURM_JOB_ID}.nsys-rep"
+echo "To analyze: nsys stats results/profiles/old_offload_nsys_${SLURM_JOB_ID}.nsys-rep"
 ls -lh ./results/profiles/

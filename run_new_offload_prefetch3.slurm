@@ -7,7 +7,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=48
 #SBATCH --mem=488G
-#SBATCH --time=00:45:00
+#SBATCH --time=01:30:00
 #SBATCH --output=results/new_offload_pf3_%j.log
 
 # NEW OFFLOAD with PREFETCH_SIZE=3: Tests if prefetching 3 layers ahead reduces stalls

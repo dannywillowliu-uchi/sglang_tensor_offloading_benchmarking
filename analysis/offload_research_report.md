@@ -1,6 +1,6 @@
 # SGLang Offload Research Report: Source Code Verification
 
-**Date:** 2026-02-08
+**Date:** 2026-02-18 (updated from 2026-02-13)
 **Authors:** Parallel source code analysis agents (A, B, C) + cross-check
 **Codebase:** sglang-src (HEAD, shallow clone)
 **Prior work:** Obsidian note `Claude/Projects/sglang-offload-research.md`
@@ -13,14 +13,30 @@ This report provides code-verified answers to 6 research questions about SGLang 
 
 1. **All prior claims about offload implementations verified** -- the OLD path uses blocking `.to()`, NEW path uses async H2D prefetch with no D2H copy
 2. **Ulysses overlap NOT feasible on ACES H100 PCIe** -- both GPU-GPU and CPU-GPU share PCIe fabric
-3. **Step 10 contradiction PARTIALLY resolved** -- math with current code says switch at step 18, not step 10; discrepancy requires live timestep logging
-4. **Clean benchmarks needed** -- Tuesday's 3-iteration runs (jobs 1439552-1439555) will provide definitive timing data
+3. **Step 10 contradiction FULLY RESOLVED** -- benchmarks used base `WanT2V480PConfig` (flow_shift=3.0) via config misresolution instead of correct `Wan2_2_T2V_A14B_Config` (flow_shift=12.0). flow_shift=3.0 -> switch at step 9/tqdm 10 (matches benchmarks). flow_shift=12.0 -> switch at step 18/tqdm 19.
+4. **NEW BENCHMARK RESULTS (2026-02-18)**: Jobs 1454665-1454666 completed Run 2 (clean timing) with correct flow_shift=12.0. Old offload is **13% faster** (was 7% with wrong flow_shift). Switch confirmed at step 19. Gap widened due to per-step overhead increase in new offload.
+5. **Batch 3 submitted** -- Jobs 1459995-1460000: 4-GPU rerun (90 min), 6-GPU (mem fix), nsys profiling
 
 ---
 
 ## Q1: Benchmark Results
 
-### Existing 4-GPU Data (Jobs 1434113/1434114)
+### NEW: Clean 4-GPU Data with Correct flow_shift=12.0 (Jobs 1454665/1454666, Run 2)
+
+| Metric | New Offload (layerwise) | Old Offload (FSDP) | Delta |
+|---|---|---|---|
+| Total denoising | 662.2s | **585.7s** | Old **13.1% faster** |
+| Steady-state per-step | ~23s | ~20s | Old **15% faster** per step |
+| First step | 65s | 40s | New 25s slower |
+| Step 19 (switch) | 23s (no spike) | **47s (+27s spike)** | New absorbs switch seamlessly |
+| Peak VRAM (est.) | ~23 GB | ~61 GB | New uses **62% less VRAM** |
+
+**Key findings:**
+1. **Old offload is 13% faster on 4 GPUs** (up from 7% with wrong flow_shift). The per-step gap is actually 15% (3s/step), driven by FSDP sharding each GPU only transferring 1/N of the model vs new offload independently moving the full model on each GPU.
+2. **Transformer switch confirmed at step 19** (tqdm 19), validating flow_shift=12.0. Old offload has a 47s spike (27s overhead) due to blocking `.to()` at `denoising.py:854,861`. New offload handles the switch seamlessly.
+3. **Per-step gap widened** from 9% (flow_shift=3.0) to 15% (flow_shift=12.0), suggesting the shifted noise schedule disproportionately affects the new offload path.
+
+### Prior 4-GPU Data (Jobs 1434113/1434114) -- flow_shift=3.0, INVALID but instructive
 
 | Metric | New Offload (layerwise) | Old Offload (full-model) |
 |---|---|---|
@@ -29,27 +45,54 @@ This report provides code-verified answers to 6 research questions about SGLang 
 | Steady state | ~23s/step | ~21s/step |
 | Step 10 anomaly | 24.2s (normal) | 29.8s (spike) |
 | Peak GPU memory | 22.88 GB | 61.25 GB |
-| Large memcpy (>10s) | 44 | 936 |
 
-**Key finding:** Old offload is **7% faster on 4 GPUs** despite having a spike at step 10. New offload's ~2s/step distributed overhead (26 steps x 2s = 52s) exceeds the one-time spike cost.
+**Note:** These totals include profiling overhead. Per-step steady-state times are comparable across runs.
 
-### Pending: Clean 3-Iteration Benchmarks (Tuesday Feb 10)
+### Comparison: flow_shift=3.0 vs 12.0
 
-| Job | Config | GPUs |
-|---|---|---|
-| 1439552 | new_offload | 4 GPU |
-| 1439553 | old_offload | 4 GPU |
-| 1439554 | new_offload | 6 GPU |
-| 1439555 | old_offload | 6 GPU |
+| Metric | flow_shift=3.0 (wrong) | flow_shift=12.0 (correct) | Change |
+|---|---|---|---|
+| New steady-state | 21.6s/step | 23s/step | +6.5% (slower) |
+| Old steady-state | 19.8s/step | 20s/step | +1.0% (similar) |
+| Switch step | tqdm 10 | tqdm 19 | Moved 9 steps later |
+| Switch spike (old) | ~8s extra | ~27s extra | 3.4x larger |
+| Switch spike (new) | none | none | Consistently seamless |
+| Gap | Old 7% faster | Old 13% faster | Gap widened |
 
-Each job runs 3 iterations: warmup (compile) -> clean timing -> profiled. Use Run 2 for comparison.
+### Job History
 
-**Action items for Tuesday:**
-1. Download logs from ACES
-2. Extract per-step timing from Run 2 (no profiling overhead)
+**Batch 1 -- Jobs 1439552-1439555: CANCELLED** (never ran, Feb 8)
+
+**Batch 2 -- Jobs 1443732-1443737: FAILED** (compute nodes no internet for HF download)
+- Fix applied: symlink `$SCRATCH/.../Wan-AI/Wan2.2-T2V-A14B-Diffusers -> ../models/wan2.2`
+
+**Batch 2b -- Jobs 1454665-1454670 (Feb 15):**
+
+| Job | Config | GPUs | Status | Usable Data |
+|---|---|---|---|---|
+| 1454665 | New offload | 4 | TIMEOUT (45 min) | Run 1 + Run 2 complete |
+| 1454666 | Old offload | 4 | TIMEOUT (45 min) | Run 1 + Run 2 complete |
+| 1454667 | Pure GPU | 4 | OOM | None (expected) |
+| 1454668 | New offload | 6 | SLURM OOM | None |
+| 1454669 | Old offload | 6 | SLURM OOM | None |
+| 1454670 | Prefetch=3 | 4 | FAILED | None (`--dit-offload-prefetch-size` not in sglang 0.5.8) |
+
+**Batch 3 -- Jobs 1459995-1460000 (Feb 18, submitted):**
+
+| Job | Config | GPUs | Fix Applied |
+|---|---|---|---|
+| 1459995 | New offload | 4 | `--time=01:30:00` (was 45 min) |
+| 1459996 | Old offload | 4 | `--time=01:30:00` |
+| 1459997 | New offload | 6 | `--mem=0` (use all node memory) |
+| 1459998 | Old offload | 6 | `--mem=0` |
+| 1459999 | nsys new offload | 4 | `--time=01:30:00` |
+| 1460000 | nsys old offload | 4 | `--time=01:30:00` |
+
+**Remaining action items:**
+1. Retrieve Batch 3 results when complete
+2. Extract nsys PCIe bandwidth (Memcpy HtoD events)
 3. Compare 4-GPU vs 6-GPU scaling
-4. Check if 6-GPU narrows the gap between old and new
-5. Extract profiler traces from Run 3
+4. Upgrade sglang on ACES for prefetch=3 testing (0.5.8 lacks CLI arg)
 
 ---
 
@@ -222,31 +265,35 @@ BETWEEN REQUESTS: release_all() -> All layers to stub (except layer 0) -> CPU bu
 
 ## Remaining Uncertainties
 
-1. ~~**Step 10 vs Step 18 switch point**~~ RESOLVED: benchmark used flow_shift=3.0 due to config misresolution (see Q3)
-2. **Benchmark validity**: all existing benchmark data used flow_shift=3.0 instead of the intended 12.0. Tuesday re-runs need correct config.
-3. **6-GPU scaling** -- does new offload become faster with more GPUs? (Tuesday data)
-4. **Profiling overhead impact** -- Run 2 (clean) vs Run 3 (profiled) comparison pending
-5. **Actual PCIe bandwidth utilization** -- could measure with `nvidia-smi dmon` during benchmark
-6. **Impact of flow_shift on performance gap** -- with flow_shift=12.0, switch at step 18 means 9 more steps with new offload overhead before the old offload's blocking transfer. This may change the 7% gap.
+1. ~~**Step 10 vs Step 18 switch point**~~ RESOLVED: config misresolution. flow_shift=3.0 -> step 10, flow_shift=12.0 -> step 19. Confirmed in Batch 2b results.
+2. ~~**Benchmark validity**~~ RESOLVED: Batch 2b jobs used correct HF path -> flow_shift=12.0 confirmed in logs.
+3. ~~**Impact of flow_shift on performance gap**~~ ANSWERED: gap widened from 7% to 13%. Per-step gap widened from 9% to 15%.
+4. **Pure GPU baseline** -- 4x H100 80GB OOM confirmed (job 1454667). Would need 8 GPUs or smaller model.
+5. **Prefetch=3 performance** -- sglang 0.5.8 on ACES lacks `--dit-offload-prefetch-size`. Needs upgrade.
+6. **Actual PCIe bandwidth utilization** -- nsys jobs 1459999/1460000 submitted, awaiting results
+7. **6-GPU scaling** -- jobs 1459997/1459998 submitted with `--mem=0`, awaiting results
+8. **Root cause of per-step gap widening** -- why does flow_shift=12.0 hurt new offload more than old? Possibly memory access pattern change or prefetch timing mismatch.
+9. **2-GPU scaling test** -- if PCIe contention confirmed in nsys, test with fewer GPUs
 
 ---
 
 ## Recommendations
 
 ### Immediate (for PI)
-1. Share this report with existing 4-GPU benchmark data
-2. Note: "old offload 7% faster on 4 GPUs" but uses 3x more VRAM (61GB vs 23GB peak)
-3. New offload designed for memory-constrained or high-GPU-count scenarios
+1. **Share updated results:** old offload is 13% faster on 4 GPUs with correct flow_shift=12.0, but uses 3x more VRAM (61GB vs 23GB peak)
+2. **Key insight:** New offload's advantage is memory efficiency (62% less VRAM), not speed. On PCIe systems without NVLink, the per-step overhead from independent full-model offloading on each GPU is the bottleneck.
+3. **Transformer switch analysis:** New offload handles the switch seamlessly (no spike), while old offload has a 47s spike. But this single-step penalty doesn't overcome the accumulated per-step advantage.
 
-### Tuesday Follow-up
-1. Add timestep logging to benchmark scripts: `print(f"Step {i}: t_int={t_int}")`
-2. Analyze 4-GPU vs 6-GPU scaling trend
-3. Determine if 6-GPU narrows performance gap (hypothesis: yes, due to better compute/transfer overlap)
+### Awaiting Batch 3 Results (Jobs 1459995-1460000)
+1. **4-GPU rerun** (1459995-1459996): Should get Run 3 profiled data this time (90 min limit)
+2. **6-GPU scaling** (1459997-1459998): Will show if more GPUs narrow the gap (hypothesis: new offload benefits less from more GPUs since it doesn't shard)
+3. **nsys profiling** (1459999-1460000): Will give actual PCIe HtoD bandwidth numbers
 
 ### Future Work
 1. Topology-aware prefetch: reduce `prefetch_size` on PCIe systems with sequence parallelism
-2. Test with 8 GPUs to match PR #15511's benchmark configuration
-3. Profile actual PCIe bandwidth during offload to quantify contention
+2. Upgrade sglang on ACES for prefetch=3 testing
+3. Test with 8 GPUs to match PR #15511's benchmark configuration
+4. Investigate per-step gap widening with flow_shift=12.0
 
 ---
 
