@@ -1,6 +1,6 @@
 # SGLang Layerwise Offloading Analysis: Wan2.2 Video Generation
 
-**Date:** February 23, 2026 (nsys temporal overlap confirmed)
+**Date:** February 24, 2026 (sharded offload implementation submitted)
 **Hardware:** ACES cluster, 4x H100 PCIe GPUs, 488GB RAM
 **Software:** SGLang 0.5.8 (PR #15511), Wan2.2-T2V-A14B-Diffusers (dual 14B transformers)
 
@@ -195,23 +195,19 @@ Prioritized by confirmed profiling evidence. All impact estimates are relative t
 
 ### Tier 1: High Impact (estimated 10-20% speedup)
 
-**FSDP-style weight sharding for layerwise offload**
+**FSDP-style weight sharding for layerwise offload -- IMPLEMENTED (Feb 24)**
 - *Addresses:* 9.3x H2D overhead (nsys: 5,767 GB vs 618 GB) causing 32% NCCL slowdown
-- *Approach:* Each GPU copies 1/N of each layer (~175MB instead of ~700MB), then NCCL all-gathers the shards. Reduces per-GPU H2D from ~28GB to ~7GB per denoising step
+- *Approach:* Each GPU copies 1/N of each layer (~175MB instead of ~700MB) from CPU via async copy stream, then `dist.all_gather_into_tensor()` reconstructs the full buffer on the compute stream. Reduces per-GPU H2D from ~28GB to ~7GB per denoising step
 - *Expected:* Eliminate the NCCL +32% overhead (~66s total), bringing layerwise within ~1% of FSDP speed while retaining low VRAM
-- *Complexity:* High -- requires rearchitecting `LayerwiseOffloadManager` to integrate with FSDP sharding
+- *Status:* **Implemented and submitted for benchmarking** (ACES job 1473071). Code: `patches/sharded_offload.patch`, `patches/aces_layerwise_offload.py`. CLI flag: `--dit-offload-sharded`
+- *Design decisions:* All-gather on compute stream (avoids cross-stream NCCL coordination); default process group (serializes with Ulysses all-to-all naturally); padded buffers for even sharding; graceful single-GPU degradation
 
 **Priority-based PCIe scheduling**
 - *Addresses:* nsys confirms 61% of H2D overlaps with NCCL, degrading BW 36.5%. Max NCCL latency spikes to 4.1s (vs 1.7s old)
 - *Approach:* Insert `cudaStreamWaitEvent` between the H2D copy stream and NCCL stream so prefetch pauses during collective communication windows. Yield PCIe to NCCL during all-to-all
 - *Expected:* Reduce NCCL mean latency from 15.7ms back toward 11.4ms baseline, recovering ~50-60s of the 273s NCCL overhead
 - *Complexity:* Medium -- requires stream synchronization logic in the prefetch hooks
-
-**Mixed FSDP + selective layerwise**
-- *Addresses:* Contention is worst during attention layers (which trigger Ulysses all-to-all)
-- *Approach:* Use FSDP for attention layers (where sharding reduces PCIe pressure during collectives) and layerwise for FFN layers (no inter-GPU communication, so full-bus H2D is fine)
-- *Expected:* Gets sharding benefits where contention matters most, without full FSDP complexity
-- *Complexity:* High -- requires per-layer strategy selection and two offload code paths
+- *Note:* Partially superseded by sharded offload (which reduces H2D by 4x, making contention less severe). May still be valuable as a complementary optimization if sharded offload alone doesn't fully close the gap
 
 ### Tier 2: Medium Impact (estimated 5-10% speedup)
 
@@ -270,16 +266,18 @@ Prioritized by confirmed profiling evidence. All impact estimates are relative t
 | **Root cause** | PCIe contention: 61% of H2D overlaps with NCCL, causing **36.5% BW degradation** (7.9 vs 12.4 GB/s). New generates **9.3x more H2D** (5,767 vs 618 GB); old has **zero** overlap. NCCL slowed **39.5%**, GPU idle doubled. Computation identical |
 | **PCIe vs NVLink** | PR claims 58% speedup on NVLink; we see 5.1% slowdown on PCIe |
 | **Switch handling** | New offload is seamless; old offload has a 27s spike at step 19 |
-| **Top optimization** | FSDP-style weight sharding for layerwise offload (see Section 7, Tier 1) |
+| **Top optimization** | FSDP-style sharded layerwise offload -- **IMPLEMENTED**, benchmark submitted |
 | **Broader takeaway** | Layerwise offload trades speed for memory on PCIe; the gap is small (5%) and fixable |
 
 ### Experiment Status
 
 | Experiment | Status | Key Finding |
 |-----------|--------|-------------|
-| 4-GPU clean benchmarks (1459995-96) | **Done** | New 641.1s vs Old 610.2s |
+| 4-GPU clean benchmarks (Batch 2b/3) | **Done** | New 641.1s vs Old 610.2s (5.1% gap) |
 | nsys profiling (1459999-1460000) | **Done** | 9.3x H2D, NCCL +39.5%, compute identical |
 | nsys temporal overlap analysis | **Done** | 61% of H2D during NCCL, 36.5% BW degradation, old has zero overlap |
 | TraceLens analysis | **Done** | GPU timeline confirms PCIe contention |
-| 6-GPU scaling (1459997-98) | Pending | Expect gap to widen (more PCIe pressure) |
-| Prefetch=3 | Blocked | sglang 0.5.8 lacks CLI flag |
+| 6-GPU scaling (1459997-98) | **OOM** | Both configs OOM on single ACES node |
+| 4-GPU new offload re-run (1459995) | **OOM** | Unexpected; worked in Batch 2b. Needs investigation |
+| Prefetch=3 | **Deprioritized** | sglang 0.5.8 lacks CLI flag; sharded offload is higher priority |
+| **Sharded offload (1473071)** | **Submitted** | FSDP-style 1/N sharding + all-gather. Tests top optimization |

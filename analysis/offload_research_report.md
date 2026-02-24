@@ -77,22 +77,22 @@ This report provides code-verified answers to 6 research questions about SGLang 
 | 1454669 | Old offload | 6 | SLURM OOM | None |
 | 1454670 | Prefetch=3 | 4 | FAILED | None (`--dit-offload-prefetch-size` not in sglang 0.5.8) |
 
-**Batch 3 -- Jobs 1459995-1460000 (Feb 18, submitted):**
+**Batch 3 -- Jobs 1459995-1460000 (Feb 18):**
 
-| Job | Config | GPUs | Fix Applied |
+| Job | Config | GPUs | Status | Usable Data |
+|---|---|---|---|---|
+| 1459995 | New offload | 4 | **OUT_OF_MEMORY** | None (likely SLURM OOM, needs investigation) |
+| 1459996 | Old offload | 4 | COMPLETED | Run 1-3 complete |
+| 1459997 | New offload | 6 | **OUT_OF_MEMORY** | None |
+| 1459998 | Old offload | 6 | **OUT_OF_MEMORY** | None |
+| 1459999 | nsys new offload | 4 | COMPLETED | nsys profiles analyzed |
+| 1460000 | nsys old offload | 4 | COMPLETED | nsys profiles analyzed |
+
+**Batch 4 -- Job 1473071 (Feb 24, submitted):**
+
+| Job | Config | GPUs | Notes |
 |---|---|---|---|
-| 1459995 | New offload | 4 | `--time=01:30:00` (was 45 min) |
-| 1459996 | Old offload | 4 | `--time=01:30:00` |
-| 1459997 | New offload | 6 | `--mem=0` (use all node memory) |
-| 1459998 | Old offload | 6 | `--mem=0` |
-| 1459999 | nsys new offload | 4 | `--time=01:30:00` |
-| 1460000 | nsys old offload | 4 | `--time=01:30:00` |
-
-**Remaining action items:**
-1. Retrieve Batch 3 results when complete
-2. Extract nsys PCIe bandwidth (Memcpy HtoD events)
-3. Compare 4-GPU vs 6-GPU scaling
-4. Upgrade sglang on ACES for prefetch=3 testing (0.5.8 lacks CLI arg)
+| 1473071 | **Sharded offload** | 4 | FSDP-style 1/N sharding + all-gather. Tests top optimization. |
 
 ---
 
@@ -268,32 +268,54 @@ BETWEEN REQUESTS: release_all() -> All layers to stub (except layer 0) -> CPU bu
 1. ~~**Step 10 vs Step 18 switch point**~~ RESOLVED: config misresolution. flow_shift=3.0 -> step 10, flow_shift=12.0 -> step 19. Confirmed in Batch 2b results.
 2. ~~**Benchmark validity**~~ RESOLVED: Batch 2b jobs used correct HF path -> flow_shift=12.0 confirmed in logs.
 3. ~~**Impact of flow_shift on performance gap**~~ ANSWERED: gap widened from 7% to 13%. Per-step gap widened from 9% to 15%.
-4. **Pure GPU baseline** -- 4x H100 80GB OOM confirmed (job 1454667). Would need 8 GPUs or smaller model.
-5. **Prefetch=3 performance** -- sglang 0.5.8 on ACES lacks `--dit-offload-prefetch-size`. Needs upgrade.
-6. **Actual PCIe bandwidth utilization** -- nsys jobs 1459999/1460000 submitted, awaiting results
-7. **6-GPU scaling** -- jobs 1459997/1459998 submitted with `--mem=0`, awaiting results
-8. **Root cause of per-step gap widening** -- why does flow_shift=12.0 hurt new offload more than old? Possibly memory access pattern change or prefetch timing mismatch.
-9. **2-GPU scaling test** -- if PCIe contention confirmed in nsys, test with fewer GPUs
+4. ~~**Actual PCIe bandwidth utilization**~~ ANSWERED: nsys jobs 1459999/1460000 confirmed 9.3x H2D, 36.5% BW degradation during NCCL overlap, NCCL +39.5% slower.
+5. **Pure GPU baseline** -- 4x H100 80GB OOM confirmed (job 1454667). Would need 8 GPUs or smaller model.
+6. **Prefetch=3 performance** -- sglang 0.5.8 on ACES lacks `--dit-offload-prefetch-size`. Deprioritized in favor of sharded offload.
+7. **6-GPU scaling** -- jobs 1459997/1459998 BOTH OOM'd. Cannot fit on a single ACES node even with `--mem=0`.
+8. **4-GPU new offload re-run** -- job 1459995 OOM'd unexpectedly (worked in Batch 2b). May be SLURM memory limit issue.
+9. **Sharded offload benchmark** -- job 1473071 submitted (Feb 24). Tests FSDP-style 1/N sharding with all-gather, the top recommended optimization.
 
 ---
 
 ## Recommendations
 
 ### Immediate (for PI)
-1. **Share updated results:** old offload is 13% faster on 4 GPUs with correct flow_shift=12.0, but uses 3x more VRAM (61GB vs 23GB peak)
+1. **Share updated results:** old offload is 5.1% faster on 4 GPUs with correct flow_shift=12.0, but uses 3x more VRAM (61GB vs 23GB peak)
 2. **Key insight:** New offload's advantage is memory efficiency (62% less VRAM), not speed. On PCIe systems without NVLink, the per-step overhead from independent full-model offloading on each GPU is the bottleneck.
-3. **Transformer switch analysis:** New offload handles the switch seamlessly (no spike), while old offload has a 47s spike. But this single-step penalty doesn't overcome the accumulated per-step advantage.
+3. **Root cause confirmed:** nsys CUPTI overlap analysis definitively proved PCIe contention -- 61% of H2D transfers overlap with NCCL, causing 36.5% BW degradation. Old offload has zero overlap.
 
-### Awaiting Batch 3 Results (Jobs 1459995-1460000)
-1. **4-GPU rerun** (1459995-1459996): Should get Run 3 profiled data this time (90 min limit)
-2. **6-GPU scaling** (1459997-1459998): Will show if more GPUs narrow the gap (hypothesis: new offload benefits less from more GPUs since it doesn't shard)
-3. **nsys profiling** (1459999-1460000): Will give actual PCIe HtoD bandwidth numbers
+### Sharded Offload Implementation (Feb 24)
+The top recommended optimization (FSDP-style weight sharding) has been **implemented and submitted for benchmarking** (job 1473071).
+
+**Design:** Each GPU copies 1/N of each layer's consolidated weight buffer from CPU to GPU via the async copy stream, then all ranks call `dist.all_gather_into_tensor()` on the compute stream to reconstruct the full buffer. This reduces per-GPU H2D from ~700MB/layer to ~175MB/layer (4x reduction), directly addressing the PCIe contention root cause.
+
+**Key properties:**
+- All-gather runs on compute stream (serialized with Ulysses all-to-all, no contention)
+- H2D shard copy is 4x smaller, reducing PCIe root complex pressure by 4x
+- Graceful degradation: falls back to non-sharded if `torch.distributed` not initialized or `world_size=1`
+- Mutually exclusive with `--dit-offload-pcie-aware`
+- VRAM unchanged (~23GB) since the all-gather output replaces the full prefetch buffer
+
+**Expected performance (4x H100 PCIe):**
+
+| Metric | Current New Offload | Sharded (Expected) |
+|--------|--------------------|--------------------|
+| H2D per GPU per step | 28 GB (700MB * 40) | 7 GB (175MB * 40) |
+| All-gather overhead | 0 | ~280ms/step (40 * 7ms) |
+| NCCL contention | +39.5% slowdown | Eliminated (H2D 4x smaller) |
+| Net per-step | ~23.7s | ~22.0-22.5s (est.) |
+
+### Batch 3 Outcomes
+- **nsys profiling** (1459999-1460000): COMPLETED. Definitive PCIe contention proof (see root_cause_analysis.md)
+- **Old offload 4-GPU** (1459996): COMPLETED. Run 2 clean timing used for report.
+- **New offload 4-GPU** (1459995): OOM'd. Unexpected -- worked in Batch 2b. May need `--mem=0`.
+- **6-GPU scaling** (1459997-1459998): BOTH OOM'd. Cannot fit on a single ACES node.
 
 ### Future Work
-1. Topology-aware prefetch: reduce `prefetch_size` on PCIe systems with sequence parallelism
-2. Upgrade sglang on ACES for prefetch=3 testing
-3. Test with 8 GPUs to match PR #15511's benchmark configuration
-4. Investigate per-step gap widening with flow_shift=12.0
+1. **Sharded offload benchmark** (job 1473071) -- awaiting results
+2. Test with 8 GPUs to match PR #15511's benchmark configuration
+3. GPU memory buffer pooling for reduced allocator churn (v2 optimization)
+4. Dedicated NCCL process group for sharded all-gather (v2 optimization)
 
 ---
 
