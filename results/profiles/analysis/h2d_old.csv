@@ -1,0 +1,2 @@
+direction,num_transfers,total_bytes,total_gb,total_time_s,avg_bw_gbps,avg_size_mb,min_size_mb,max_size_mb,avg_dur_ms,min_dur_ms,max_dur_ms
+H2D,18802,617665641332,617.665641332,59.722064641,10.342335701970427,32.85106059631954,4e-06,4200.595456,3.1763676545580255,0.000736,414.175612

@@ -1,0 +1,21 @@
+deviceId,gap_ms,before_kernel,after_kernel
+0,112113.494089,ncclDevKernel_AllGather_RING_LL(ncclDevKernelArgsStorage<(un,"void at::native::vectorized_gather_kernel<(int)16, long>(cha"
+0,81504.472073,triton_poi_fused_all_to_all_single_clone_permute_view_6,"void at::native::vectorized_elementwise_kernel<(int)4, at::n"
+0,62847.972602,ncclDevKernel_AllGather_RING_LL(ncclDevKernelArgsStorage<(un,"void at::native::vectorized_elementwise_kernel<(int)2, at::n"
+0,9410.657316,triton_poi_fused__to_copy_addmm_arange_cat_cos_div_exp_mul_s,triton_poi_fused__to_copy_addmm_arange_cat_cos_div_exp_mul_s
+0,8098.344153,nvjet_tst_192x128_64x5_1x4_h_bz_coopB_bias_TNT,triton_poi_fused__to_copy_add_0
+0,7578.688966,ncclDevKernel_AllGather_RING_LL(ncclDevKernelArgsStorage<(un,"void at::native::vectorized_elementwise_kernel<(int)4, at::n"
+0,5500.671213,"void at::native::vectorized_elementwise_kernel<(int)4, at::n","void at::native::vectorized_elementwise_kernel<(int)2, at::n"
+0,4085.349365,"void at::native::elementwise_kernel<(int)128, (int)4, void a",triton_poi_fused__to_copy_arange_copy_cos_div_mul_pow_recipr
+0,3565.355797,"void at::native::vectorized_gather_kernel<(int)16, long>(cha",_layer_norm_fwd_1pass_kernel
+0,1930.166953,triton_red_fused__unsafe_view_clone_mean_permute_view_2,triton_red_fused__unsafe_view_clone_mean_permute_view_2
+0,1437.94136,triton_red_fused__unsafe_view_clone_mean_permute_view_2,triton_red_fused__unsafe_view_clone_mean_permute_view_2
+0,1284.740676,void flashinfer::BatchQKApplyRotaryPosIdsCosSinCacheKernel<(,triton_poi_fused_all_to_all_single_clone_permute_view_0
+0,1203.667514,triton_poi_fused_addmm_gelu_view_5,triton_poi_fused_addmm_gelu_view_5
+0,1134.372193,triton_red_fused__unsafe_view_clone_mean_permute_view_2,triton_red_fused__unsafe_view_clone_mean_permute_view_2
+0,1125.574328,triton_poi_fused_addmm_gelu_view_5,triton_poi_fused_addmm_gelu_view_5
+0,1089.686862,triton_poi_fused_addmm_gelu_view_5,triton_poi_fused_addmm_gelu_view_5
+0,959.268345,triton_poi_fused__to_copy_addmm_arange_cat_cos_div_exp_mul_s,triton_poi_fused__to_copy_addmm_arange_cat_cos_div_exp_mul_s
+0,885.548392,triton_poi_fused__to_copy_arange_copy_div_mul_pow_reciprocal,triton_tem_fused_convolution_0
+0,809.337773,triton_red_fused__unsafe_view_clone_mean_permute_view_2,triton_red_fused__unsafe_view_clone_mean_permute_view_2
+0,807.72362,triton_per_fused__to_copy_addmm_arange_cat_cos_div_exp_mul_s,triton_per_fused__to_copy_addmm_arange_cat_cos_div_exp_mul_s

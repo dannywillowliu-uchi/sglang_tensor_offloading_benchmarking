@@ -1,0 +1,3 @@
+context,h2d_count,total_h2d_gb,avg_h2d_bw_mbps,min_h2d_bw_mbps,max_h2d_bw_mbps
+during_nccl,0,,,,
+no_nccl,6314,617.5186944,11140.890435702197,2971.6584132250496,55158.5900006

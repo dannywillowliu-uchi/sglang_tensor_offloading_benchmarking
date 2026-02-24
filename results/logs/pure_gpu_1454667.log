@@ -1,0 +1,578 @@
+==========================================
+PURE GPU BENCHMARK (3 iterations)
+==========================================
+Timestamp: Sun Feb 15 22:57:54 CST 2026
+Job ID: 1454667
+Node: ac049
+
+Config: --dit-cpu-offload false --dit-layerwise-offload false
+        --num-gpus 4 --ulysses-degree 4 --attention-backend sage_attn --enable-torch-compile
+NOTE: May OOM if 14B model cannot fit in 4x H100 VRAM without offloading
+
+Sun Feb 15 22:57:55 2026       
++---------------------------------------------------------------------------------------+
+| NVIDIA-SMI 535.288.01             Driver Version: 535.288.01   CUDA Version: 12.2     |
+|-----------------------------------------+----------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |         Memory-Usage | GPU-Util  Compute M. |
+|                                         |                      |               MIG M. |
+|=========================================+======================+======================|
+|   0  NVIDIA H100 PCIe               On  | 00000000:10:00.0 Off |                    0 |
+| N/A   28C    P0              49W / 350W |      0MiB / 81559MiB |      0%      Default |
+|                                         |                      |             Disabled |
++-----------------------------------------+----------------------+----------------------+
+|   1  NVIDIA H100 PCIe               On  | 00000000:11:00.0 Off |                    0 |
+| N/A   29C    P0              49W / 350W |      0MiB / 81559MiB |      0%      Default |
+|                                         |                      |             Disabled |
++-----------------------------------------+----------------------+----------------------+
+|   2  NVIDIA H100 PCIe               On  | 00000000:12:00.0 Off |                    0 |
+| N/A   26C    P0              49W / 350W |      0MiB / 81559MiB |      0%      Default |
+|                                         |                      |             Disabled |
++-----------------------------------------+----------------------+----------------------+
+|   3  NVIDIA H100 PCIe               On  | 00000000:13:00.0 Off |                    0 |
+| N/A   28C    P0              49W / 350W |      0MiB / 81559MiB |      0%      Default |
+|                                         |                      |             Disabled |
++-----------------------------------------+----------------------+----------------------+
+                                                                                         
++---------------------------------------------------------------------------------------+
+| Processes:                                                                            |
+|  GPU   GI   CI        PID   Type   Process name                            GPU Memory |
+|        ID   ID                                                             Usage      |
+|=======================================================================================|
+|  No running processes found                                                           |
++---------------------------------------------------------------------------------------+
+
+PyTorch: 2.9.1+cu128
+CUDA available: True
+GPU count: 4
+
+==========================================
+RUN 1/3: Warmup (torch.compile JIT)
+==========================================
+Start: Sun Feb 15 22:58:00 CST 2026
+[02-15 22:58:13] server_args: {"model_path": "Wan-AI/Wan2.2-T2V-A14B-Diffusers", "backend": "auto", "attention_backend": "sage_attn", "diffusers_attention_backend": null, "nccl_port": null, "trust_remote_code": false, "revision": null, "num_gpus": 4, "tp_size": 1, "sp_degree": 4, "ulysses_degree": 4, "ring_degree": 1, "dp_size": 1, "dp_degree": 1, "enable_cfg_parallel": false, "hsdp_replicate_dim": 1, "hsdp_shard_dim": 4, "dist_timeout": null, "pipeline_class_name": null, "lora_path": null, "lora_nickname": "default", "vae_path": null, "lora_target_modules": null, "dit_cpu_offload": false, "dit_layerwise_offload": false, "text_encoder_cpu_offload": false, "image_encoder_cpu_offload": true, "vae_cpu_offload": true, "use_fsdp_inference": false, "pin_cpu_memory": true, "comfyui_mode": false, "mask_strategy_file_path": null, "STA_mode": "STA_inference", "skip_time_steps": 15, "enable_torch_compile": true, "warmup": false, "warmup_resolutions": null, "disable_autocast": false, "VSA_sparsity": 0.0, "moba_config_path": null, "moba_config": {}, "master_port": 30027, "host": "127.0.0.1", "port": 30000, "webui": false, "webui_port": 12312, "scheduler_port": 5629, "output_path": "./results/pure_gpu_1454667_run1.mp4", "prompt_file_path": null, "model_paths": {}, "model_loaded": {"transformer": true, "vae": true}, "boundary_ratio": null, "log_level": "info"}
+[02-15 22:58:13] Local mode: True
+[02-15 22:58:13] Starting server...
+[02-15 22:58:22] Scheduler bind at endpoint: tcp://127.0.0.1:5629
+[02-15 22:58:22] Initializing distributed environment with world_size=4, device=cuda:0
+[02-15 22:58:23] Found nccl from library libnccl.so.2
+[02-15 22:58:23] sglang-diffusion is using nccl==2.27.5
+[02-15 22:58:23] Found nccl from library libnccl.so.2
+[02-15 22:58:23] sglang-diffusion is using nccl==2.27.5
+[02-15 22:58:24] No pipeline_class_name specified, using model_index.json
+[02-15 22:58:24] Diffusers version: 0.35.0.dev0
+[02-15 22:58:24] Using native sglang backend for model 'Wan-AI/Wan2.2-T2V-A14B-Diffusers'
+[02-15 22:58:24] Found model info: ModelInfo(pipeline_cls=<class 'sglang.multimodal_gen.runtime.pipelines.wan_pipeline.WanPipeline'>, sampling_param_cls=<class 'sglang.multimodal_gen.configs.sample.wan.Wan2_2_T2V_A14B_SamplingParam'>, pipeline_config_cls=<class 'sglang.multimodal_gen.configs.pipeline_configs.wan.Wan2_2_T2V_A14B_Config'>)
+[02-15 22:58:24] Using pipeline from model_index.json: WanPipeline
+[02-15 22:58:24] Loading pipeline modules...
+[02-15 22:58:24] Model already exists locally and is complete
+[02-15 22:58:24] Model path: Wan-AI/Wan2.2-T2V-A14B-Diffusers
+[02-15 22:58:24] Diffusers version: 0.35.0.dev0
+[02-15 22:58:24] Loading pipeline modules from config: {'_class_name': 'WanPipeline', '_diffusers_version': '0.35.0.dev0', 'boundary_ratio': 0.875, 'scheduler': ['diffusers', 'UniPCMultistepScheduler'], 'text_encoder': ['transformers', 'UMT5EncoderModel'], 'tokenizer': ['transformers', 'T5TokenizerFast'], 'transformer': ['diffusers', 'WanTransformer3DModel'], 'transformer_2': ['diffusers', 'WanTransformer3DModel'], 'vae': ['diffusers', 'AutoencoderKLWan']}
+[02-15 22:58:24] MoE pipeline detected. Adding transformer_2 to self.required_config_modules...
+[02-15 22:58:24] MoE pipeline detected. Setting boundary ratio to 0.875
+[02-15 22:58:24] Loading required components: ['text_encoder', 'tokenizer', 'vae', 'transformer', 'scheduler', 'transformer_2']
+Loading required modules:   0%|          | 0/6 [00:00<?, ?it/s]Loading required modules:   0%|          | 0/6 [00:00<?, ?it/s]Loading required modules:   0%|          | 0/6 [00:00<?, ?it/s]Loading required modules:   0%|          | 0/6 [00:00<?, ?it/s][02-15 22:58:24] Loading text_encoder from Wan-AI/Wan2.2-T2V-A14B-Diffusers/text_encoder. avail mem: 75.31 GB
+[02-15 22:58:27] [RunAI Streamer] Overall time to stream 10.6 GiB of all files to cpu: 2.47s, 4.3 GiB/s
+[02-15 22:58:27] [RunAI Streamer] Overall time to stream 10.6 GiB of all files to cpu: 2.55s, 4.2 GiB/s
+Loading required modules:  17%|█▋        | 1/6 [00:03<00:15,  3.03s/it][02-15 22:58:27] Loaded text_encoder: UMT5EncoderModel (sgl-diffusion version). model size: 21.16 GB, avail mem: 52.81 GB
+Loading required modules:  17%|█▋        | 1/6 [00:03<00:15,  3.03s/it][02-15 22:58:27] Loading tokenizer from Wan-AI/Wan2.2-T2V-A14B-Diffusers/tokenizer. avail mem: 52.81 GB
+[02-15 22:58:27] [RunAI Streamer] Overall time to stream 10.6 GiB of all files to cpu: 2.51s, 4.2 GiB/s
+[02-15 22:58:27] [RunAI Streamer] Overall time to stream 10.6 GiB of all files to cpu: 2.51s, 4.2 GiB/s
+Loading required modules:  17%|█▋        | 1/6 [00:03<00:15,  3.07s/it]Loading required modules:  17%|█▋        | 1/6 [00:03<00:15,  3.07s/it][02-15 22:58:27] Loaded tokenizer: T5TokenizerFast (sgl-diffusion version). model size: 0.00 GB, avail mem: 52.81 GB
+Loading required modules:  33%|███▎      | 2/6 [00:03<00:06,  1.50s/it]Loading required modules:  33%|███▎      | 2/6 [00:03<00:06,  1.50s/it][02-15 22:58:27] Loading vae from Wan-AI/Wan2.2-T2V-A14B-Diffusers/vae. avail mem: 52.81 GB
+Loading required modules:  33%|███▎      | 2/6 [00:03<00:06,  1.50s/it]Loading required modules:  33%|███▎      | 2/6 [00:03<00:06,  1.50s/it]Loading required modules:  50%|█████     | 3/6 [00:04<00:03,  1.23s/it][02-15 22:58:28] Loaded vae: AutoencoderKLWan (sgl-diffusion version). model size: 0.47 GB, avail mem: 52.81 GB
+Loading required modules:  50%|█████     | 3/6 [00:04<00:03,  1.24s/it][02-15 22:58:28] Loading transformer from Wan-AI/Wan2.2-T2V-A14B-Diffusers/transformer. avail mem: 52.81 GB
+[02-15 22:58:28] Loading WanTransformer3DModel from 12 safetensors files, default_dtype: torch.bfloat16
+Loading required modules:  50%|█████     | 3/6 [00:04<00:03,  1.24s/it]Loading required modules:  50%|█████     | 3/6 [00:04<00:03,  1.25s/it][02-15 22:58:28] Using Sage Attention backend
+[02-15 22:59:00] [RunAI Streamer] Overall time to stream 53.2 GiB of all files to cpu: 32.06s, 1.7 GiB/s
+[02-15 22:59:00] [RunAI Streamer] Overall time to stream 53.2 GiB of all files to cpu: 32.09s, 1.7 GiB/s
+[02-15 22:59:00] [RunAI Streamer] Overall time to stream 53.2 GiB of all files to cpu: 32.09s, 1.7 GiB/s
+[02-15 22:59:00] [RunAI Streamer] Overall time to stream 53.2 GiB of all files to cpu: 32.14s, 1.7 GiB/s
+Loading required modules:  67%|██████▋   | 4/6 [01:02<00:47, 23.58s/it][02-15 22:59:26] Loaded model with 14.29B parameters
+[02-15 22:59:26] Loaded transformer: WanTransformer3DModel (sgl-diffusion version). model size: 26.61 GB, avail mem: 23.86 GB
+Loading required modules:  67%|██████▋   | 4/6 [01:02<00:47, 23.63s/it][02-15 22:59:26] Loading scheduler from Wan-AI/Wan2.2-T2V-A14B-Diffusers/scheduler. avail mem: 23.86 GB
+[02-15 22:59:26] Loaded scheduler: UniPCMultistepScheduler (sgl-diffusion version). model size: 0.00 GB, avail mem: 23.86 GB
+[02-15 22:59:26] Loading transformer_2 from Wan-AI/Wan2.2-T2V-A14B-Diffusers/transformer_2. avail mem: 23.86 GB
+[02-15 22:59:26] Loading WanTransformer3DModel from 12 safetensors files, default_dtype: torch.bfloat16
+Loading required modules:  67%|██████▋   | 4/6 [01:02<00:47, 23.76s/it]Loading required modules:  67%|██████▋   | 4/6 [01:02<00:47, 23.83s/it][02-15 22:59:51] [RunAI Streamer] Overall time to stream 53.2 GiB of all files to cpu: 24.99s, 2.1 GiB/s
+[02-15 22:59:51] [RunAI Streamer] Overall time to stream 53.2 GiB of all files to cpu: 25.03s, 2.1 GiB/s
+[02-15 22:59:51] [RunAI Streamer] Overall time to stream 53.2 GiB of all files to cpu: 24.72s, 2.2 GiB/s
+[02-15 22:59:51] [RunAI Streamer] Overall time to stream 53.2 GiB of all files to cpu: 24.61s, 2.2 GiB/s
+Traceback (most recent call last):
+Traceback (most recent call last):
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/component_loader.py", line 158, in load
+    component = self.load_customized(
+                ^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/component_loader.py", line 728, in load_customized
+    model = maybe_load_fsdp_model(
+            ^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/fsdp_load.py", line 147, in maybe_load_fsdp_model
+    load_model_from_full_model_state_dict(
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/component_loader.py", line 158, in load
+    component = self.load_customized(
+                ^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/fsdp_load.py", line 284, in load_model_from_full_model_state_dict
+    sharded_tensor = torch.empty_like(
+                     ^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/component_loader.py", line 728, in load_customized
+    model = maybe_load_fsdp_model(
+            ^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/_prims_common/wrappers.py", line 309, in _fn
+    result = fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/fsdp_load.py", line 147, in maybe_load_fsdp_model
+    load_model_from_full_model_state_dict(
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/_refs/__init__.py", line 5113, in empty_like
+    return torch.empty_permuted(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/fsdp_load.py", line 284, in load_model_from_full_model_state_dict
+    sharded_tensor = torch.empty_like(
+                     ^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/_prims_common/wrappers.py", line 309, in _fn
+    result = fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/_refs/__init__.py", line 5113, in empty_like
+    return torch.empty_permuted(
+           ^^^^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 50.00 MiB. GPU 0 has a total capacity of 79.11 GiB of which 26.12 MiB is free. Process 480488 has 450.00 MiB memory in use. Process 480487 has 450.00 MiB memory in use. Including non-PyTorch memory, this process has 77.74 GiB memory in use. Process 480489 has 450.00 MiB memory in use. Of the allocated memory 69.85 GiB is allocated by PyTorch, and 4.10 GiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 136.00 MiB. GPU 3 has a total capacity of 79.11 GiB of which 126.81 MiB is free. Including non-PyTorch memory, this process has 78.98 GiB memory in use. Of the allocated memory 71.05 GiB is allocated by PyTorch, and 4.14 GiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+[02-15 23:00:02] Error while loading customized transformer_2, falling back to native version
+Traceback (most recent call last):
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/component_loader.py", line 158, in load
+    component = self.load_customized(
+                ^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/component_loader.py", line 728, in load_customized
+    model = maybe_load_fsdp_model(
+            ^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/fsdp_load.py", line 147, in maybe_load_fsdp_model
+    load_model_from_full_model_state_dict(
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/fsdp_load.py", line 284, in load_model_from_full_model_state_dict
+    sharded_tensor = torch.empty_like(
+                     ^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/_prims_common/wrappers.py", line 309, in _fn
+    result = fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/_refs/__init__.py", line 5113, in empty_like
+    return torch.empty_permuted(
+           ^^^^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 136.00 MiB. GPU 2 has a total capacity of 79.11 GiB of which 20.81 MiB is free. Including non-PyTorch memory, this process has 79.08 GiB memory in use. Of the allocated memory 71.28 GiB is allocated by PyTorch, and 4.01 GiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+Traceback (most recent call last):
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/component_loader.py", line 158, in load
+    component = self.load_customized(
+                ^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/component_loader.py", line 728, in load_customized
+    model = maybe_load_fsdp_model(
+            ^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/fsdp_load.py", line 147, in maybe_load_fsdp_model
+    load_model_from_full_model_state_dict(
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/fsdp_load.py", line 284, in load_model_from_full_model_state_dict
+    sharded_tensor = torch.empty_like(
+                     ^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/_prims_common/wrappers.py", line 309, in _fn
+    result = fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/_refs/__init__.py", line 5113, in empty_like
+    return torch.empty_permuted(
+           ^^^^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 136.00 MiB. GPU 1 has a total capacity of 79.11 GiB of which 134.81 MiB is free. Including non-PyTorch memory, this process has 78.97 GiB memory in use. Of the allocated memory 71.05 GiB is allocated by PyTorch, and 4.13 GiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+
+
+
+
+Loading checkpoint shards:   0%|          | 0/12 [00:00<?, ?it/s][ALoading checkpoint shards:   0%|          | 0/12 [00:00<?, ?it/s][ALoading checkpoint shards:   0%|          | 0/12 [00:00<?, ?it/s][ALoading checkpoint shards:   0%|          | 0/12 [00:00<?, ?it/s][ALoading checkpoint shards: 100%|██████████| 12/12 [00:00<00:00, 149.62it/s]Loading checkpoint shards: 100%|██████████| 12/12 [00:00<00:00, 149.68it/s]
+Loading checkpoint shards: 100%|██████████| 12/12 [00:00<00:00, 149.55it/s]
+
+Loading checkpoint shards: 100%|██████████| 12/12 [00:00<00:00, 149.39it/s]
+[02-15 23:00:03] Error while loading component: transformer_2, component_model_path='Wan-AI/Wan2.2-T2V-A14B-Diffusers/transformer_2'
+Loading required modules:  83%|████████▎ | 5/6 [01:39<00:19, 19.84s/it]Loading required modules:  83%|████████▎ | 5/6 [01:39<00:19, 19.84s/it]Loading required modules:  83%|████████▎ | 5/6 [01:39<00:19, 19.84s/it]
+
+
+
+OOM detected. Possible solutions:
+  - If the OOM occurs during loading:
+    1. Enable CPU offload for memory-intensive components, or use `--dit-layerwise-offload` for DiT
+  - If the OOM occurs during runtime:
+    1. Reduce the number of output tokens by lowering resolution or decreasing `--num-frames`
+    2. Enable SP and/or TP
+    3. Enable a sparse-attention backend
+  Or, open an issue on GitHub https://github.com/sgl-project/sglang/issues/new/choose
+
+
+OOM detected. Possible solutions:
+  - If the OOM occurs during loading:
+    1. Enable CPU offload for memory-intensive components, or use `--dit-layerwise-offload` for DiT
+  - If the OOM occurs during runtime:
+    1. Reduce the number of output tokens by lowering resolution or decreasing `--num-frames`
+    2. Enable SP and/or TP
+    3. Enable a sparse-attention backend
+  Or, open an issue on GitHub https://github.com/sgl-project/sglang/issues/new/choose
+
+OOM detected. Possible solutions:
+  - If the OOM occurs during loading:
+    1. Enable CPU offload for memory-intensive components, or use `--dit-layerwise-offload` for DiT
+  - If the OOM occurs during runtime:
+    1. Reduce the number of output tokens by lowering resolution or decreasing `--num-frames`
+    2. Enable SP and/or TP
+    3. Enable a sparse-attention backend
+  Or, open an issue on GitHub https://github.com/sgl-project/sglang/issues/new/choose
+
+
+Loading required modules:  83%|████████▎ | 5/6 [01:39<00:19, 19.84s/it]
+
+OOM detected. Possible solutions:
+  - If the OOM occurs during loading:
+    1. Enable CPU offload for memory-intensive components, or use `--dit-layerwise-offload` for DiT
+  - If the OOM occurs during runtime:
+    1. Reduce the number of output tokens by lowering resolution or decreasing `--num-frames`
+    2. Enable SP and/or TP
+    3. Enable a sparse-attention backend
+  Or, open an issue on GitHub https://github.com/sgl-project/sglang/issues/new/choose
+
+[02-15 23:00:03] Worker 0: Shutdown complete.
+Process sglang-diffusionWorker-0:
+Process sglang-diffusionWorker-1:
+Process sglang-diffusionWorker-3:
+Process sglang-diffusionWorker-2:
+Traceback (most recent call last):
+Traceback (most recent call last):
+Traceback (most recent call last):
+Traceback (most recent call last):
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/component_loader.py", line 158, in load
+    component = self.load_customized(
+                ^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/component_loader.py", line 728, in load_customized
+    model = maybe_load_fsdp_model(
+            ^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/fsdp_load.py", line 147, in maybe_load_fsdp_model
+    load_model_from_full_model_state_dict(
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/component_loader.py", line 158, in load
+    component = self.load_customized(
+                ^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/fsdp_load.py", line 284, in load_model_from_full_model_state_dict
+    sharded_tensor = torch.empty_like(
+                     ^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/component_loader.py", line 158, in load
+    component = self.load_customized(
+                ^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/_prims_common/wrappers.py", line 309, in _fn
+    result = fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/component_loader.py", line 728, in load_customized
+    model = maybe_load_fsdp_model(
+            ^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/component_loader.py", line 728, in load_customized
+    model = maybe_load_fsdp_model(
+            ^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/_refs/__init__.py", line 5113, in empty_like
+    return torch.empty_permuted(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/fsdp_load.py", line 147, in maybe_load_fsdp_model
+    load_model_from_full_model_state_dict(
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/fsdp_load.py", line 147, in maybe_load_fsdp_model
+    load_model_from_full_model_state_dict(
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/component_loader.py", line 158, in load
+    component = self.load_customized(
+                ^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/component_loader.py", line 728, in load_customized
+    model = maybe_load_fsdp_model(
+            ^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/fsdp_load.py", line 284, in load_model_from_full_model_state_dict
+    sharded_tensor = torch.empty_like(
+                     ^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/fsdp_load.py", line 284, in load_model_from_full_model_state_dict
+    sharded_tensor = torch.empty_like(
+                     ^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 50.00 MiB. GPU 0 has a total capacity of 79.11 GiB of which 26.12 MiB is free. Process 480488 has 450.00 MiB memory in use. Process 480487 has 450.00 MiB memory in use. Including non-PyTorch memory, this process has 77.74 GiB memory in use. Process 480489 has 450.00 MiB memory in use. Of the allocated memory 69.85 GiB is allocated by PyTorch, and 4.10 GiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/_prims_common/wrappers.py", line 309, in _fn
+    result = fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/fsdp_load.py", line 147, in maybe_load_fsdp_model
+    load_model_from_full_model_state_dict(
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/_prims_common/wrappers.py", line 309, in _fn
+    result = fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+
+During handling of the above exception, another exception occurred:
+
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/_refs/__init__.py", line 5113, in empty_like
+    return torch.empty_permuted(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/_refs/__init__.py", line 5113, in empty_like
+    return torch.empty_permuted(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/fsdp_load.py", line 284, in load_model_from_full_model_state_dict
+    sharded_tensor = torch.empty_like(
+                     ^^^^^^^^^^^^^^^^^
+Traceback (most recent call last):
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 136.00 MiB. GPU 2 has a total capacity of 79.11 GiB of which 20.81 MiB is free. Including non-PyTorch memory, this process has 79.08 GiB memory in use. Of the allocated memory 71.28 GiB is allocated by PyTorch, and 4.01 GiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 136.00 MiB. GPU 1 has a total capacity of 79.11 GiB of which 134.81 MiB is free. Including non-PyTorch memory, this process has 78.97 GiB memory in use. Of the allocated memory 71.05 GiB is allocated by PyTorch, and 4.13 GiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/_prims_common/wrappers.py", line 309, in _fn
+    result = fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/_refs/__init__.py", line 5113, in empty_like
+    return torch.empty_permuted(
+           ^^^^^^^^^^^^^^^^^^^^^
+
+During handling of the above exception, another exception occurred:
+
+
+During handling of the above exception, another exception occurred:
+
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 136.00 MiB. GPU 3 has a total capacity of 79.11 GiB of which 126.81 MiB is free. Including non-PyTorch memory, this process has 78.98 GiB memory in use. Of the allocated memory 71.05 GiB is allocated by PyTorch, and 4.14 GiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+Traceback (most recent call last):
+Traceback (most recent call last):
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/managers/gpu_worker.py", line 315, in run_scheduler_process
+    scheduler = Scheduler(
+                ^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/managers/scheduler.py", line 71, in __init__
+    worker = GPUWorker(
+             ^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/managers/gpu_worker.py", line 61, in __init__
+    self.init_device_and_model()
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/managers/gpu_worker.py", line 90, in init_device_and_model
+    self.pipeline = build_pipeline(self.server_args)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/pipelines_core/__init__.py", line 74, in build_pipeline
+    pipeline = pipeline_cls(model_path, server_args)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/pipelines_core/lora_pipeline.py", line 71, in __init__
+    super().__init__(*args, **kwargs)
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/pipelines_core/composed_pipeline_base.py", line 90, in __init__
+    self.modules = self.load_modules(server_args, loaded_modules)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/pipelines_core/composed_pipeline_base.py", line 278, in load_modules
+    module, memory_usage = PipelineComponentLoader.load_module(
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/component_loader.py", line 857, in load_module
+    raise e
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/managers/gpu_worker.py", line 315, in run_scheduler_process
+    scheduler = Scheduler(
+                ^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/managers/gpu_worker.py", line 315, in run_scheduler_process
+    scheduler = Scheduler(
+                ^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/managers/gpu_worker.py", line 315, in run_scheduler_process
+    scheduler = Scheduler(
+                ^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/component_loader.py", line 847, in load_module
+    return loader.load(
+           ^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/managers/scheduler.py", line 71, in __init__
+    worker = GPUWorker(
+             ^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/managers/scheduler.py", line 71, in __init__
+    worker = GPUWorker(
+             ^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/managers/scheduler.py", line 71, in __init__
+    worker = GPUWorker(
+             ^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/component_loader.py", line 178, in load
+    component = component.to(device=target_device)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/managers/gpu_worker.py", line 61, in __init__
+    self.init_device_and_model()
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/managers/gpu_worker.py", line 61, in __init__
+    self.init_device_and_model()
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/managers/gpu_worker.py", line 61, in __init__
+    self.init_device_and_model()
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/diffusers/models/modeling_utils.py", line 1435, in to
+    return super().to(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/managers/gpu_worker.py", line 90, in init_device_and_model
+    self.pipeline = build_pipeline(self.server_args)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1371, in to
+    return self._apply(convert)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/managers/gpu_worker.py", line 90, in init_device_and_model
+    self.pipeline = build_pipeline(self.server_args)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/managers/gpu_worker.py", line 90, in init_device_and_model
+    self.pipeline = build_pipeline(self.server_args)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/pipelines_core/__init__.py", line 74, in build_pipeline
+    pipeline = pipeline_cls(model_path, server_args)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 930, in _apply
+    module._apply(fn)
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/pipelines_core/__init__.py", line 74, in build_pipeline
+    pipeline = pipeline_cls(model_path, server_args)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/pipelines_core/__init__.py", line 74, in build_pipeline
+    pipeline = pipeline_cls(model_path, server_args)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/pipelines_core/lora_pipeline.py", line 71, in __init__
+    super().__init__(*args, **kwargs)
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 930, in _apply
+    module._apply(fn)
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/pipelines_core/lora_pipeline.py", line 71, in __init__
+    super().__init__(*args, **kwargs)
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/pipelines_core/lora_pipeline.py", line 71, in __init__
+    super().__init__(*args, **kwargs)
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 930, in _apply
+    module._apply(fn)
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/pipelines_core/composed_pipeline_base.py", line 90, in __init__
+    self.modules = self.load_modules(server_args, loaded_modules)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/pipelines_core/composed_pipeline_base.py", line 90, in __init__
+    self.modules = self.load_modules(server_args, loaded_modules)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/pipelines_core/composed_pipeline_base.py", line 90, in __init__
+    self.modules = self.load_modules(server_args, loaded_modules)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 957, in _apply
+    param_applied = fn(param)
+                    ^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/pipelines_core/composed_pipeline_base.py", line 278, in load_modules
+    module, memory_usage = PipelineComponentLoader.load_module(
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/pipelines_core/composed_pipeline_base.py", line 278, in load_modules
+    module, memory_usage = PipelineComponentLoader.load_module(
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/pipelines_core/composed_pipeline_base.py", line 278, in load_modules
+    module, memory_usage = PipelineComponentLoader.load_module(
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1357, in convert
+    return t.to(
+           ^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/component_loader.py", line 857, in load_module
+    raise e
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/component_loader.py", line 857, in load_module
+    raise e
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/component_loader.py", line 857, in load_module
+    raise e
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/component_loader.py", line 847, in load_module
+    return loader.load(
+           ^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/component_loader.py", line 847, in load_module
+    return loader.load(
+           ^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/component_loader.py", line 847, in load_module
+    return loader.load(
+           ^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 100.00 MiB. GPU 0 has a total capacity of 79.11 GiB of which 24.12 MiB is free. Process 480488 has 450.00 MiB memory in use. Process 480487 has 450.00 MiB memory in use. Including non-PyTorch memory, this process has 77.74 GiB memory in use. Process 480489 has 450.00 MiB memory in use. Of the allocated memory 69.85 GiB is allocated by PyTorch, and 4.10 GiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/component_loader.py", line 178, in load
+    component = component.to(device=target_device)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/component_loader.py", line 178, in load
+    component = component.to(device=target_device)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/component_loader.py", line 178, in load
+    component = component.to(device=target_device)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/diffusers/models/modeling_utils.py", line 1435, in to
+    return super().to(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/diffusers/models/modeling_utils.py", line 1435, in to
+    return super().to(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/diffusers/models/modeling_utils.py", line 1435, in to
+    return super().to(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1371, in to
+    return self._apply(convert)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1371, in to
+    return self._apply(convert)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1371, in to
+    return self._apply(convert)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 930, in _apply
+    module._apply(fn)
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 930, in _apply
+    module._apply(fn)
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 930, in _apply
+    module._apply(fn)
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 930, in _apply
+    module._apply(fn)
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 930, in _apply
+    module._apply(fn)
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 930, in _apply
+    module._apply(fn)
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 957, in _apply
+    param_applied = fn(param)
+                    ^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 930, in _apply
+    module._apply(fn)
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 957, in _apply
+    param_applied = fn(param)
+                    ^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1357, in convert
+    return t.to(
+           ^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 957, in _apply
+    param_applied = fn(param)
+                    ^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1357, in convert
+    return t.to(
+           ^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1357, in convert
+    return t.to(
+           ^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 600.00 MiB. GPU 1 has a total capacity of 79.11 GiB of which 32.81 MiB is free. Including non-PyTorch memory, this process has 79.07 GiB memory in use. Of the allocated memory 71.15 GiB is allocated by PyTorch, and 4.12 GiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 600.00 MiB. GPU 3 has a total capacity of 79.11 GiB of which 24.81 MiB is free. Including non-PyTorch memory, this process has 79.08 GiB memory in use. Of the allocated memory 71.15 GiB is allocated by PyTorch, and 4.13 GiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 100.00 MiB. GPU 2 has a total capacity of 79.11 GiB of which 18.81 MiB is free. Including non-PyTorch memory, this process has 79.08 GiB memory in use. Of the allocated memory 71.29 GiB is allocated by PyTorch, and 4.01 GiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+[rank1]:[W215 23:00:06.102977618 ProcessGroupNCCL.cpp:1524] Warning: WARNING: destroy_process_group() was not called before program exit, which can leak resources. For more info, please see https://pytorch.org/docs/stable/distributed.html#shutdown (function operator())
+[rank0]:[W215 23:00:06.102975580 ProcessGroupNCCL.cpp:1524] Warning: WARNING: destroy_process_group() was not called before program exit, which can leak resources. For more info, please see https://pytorch.org/docs/stable/distributed.html#shutdown (function operator())
+[rank3]:[W215 23:00:06.103243743 ProcessGroupNCCL.cpp:1524] Warning: WARNING: destroy_process_group() was not called before program exit, which can leak resources. For more info, please see https://pytorch.org/docs/stable/distributed.html#shutdown (function operator())
+[rank2]:[W215 23:00:06.103011313 ProcessGroupNCCL.cpp:1524] Warning: WARNING: destroy_process_group() was not called before program exit, which can leak resources. For more info, please see https://pytorch.org/docs/stable/distributed.html#shutdown (function operator())
+[02-15 23:00:06] Rank 0 scheduler is dead. Please check if there are relevant logs.
+[02-15 23:00:08] Exit code: 1
+Traceback (most recent call last):
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/bin/sglang", line 7, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/cli/main.py", line 42, in main
+    args.func(args, extra_argv)
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/cli/generate.py", line 29, in generate
+    generate_cmd(parsed_args)
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/entrypoints/cli/generate.py", line 116, in generate_cmd
+    generator = DiffGenerator.from_pretrained(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/entrypoints/diffusion_generator.py", line 102, in from_pretrained
+    return cls.from_server_args(server_args, local_mode=local_mode)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/entrypoints/diffusion_generator.py", line 122, in from_server_args
+    instance.local_scheduler_process = instance._start_local_server_if_needed()
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/entrypoints/diffusion_generator.py", line 139, in _start_local_server_if_needed
+    processes = launch_server(self.server_args, launch_http_server=False)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/launch_server.py", line 153, in launch_server
+    data = reader.recv()
+           ^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/multiprocessing/connection.py", line 250, in recv
+    buf = self._recv_bytes()
+          ^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/multiprocessing/connection.py", line 430, in _recv_bytes
+    buf = self._recv(4)
+          ^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/multiprocessing/connection.py", line 399, in _recv
+    raise EOFError
+EOFError
+
+real	2m9.429s
+user	2m33.033s
+sys	9m23.363s

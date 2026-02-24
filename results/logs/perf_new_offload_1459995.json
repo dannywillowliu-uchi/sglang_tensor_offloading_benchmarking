@@ -1,0 +1,151 @@
+{
+  "timestamp": "2026-02-20T22:39:51.523166+00:00",
+  "request_id": "9c07f216-97a4-4364-9302-b3cdfa349bfd",
+  "commit_hash": "N/A",
+  "tag": "cli_generate",
+  "total_duration_ms": 1386756.7871329375,
+  "steps": [
+    {
+      "name": "InputValidationStage",
+      "duration_ms": 1.5650170389562845
+    },
+    {
+      "name": "TextEncodingStage",
+      "duration_ms": 6446.404919028282
+    },
+    {
+      "name": "ConditioningStage",
+      "duration_ms": 0.04075700417160988
+    },
+    {
+      "name": "TimestepPreparationStage",
+      "duration_ms": 2.491832012310624
+    },
+    {
+      "name": "LatentPreparationStage",
+      "duration_ms": 43.500169878825545
+    },
+    {
+      "name": "DenoisingStage",
+      "duration_ms": 669142.3177269753
+    },
+    {
+      "name": "DecodingStage",
+      "duration_ms": 29327.147238887846
+    }
+  ],
+  "denoise_steps_ms": [
+    {
+      "step": 0,
+      "duration_ms": 64853.73440897092
+    },
+    {
+      "step": 1,
+      "duration_ms": 22741.61565187387
+    },
+    {
+      "step": 2,
+      "duration_ms": 22797.53451095894
+    },
+    {
+      "step": 3,
+      "duration_ms": 22797.802357934415
+    },
+    {
+      "step": 4,
+      "duration_ms": 22822.261288994923
+    },
+    {
+      "step": 5,
+      "duration_ms": 22883.042630041018
+    },
+    {
+      "step": 6,
+      "duration_ms": 23102.95698302798
+    },
+    {
+      "step": 7,
+      "duration_ms": 23162.42033103481
+    },
+    {
+      "step": 8,
+      "duration_ms": 23224.706592969596
+    },
+    {
+      "step": 9,
+      "duration_ms": 23173.34701307118
+    },
+    {
+      "step": 10,
+      "duration_ms": 23305.926172062755
+    },
+    {
+      "step": 11,
+      "duration_ms": 23265.20591112785
+    },
+    {
+      "step": 12,
+      "duration_ms": 23267.809596145526
+    },
+    {
+      "step": 13,
+      "duration_ms": 23959.489039843902
+    },
+    {
+      "step": 14,
+      "duration_ms": 23248.020821018144
+    },
+    {
+      "step": 15,
+      "duration_ms": 23299.104606965557
+    },
+    {
+      "step": 16,
+      "duration_ms": 23293.895923998207
+    },
+    {
+      "step": 17,
+      "duration_ms": 23206.367389997467
+    },
+    {
+      "step": 18,
+      "duration_ms": 24297.630856046453
+    },
+    {
+      "step": 19,
+      "duration_ms": 23222.31370420195
+    },
+    {
+      "step": 20,
+      "duration_ms": 23256.00393000059
+    },
+    {
+      "step": 21,
+      "duration_ms": 23265.359592158347
+    },
+    {
+      "step": 22,
+      "duration_ms": 23324.50418290682
+    },
+    {
+      "step": 23,
+      "duration_ms": 23149.557556025684
+    },
+    {
+      "step": 24,
+      "duration_ms": 23240.733628859743
+    },
+    {
+      "step": 25,
+      "duration_ms": 23256.604257039726
+    },
+    {
+      "step": 26,
+      "duration_ms": 23407.128466991708
+    }
+  ],
+  "meta": {
+    "prompt": "A cat walks on the grass, realistic",
+    "model": "Wan-AI/Wan2.2-T2V-A14B-Diffusers"
+  }
+}

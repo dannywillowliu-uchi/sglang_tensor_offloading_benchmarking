@@ -1,0 +1,132 @@
+==========================================
+NEW OFFLOAD + PREFETCH=3 BENCHMARK (3 iterations)
+==========================================
+Timestamp: Sun Feb 15 23:00:24 CST 2026
+Job ID: 1454670
+Node: ac049
+
+Config: --dit-layerwise-offload true --dit-offload-prefetch-size 3
+        --num-gpus 4 --ulysses-degree 4 --attention-backend sage_attn --enable-torch-compile
+
+Sun Feb 15 23:00:24 2026       
++---------------------------------------------------------------------------------------+
+| NVIDIA-SMI 535.288.01             Driver Version: 535.288.01   CUDA Version: 12.2     |
+|-----------------------------------------+----------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |         Memory-Usage | GPU-Util  Compute M. |
+|                                         |                      |               MIG M. |
+|=========================================+======================+======================|
+|   0  NVIDIA H100 PCIe               On  | 00000000:10:00.0 Off |                    0 |
+| N/A   25C    P0              49W / 350W |      0MiB / 81559MiB |      0%      Default |
+|                                         |                      |             Disabled |
++-----------------------------------------+----------------------+----------------------+
+|   1  NVIDIA H100 PCIe               On  | 00000000:11:00.0 Off |                    0 |
+| N/A   26C    P0              49W / 350W |      0MiB / 81559MiB |      0%      Default |
+|                                         |                      |             Disabled |
++-----------------------------------------+----------------------+----------------------+
+|   2  NVIDIA H100 PCIe               On  | 00000000:12:00.0 Off |                    0 |
+| N/A   24C    P0              48W / 350W |      0MiB / 81559MiB |      0%      Default |
+|                                         |                      |             Disabled |
++-----------------------------------------+----------------------+----------------------+
+|   3  NVIDIA H100 PCIe               On  | 00000000:13:00.0 Off |                    0 |
+| N/A   26C    P0              48W / 350W |      0MiB / 81559MiB |      0%      Default |
+|                                         |                      |             Disabled |
++-----------------------------------------+----------------------+----------------------+
+                                                                                         
++---------------------------------------------------------------------------------------+
+| Processes:                                                                            |
+|  GPU   GI   CI        PID   Type   Process name                            GPU Memory |
+|        ID   ID                                                             Usage      |
+|=======================================================================================|
+|  No running processes found                                                           |
++---------------------------------------------------------------------------------------+
+
+PyTorch: 2.9.1+cu128
+CUDA available: True
+GPU count: 4
+
+==========================================
+RUN 1/3: Warmup (torch.compile JIT)
+==========================================
+Start: Sun Feb 15 23:00:30 CST 2026
+usage: sglang [-h] [--config CONFIG] [--perf-dump-path PERF_DUMP_PATH]
+              [--model-path MODEL_PATH] [--vae-path VAE_PATH]
+              [--attention-backend {fa2,fa,sliding_tile_attn,torch_sdpa,sage_attn,sage_attn_3,video_sparse_attn,vmoba_attn,aiter,sla_attn,sage_sla_attn,no_attention,fa3,fa4}]
+              [--diffusers-attention-backend DIFFUSERS_ATTENTION_BACKEND]
+              [--trust-remote-code [TRUST_REMOTE_CODE]] [--revision REVISION]
+              [--num-gpus NUM_GPUS] [--tp-size TP_SIZE]
+              [--sp-degree SP_DEGREE] [--ulysses-degree ULYSSES_DEGREE]
+              [--ring-degree RING_DEGREE] [--enable-cfg-parallel]
+              [--data-parallel-size DATA_PARALLEL_SIZE]
+              [--hsdp-replicate-dim HSDP_REPLICATE_DIM]
+              [--hsdp-shard-dim HSDP_SHARD_DIM] [--dist-timeout DIST_TIMEOUT]
+              [--prompt-file-path PROMPT_FILE_PATH]
+              [--STA-mode {STA_inference,STA_searching,STA_tuning,STA_tuning_cfg,None}]
+              [--skip-time-steps SKIP_TIME_STEPS]
+              [--mask-strategy-file-path MASK_STRATEGY_FILE_PATH]
+              [--enable-torch-compile [ENABLE_TORCH_COMPILE]]
+              [--warmup [WARMUP]]
+              [--warmup-resolutions WARMUP_RESOLUTIONS [WARMUP_RESOLUTIONS ...]]
+              [--dit-cpu-offload [DIT_CPU_OFFLOAD]]
+              [--dit-layerwise-offload [DIT_LAYERWISE_OFFLOAD]]
+              [--use-fsdp-inference [USE_FSDP_INFERENCE]]
+              [--text-encoder-cpu-offload [TEXT_ENCODER_CPU_OFFLOAD]]
+              [--image-encoder-cpu-offload [IMAGE_ENCODER_CPU_OFFLOAD]]
+              [--vae-cpu-offload [VAE_CPU_OFFLOAD]]
+              [--pin-cpu-memory [PIN_CPU_MEMORY]]
+              [--disable-autocast [DISABLE_AUTOCAST]]
+              [--VSA-sparsity VSA_SPARSITY] [--master-port MASTER_PORT]
+              [--scheduler-port SCHEDULER_PORT] [--host HOST] [--port PORT]
+              [--webui [WEBUI]] [--webui-port WEBUI_PORT]
+              [--output-path OUTPUT_PATH] [--lora-path LORA_PATH]
+              [--lora-nickname LORA_NICKNAME]
+              [--pipeline-config-path PIPELINE_CONFIG_PATH]
+              [--embedded-cfg-scale EMBEDDED_CFG_SCALE]
+              [--flow-shift FLOW_SHIFT] [--dit-precision {fp32,fp16,bf16}]
+              [--vae-precision {fp32,fp16,bf16}] [--vae-tiling [VAE_TILING]]
+              [--vae-sp [VAE_SP]]
+              [--text-encoder-precisions {fp32,fp16,bf16} [{fp32,fp16,bf16} ...]]
+              [--image-encoder-precision {fp32,fp16,bf16}]
+              [--dmd-denoising-steps DMD_DENOISING_STEPS]
+              [--vae-config.load-encoder [VAE_CONFIG.LOAD_ENCODER]]
+              [--vae-config.load-decoder [VAE_CONFIG.LOAD_DECODER]]
+              [--vae-config.tile-sample-min-height VAE_CONFIG.TILE_SAMPLE_MIN_HEIGHT]
+              [--vae-config.tile-sample-min-width VAE_CONFIG.TILE_SAMPLE_MIN_WIDTH]
+              [--vae-config.tile-sample-min-num-frames VAE_CONFIG.TILE_SAMPLE_MIN_NUM_FRAMES]
+              [--vae-config.tile-sample-stride-height VAE_CONFIG.TILE_SAMPLE_STRIDE_HEIGHT]
+              [--vae-config.tile-sample-stride-width VAE_CONFIG.TILE_SAMPLE_STRIDE_WIDTH]
+              [--vae-config.tile-sample-stride-num-frames VAE_CONFIG.TILE_SAMPLE_STRIDE_NUM_FRAMES]
+              [--vae-config.blend-num-frames VAE_CONFIG.BLEND_NUM_FRAMES]
+              [--vae-config.use-tiling [VAE_CONFIG.USE_TILING]]
+              [--vae-config.use-temporal-tiling [VAE_CONFIG.USE_TEMPORAL_TILING]]
+              [--vae-config.use-parallel-tiling [VAE_CONFIG.USE_PARALLEL_TILING]]
+              [--dit-config.prefix DIT_CONFIG.PREFIX]
+              [--dit-config.quant-config DIT_CONFIG.QUANT_CONFIG]
+              [--log-level LOG_LEVEL] [--backend {auto,sglang,diffusers}]
+              [--data-type DATA_TYPE [DATA_TYPE ...]]
+              [--num-frames-round-down] [--enable-teacache] [--profile]
+              [--num-profiled-timesteps NUM_PROFILED_TIMESTEPS]
+              [--profile-all-stages] [--debug] [--prompt PROMPT]
+              [--negative-prompt NEGATIVE_PROMPT] [--prompt-path PROMPT_PATH]
+              [--output-file-name OUTPUT_FILE_NAME]
+              [--num-outputs-per-prompt NUM_OUTPUTS_PER_PROMPT] [--seed SEED]
+              [--generator-device {cuda,musa,cpu}] [--num-frames NUM_FRAMES]
+              [--height HEIGHT] [--width WIDTH] [--4k] [--2k] [--1080p]
+              [--720p] [--fps FPS] [--num-inference-steps NUM_INFERENCE_STEPS]
+              [--guidance-scale GUIDANCE_SCALE]
+              [--guidance-scale-2 GUIDANCE_SCALE_2]
+              [--guidance-rescale GUIDANCE_RESCALE]
+              [--boundary-ratio BOUNDARY_RATIO] [--save-output]
+              [--no-save-output] [--return-frames]
+              [--image-path IMAGE_PATH [IMAGE_PATH ...]]
+              [--moba-config-path MOBA_CONFIG_PATH]
+              [--return-trajectory-latents] [--return-trajectory-decoded]
+              [--diffusers-kwargs DIFFUSERS_KWARGS]
+              [--no-override-protected-fields]
+              [--adjust-frames [ADJUST_FRAMES]]
+              [--text-encoder-configs TEXT_ENCODER_CONFIGS]
+sglang: error: unrecognized arguments: --dit-offload-prefetch-size 3
+
+real	0m12.419s
+user	0m5.593s
+sys	0m2.994s

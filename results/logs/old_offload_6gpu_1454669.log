@@ -1,0 +1,670 @@
+==========================================
+OLD OFFLOAD BENCHMARK - 6 GPU (3 iterations)
+==========================================
+Timestamp: Mon Feb 16 17:22:15 CST 2026
+Job ID: 1454669
+Node: ac041
+
+Config: --text-encoder-cpu-offload --pin-cpu-memory --dit-layerwise-offload false
+        --num-gpus 6 --ulysses-degree 6 --attention-backend sage_attn --enable-torch-compile
+
+Mon Feb 16 17:22:15 2026       
++---------------------------------------------------------------------------------------+
+| NVIDIA-SMI 535.288.01             Driver Version: 535.288.01   CUDA Version: 12.2     |
+|-----------------------------------------+----------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |         Memory-Usage | GPU-Util  Compute M. |
+|                                         |                      |               MIG M. |
+|=========================================+======================+======================|
+|   0  NVIDIA H100 PCIe               On  | 00000000:10:00.0 Off |                    0 |
+| N/A   24C    P0              48W / 350W |      0MiB / 81559MiB |      0%      Default |
+|                                         |                      |             Disabled |
++-----------------------------------------+----------------------+----------------------+
+|   1  NVIDIA H100 PCIe               On  | 00000000:11:00.0 Off |                    0 |
+| N/A   23C    P0              47W / 350W |      0MiB / 81559MiB |      0%      Default |
+|                                         |                      |             Disabled |
++-----------------------------------------+----------------------+----------------------+
+|   2  NVIDIA H100 PCIe               On  | 00000000:12:00.0 Off |                    0 |
+| N/A   23C    P0              47W / 350W |      0MiB / 81559MiB |      0%      Default |
+|                                         |                      |             Disabled |
++-----------------------------------------+----------------------+----------------------+
+|   3  NVIDIA H100 PCIe               On  | 00000000:13:00.0 Off |                    0 |
+| N/A   23C    P0              47W / 350W |      0MiB / 81559MiB |      0%      Default |
+|                                         |                      |             Disabled |
++-----------------------------------------+----------------------+----------------------+
+|   4  NVIDIA H100 PCIe               On  | 00000000:14:00.0 Off |                    0 |
+| N/A   23C    P0              46W / 350W |      0MiB / 81559MiB |      0%      Default |
+|                                         |                      |             Disabled |
++-----------------------------------------+----------------------+----------------------+
+|   5  NVIDIA H100 PCIe               On  | 00000000:15:00.0 Off |                    0 |
+| N/A   21C    P0              48W / 350W |      0MiB / 81559MiB |      0%      Default |
+|                                         |                      |             Disabled |
++-----------------------------------------+----------------------+----------------------+
+                                                                                         
++---------------------------------------------------------------------------------------+
+| Processes:                                                                            |
+|  GPU   GI   CI        PID   Type   Process name                            GPU Memory |
+|        ID   ID                                                             Usage      |
+|=======================================================================================|
+|  No running processes found                                                           |
++---------------------------------------------------------------------------------------+
+
+PyTorch: 2.9.1+cu128
+CUDA available: True
+GPU count: 6
+
+==========================================
+RUN 1/3: Warmup (torch.compile JIT)
+==========================================
+Start: Mon Feb 16 17:22:22 CST 2026
+[02-16 17:22:35] server_args: {"model_path": "./models/wan2.2", "backend": "auto", "attention_backend": "sage_attn", "diffusers_attention_backend": null, "nccl_port": null, "trust_remote_code": false, "revision": null, "num_gpus": 6, "tp_size": 1, "sp_degree": 6, "ulysses_degree": 6, "ring_degree": 1, "dp_size": 1, "dp_degree": 1, "enable_cfg_parallel": false, "hsdp_replicate_dim": 1, "hsdp_shard_dim": 6, "dist_timeout": null, "pipeline_class_name": null, "lora_path": null, "lora_nickname": "default", "vae_path": null, "lora_target_modules": null, "dit_cpu_offload": true, "dit_layerwise_offload": false, "text_encoder_cpu_offload": true, "image_encoder_cpu_offload": true, "vae_cpu_offload": true, "use_fsdp_inference": false, "pin_cpu_memory": true, "comfyui_mode": false, "mask_strategy_file_path": null, "STA_mode": "STA_inference", "skip_time_steps": 15, "enable_torch_compile": true, "warmup": false, "warmup_resolutions": null, "disable_autocast": false, "VSA_sparsity": 0.0, "moba_config_path": null, "moba_config": {}, "master_port": 30091, "host": "127.0.0.1", "port": 30000, "webui": false, "webui_port": 12312, "scheduler_port": 5649, "output_path": "./results/old_offload_6gpu_1454669_run1.mp4", "prompt_file_path": null, "model_paths": {}, "model_loaded": {"transformer": true, "vae": true}, "boundary_ratio": null, "log_level": "info"}
+[02-16 17:22:35] Local mode: True
+[02-16 17:22:35] Starting server...
+[02-16 17:22:44] Scheduler bind at endpoint: tcp://127.0.0.1:5649
+[02-16 17:22:45] Initializing distributed environment with world_size=6, device=cuda:0
+[02-16 17:22:46] Found nccl from library libnccl.so.2
+[02-16 17:22:46] sglang-diffusion is using nccl==2.27.5
+[02-16 17:22:47] Found nccl from library libnccl.so.2
+[02-16 17:22:47] sglang-diffusion is using nccl==2.27.5
+[02-16 17:22:47] No pipeline_class_name specified, using model_index.json
+[02-16 17:22:47] Diffusers version: 0.35.0.dev0
+Loading required modules:   0%|          | 0/6 [00:00<?, ?it/s][02-16 17:22:47] Diffusers version: 0.35.0.dev0
+[02-16 17:22:47] Using native sglang backend for model './models/wan2.2'
+[02-16 17:22:47] Found model info: ModelInfo(pipeline_cls=<class 'sglang.multimodal_gen.runtime.pipelines.wan_pipeline.WanPipeline'>, sampling_param_cls=<class 'sglang.multimodal_gen.configs.sample.wan.WanT2V_1_3B_SamplingParams'>, pipeline_config_cls=<class 'sglang.multimodal_gen.configs.pipeline_configs.wan.WanT2V480PConfig'>)
+[02-16 17:22:47] Using pipeline from model_index.json: WanPipeline
+[02-16 17:22:47] Loading pipeline modules...
+[02-16 17:22:47] Model already exists locally and is complete
+[02-16 17:22:47] Model path: ./models/wan2.2
+[02-16 17:22:47] Diffusers version: 0.35.0.dev0
+[02-16 17:22:47] Loading pipeline modules from config: {'_class_name': 'WanPipeline', '_diffusers_version': '0.35.0.dev0', 'boundary_ratio': 0.875, 'scheduler': ['diffusers', 'UniPCMultistepScheduler'], 'text_encoder': ['transformers', 'UMT5EncoderModel'], 'tokenizer': ['transformers', 'T5TokenizerFast'], 'transformer': ['diffusers', 'WanTransformer3DModel'], 'transformer_2': ['diffusers', 'WanTransformer3DModel'], 'vae': ['diffusers', 'AutoencoderKLWan']}
+[02-16 17:22:47] MoE pipeline detected. Adding transformer_2 to self.required_config_modules...
+Loading required modules:   0%|          | 0/6 [00:00<?, ?it/s][02-16 17:22:47] MoE pipeline detected. Setting boundary ratio to 0.875
+[02-16 17:22:47] Loading required components: ['text_encoder', 'tokenizer', 'vae', 'transformer', 'scheduler', 'transformer_2']
+Loading required modules:   0%|          | 0/6 [00:00<?, ?it/s]Loading required modules:   0%|          | 0/6 [00:00<?, ?it/s]Loading required modules:   0%|          | 0/6 [00:00<?, ?it/s]Loading required modules:   0%|          | 0/6 [00:00<?, ?it/s][02-16 17:22:47] Loading text_encoder from ./models/wan2.2/text_encoder. avail mem: 75.31 GB
+[02-16 17:22:56] [RunAI Streamer] Overall time to stream 10.6 GiB of all files to cpu: 7.75s, 1.4 GiB/s
+[02-16 17:22:56] [RunAI Streamer] Overall time to stream 10.6 GiB of all files to cpu: 7.88s, 1.3 GiB/s
+[02-16 17:22:56] [RunAI Streamer] Overall time to stream 10.6 GiB of all files to cpu: 8.18s, 1.3 GiB/s
+[02-16 17:22:56] [RunAI Streamer] Overall time to stream 10.6 GiB of all files to cpu: 8.27s, 1.3 GiB/s
+[02-16 17:22:56] [RunAI Streamer] Overall time to stream 10.6 GiB of all files to cpu: 9.14s, 1.2 GiB/s
+[02-16 17:22:56] [RunAI Streamer] Overall time to stream 10.6 GiB of all files to cpu: 8.32s, 1.3 GiB/s
+Loading required modules:  17%|█▋        | 1/6 [00:29<02:28, 29.78s/it]Loading required modules:  17%|█▋        | 1/6 [00:29<02:29, 29.94s/it]Loading required modules:  33%|███▎      | 2/6 [00:30<00:50, 12.51s/it]Loading required modules:  33%|███▎      | 2/6 [00:30<00:50, 12.56s/it]Loading required modules:  50%|█████     | 3/6 [00:30<00:20,  6.91s/it][02-16 17:23:18] Loaded text_encoder: FSDPUMT5EncoderModel (sgl-diffusion version). model size: 21.16 GB, avail mem: 72.34 GB
+Loading required modules:  17%|█▋        | 1/6 [00:30<02:32, 30.50s/it][02-16 17:23:18] Loading tokenizer from ./models/wan2.2/tokenizer. avail mem: 72.34 GB
+Loading required modules:  50%|█████     | 3/6 [00:30<00:20,  6.90s/it]Loading required modules:  17%|█▋        | 1/6 [00:30<02:34, 30.93s/it][02-16 17:23:18] Loaded tokenizer: T5TokenizerFast (sgl-diffusion version). model size: 0.02 GB, avail mem: 72.33 GB
+Loading required modules:  33%|███▎      | 2/6 [00:30<00:51, 12.82s/it][02-16 17:23:18] Loading vae from ./models/wan2.2/vae. avail mem: 72.33 GB
+[02-16 17:23:18] Loaded vae: AutoencoderKLWan (sgl-diffusion version). model size: 0.27 GB, avail mem: 72.33 GB
+Loading required modules:  50%|█████     | 3/6 [00:31<00:21,  7.04s/it][02-16 17:23:18] Loading transformer from ./models/wan2.2/transformer. avail mem: 72.33 GB
+[02-16 17:23:18] Loading WanTransformer3DModel from 12 safetensors files, default_dtype: torch.bfloat16
+[02-16 17:23:18] Using Sage Attention backend
+Loading required modules:  33%|███▎      | 2/6 [00:31<00:51, 13.00s/it]Loading required modules:  17%|█▋        | 1/6 [00:31<02:36, 31.38s/it]Loading required modules:  17%|█▋        | 1/6 [00:31<02:37, 31.41s/it]Loading required modules:  50%|█████     | 3/6 [00:31<00:21,  7.14s/it]Loading required modules:  33%|███▎      | 2/6 [00:31<00:52, 13.16s/it]Loading required modules:  33%|███▎      | 2/6 [00:31<00:52, 13.17s/it]Loading required modules:  50%|█████     | 3/6 [00:31<00:21,  7.23s/it]Loading required modules:  50%|█████     | 3/6 [00:31<00:21,  7.23s/it][02-16 17:25:20] [RunAI Streamer] Overall time to stream 53.2 GiB of all files to cpu: 121.13s, 450.0 MiB/s
+[02-16 17:25:22] [RunAI Streamer] Overall time to stream 53.2 GiB of all files to cpu: 123.6s, 441.0 MiB/s
+[02-16 17:25:22] [RunAI Streamer] Overall time to stream 53.2 GiB of all files to cpu: 123.11s, 442.7 MiB/s
+[02-16 17:25:23] [RunAI Streamer] Overall time to stream 53.2 GiB of all files to cpu: 123.69s, 440.7 MiB/s
+Loading required modules:  67%|██████▋   | 4/6 [02:52<01:59, 59.74s/it]Loading required modules:  67%|██████▋   | 4/6 [02:52<02:00, 60.15s/it]Loading required modules:  83%|████████▎ | 5/6 [02:53<00:38, 38.49s/it]Loading required modules:  83%|████████▎ | 5/6 [02:53<00:38, 38.51s/it][02-16 17:25:41] [RunAI Streamer] Overall time to stream 0 Bytes of all files to None: 0.23s, 0 Bytes/s
+Traceback (most recent call last):
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/component_loader.py", line 158, in load
+    component = self.load_customized(
+                ^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/component_loader.py", line 728, in load_customized
+    model = maybe_load_fsdp_model(
+            ^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/fsdp_load.py", line 147, in maybe_load_fsdp_model
+    load_model_from_full_model_state_dict(
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/fsdp_load.py", line 259, in load_model_from_full_model_state_dict
+    custom_param_sd, reverse_param_names_mapping = hf_to_custom_state_dict(
+                                                   ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/utils.py", line 80, in hf_to_custom_state_dict
+    for source_param_name, full_tensor in hf_param_sd:  # type: ignore
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/weight_utils.py", line 203, in safetensors_weights_iterator
+    streamer.stream_files(hf_weights_files)
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/runai_model_streamer/safetensors_streamer/safetensors_streamer.py", line 81, in stream_files
+    safetensors_metadatas = safetensors_pytorch.prepare_request(self.file_streamer, paths, s3_credentials)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/runai_model_streamer/safetensors_streamer/safetensors_pytorch.py", line 181, in prepare_request
+    safetensors_metadatas = SafetensorsMetadata.from_files(fs, paths, s3_credentials)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/runai_model_streamer/safetensors_streamer/safetensors_pytorch.py", line 78, in from_files
+    fs.stream_files([FileChunks(i, filenames[i], 0, [SAFETENSORS_HEADER_BUFFER_SIZE]) for i in range(len(filenames))], s3_credentials, "cpu", False)
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/runai_model_streamer/distributed_streamer/distributed_streamer.py", line 127, in stream_files
+    self.params.set_params(file_stream_requests)
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/runai_model_streamer/distributed_streamer/distributed_streamer.py", line 228, in set_params
+    self.num_processes_on_node, self.my_global_rank, self.groups_by_ranks = self.find_local_ranks()
+                                                                            ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/runai_model_streamer/distributed_streamer/distributed_streamer.py", line 192, in find_local_ranks
+    sandbox_global_group = dist.new_group(ranks=list(range(world_size)), timeout=self.broadcast_timeout)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/distributed/c10d_logger.py", line 95, in wrapper
+    func_return = func(*args, **kwargs)
+                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/distributed/distributed_c10d.py", line 5276, in new_group
+    return _new_group_with_tag(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/distributed/distributed_c10d.py", line 5366, in _new_group_with_tag
+    pg, pg_store = _new_process_group_helper(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/distributed/distributed_c10d.py", line 2134, in _new_process_group_helper
+    eager_backend.eager_connect_single_device(device_id)
+torch.distributed.DistBackendError: NCCL error in: /pytorch/torch/csrc/distributed/c10d/NCCLUtils.cpp:230, remote process exited or there was a network error, NCCL version 2.27.5
+ncclRemoteError: A call failed possibly due to a network error or a remote process exiting prematurely.
+Last error:
+socketProgress: Connection closed by remote peer ac041-ib.cluster<54993>
+
+Loading checkpoint shards:   0%|          | 0/12 [00:00<?, ?it/s][A
+Loading checkpoint shards:  25%|██▌       | 3/12 [00:00<00:00, 29.59it/s][A
+Loading checkpoint shards:  58%|█████▊    | 7/12 [00:00<00:00, 31.12it/s][A
+Loading checkpoint shards:  92%|█████████▏| 11/12 [00:00<00:00, 31.23it/s][ALoading checkpoint shards: 100%|██████████| 12/12 [00:00<00:00, 32.01it/s]
+[02-16 17:25:47] Loaded model with 14.29B parameters
+[02-16 17:25:47] Loaded transformer: WanTransformer3DModel (sgl-diffusion version). model size: 26.61 GB, avail mem: 44.47 GB
+Loading required modules:  67%|██████▋   | 4/6 [02:59<02:05, 62.94s/it][02-16 17:25:47] Loading scheduler from ./models/wan2.2/scheduler. avail mem: 44.47 GB
+[02-16 17:25:47] Loaded scheduler: UniPCMultistepScheduler (sgl-diffusion version). model size: 0.00 GB, avail mem: 44.47 GB
+[02-16 17:25:47] Loading transformer_2 from ./models/wan2.2/transformer_2. avail mem: 44.47 GB
+[02-16 17:25:47] Loading WanTransformer3DModel from 12 safetensors files, default_dtype: torch.bfloat16
+[02-16 17:25:47] [RunAI Streamer] Overall time to stream 0 Bytes of all files to None: 0.03s, 0 Bytes/s
+Traceback (most recent call last):
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/component_loader.py", line 158, in load
+    component = self.load_customized(
+                ^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/component_loader.py", line 728, in load_customized
+    model = maybe_load_fsdp_model(
+            ^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/fsdp_load.py", line 147, in maybe_load_fsdp_model
+    load_model_from_full_model_state_dict(
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/fsdp_load.py", line 259, in load_model_from_full_model_state_dict
+    custom_param_sd, reverse_param_names_mapping = hf_to_custom_state_dict(
+                                                   ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/utils.py", line 80, in hf_to_custom_state_dict
+    for source_param_name, full_tensor in hf_param_sd:  # type: ignore
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/weight_utils.py", line 203, in safetensors_weights_iterator
+    streamer.stream_files(hf_weights_files)
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/runai_model_streamer/safetensors_streamer/safetensors_streamer.py", line 81, in stream_files
+    safetensors_metadatas = safetensors_pytorch.prepare_request(self.file_streamer, paths, s3_credentials)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/runai_model_streamer/safetensors_streamer/safetensors_pytorch.py", line 181, in prepare_request
+    safetensors_metadatas = SafetensorsMetadata.from_files(fs, paths, s3_credentials)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/runai_model_streamer/safetensors_streamer/safetensors_pytorch.py", line 78, in from_files
+    fs.stream_files([FileChunks(i, filenames[i], 0, [SAFETENSORS_HEADER_BUFFER_SIZE]) for i in range(len(filenames))], s3_credentials, "cpu", False)
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/runai_model_streamer/distributed_streamer/distributed_streamer.py", line 127, in stream_files
+    self.params.set_params(file_stream_requests)
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/runai_model_streamer/distributed_streamer/distributed_streamer.py", line 228, in set_params
+    self.num_processes_on_node, self.my_global_rank, self.groups_by_ranks = self.find_local_ranks()
+                                                                            ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/runai_model_streamer/distributed_streamer/distributed_streamer.py", line 192, in find_local_ranks
+    sandbox_global_group = dist.new_group(ranks=list(range(world_size)), timeout=self.broadcast_timeout)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/distributed/c10d_logger.py", line 95, in wrapper
+    func_return = func(*args, **kwargs)
+                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/distributed/distributed_c10d.py", line 5276, in new_group
+    return _new_group_with_tag(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/distributed/distributed_c10d.py", line 5366, in _new_group_with_tag
+    pg, pg_store = _new_process_group_helper(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/distributed/distributed_c10d.py", line 2134, in _new_process_group_helper
+    eager_backend.eager_connect_single_device(device_id)
+torch.distributed.DistBackendError: NCCL error in: /pytorch/torch/csrc/distributed/c10d/NCCLUtils.cpp:230, remote process exited or there was a network error, NCCL version 2.27.5
+ncclRemoteError: A call failed possibly due to a network error or a remote process exiting prematurely.
+Last error:
+socketProgress: Connection closed by remote peer ac041-ib.cluster<37540>
+[02-16 17:25:47] Error while loading customized transformer_2, falling back to native version
+
+Loading checkpoint shards:   0%|          | 0/12 [00:00<?, ?it/s][ALoading checkpoint shards: 100%|██████████| 12/12 [00:00<00:00, 150.82it/s]
+Loading required modules:  67%|██████▋   | 4/6 [03:03<02:08, 64.34s/it][02-16 17:26:11] Error while loading component: transformer_2, component_model_path='./models/wan2.2/transformer_2'
+Loading required modules:  83%|████████▎ | 5/6 [03:23<00:40, 40.72s/it]
+
+OOM detected. Possible solutions:
+  - If the OOM occurs during loading:
+    1. Enable CPU offload for memory-intensive components, or use `--dit-layerwise-offload` for DiT
+  - If the OOM occurs during runtime:
+    1. Reduce the number of output tokens by lowering resolution or decreasing `--num-frames`
+    2. Enable SP and/or TP
+    3. Enable a sparse-attention backend
+  Or, open an issue on GitHub https://github.com/sgl-project/sglang/issues/new/choose
+
+[02-16 17:26:11] Worker 0: Shutdown complete.
+Process sglang-diffusionWorker-0:
+Traceback (most recent call last):
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/component_loader.py", line 158, in load
+    component = self.load_customized(
+                ^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/component_loader.py", line 728, in load_customized
+    model = maybe_load_fsdp_model(
+            ^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/fsdp_load.py", line 147, in maybe_load_fsdp_model
+    load_model_from_full_model_state_dict(
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/fsdp_load.py", line 259, in load_model_from_full_model_state_dict
+    custom_param_sd, reverse_param_names_mapping = hf_to_custom_state_dict(
+                                                   ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/utils.py", line 80, in hf_to_custom_state_dict
+    for source_param_name, full_tensor in hf_param_sd:  # type: ignore
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/weight_utils.py", line 203, in safetensors_weights_iterator
+    streamer.stream_files(hf_weights_files)
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/runai_model_streamer/safetensors_streamer/safetensors_streamer.py", line 81, in stream_files
+    safetensors_metadatas = safetensors_pytorch.prepare_request(self.file_streamer, paths, s3_credentials)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/runai_model_streamer/safetensors_streamer/safetensors_pytorch.py", line 181, in prepare_request
+    safetensors_metadatas = SafetensorsMetadata.from_files(fs, paths, s3_credentials)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/runai_model_streamer/safetensors_streamer/safetensors_pytorch.py", line 78, in from_files
+    fs.stream_files([FileChunks(i, filenames[i], 0, [SAFETENSORS_HEADER_BUFFER_SIZE]) for i in range(len(filenames))], s3_credentials, "cpu", False)
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/runai_model_streamer/distributed_streamer/distributed_streamer.py", line 127, in stream_files
+    self.params.set_params(file_stream_requests)
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/runai_model_streamer/distributed_streamer/distributed_streamer.py", line 228, in set_params
+    self.num_processes_on_node, self.my_global_rank, self.groups_by_ranks = self.find_local_ranks()
+                                                                            ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/runai_model_streamer/distributed_streamer/distributed_streamer.py", line 192, in find_local_ranks
+    sandbox_global_group = dist.new_group(ranks=list(range(world_size)), timeout=self.broadcast_timeout)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/distributed/c10d_logger.py", line 95, in wrapper
+    func_return = func(*args, **kwargs)
+                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/distributed/distributed_c10d.py", line 5276, in new_group
+    return _new_group_with_tag(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/distributed/distributed_c10d.py", line 5366, in _new_group_with_tag
+    pg, pg_store = _new_process_group_helper(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/distributed/distributed_c10d.py", line 2134, in _new_process_group_helper
+    eager_backend.eager_connect_single_device(device_id)
+torch.distributed.DistBackendError: NCCL error in: /pytorch/torch/csrc/distributed/c10d/NCCLUtils.cpp:230, remote process exited or there was a network error, NCCL version 2.27.5
+ncclRemoteError: A call failed possibly due to a network error or a remote process exiting prematurely.
+Last error:
+socketProgress: Connection closed by remote peer ac041-ib.cluster<37540>
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/managers/gpu_worker.py", line 315, in run_scheduler_process
+    scheduler = Scheduler(
+                ^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/managers/scheduler.py", line 71, in __init__
+    worker = GPUWorker(
+             ^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/managers/gpu_worker.py", line 61, in __init__
+    self.init_device_and_model()
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/managers/gpu_worker.py", line 90, in init_device_and_model
+    self.pipeline = build_pipeline(self.server_args)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/pipelines_core/__init__.py", line 74, in build_pipeline
+    pipeline = pipeline_cls(model_path, server_args)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/pipelines_core/lora_pipeline.py", line 71, in __init__
+    super().__init__(*args, **kwargs)
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/pipelines_core/composed_pipeline_base.py", line 90, in __init__
+    self.modules = self.load_modules(server_args, loaded_modules)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/pipelines_core/composed_pipeline_base.py", line 278, in load_modules
+    module, memory_usage = PipelineComponentLoader.load_module(
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/component_loader.py", line 857, in load_module
+    raise e
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/component_loader.py", line 847, in load_module
+    return loader.load(
+           ^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/component_loader.py", line 178, in load
+    component = component.to(device=target_device)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/diffusers/models/modeling_utils.py", line 1435, in to
+    return super().to(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1371, in to
+    return self._apply(convert)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 930, in _apply
+    module._apply(fn)
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 930, in _apply
+    module._apply(fn)
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 930, in _apply
+    module._apply(fn)
+  [Previous line repeated 1 more time]
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 957, in _apply
+    param_applied = fn(param)
+                    ^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1357, in convert
+    return t.to(
+           ^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 100.00 MiB. GPU 0 has a total capacity of 79.11 GiB of which 26.12 MiB is free. Process 2349153 has 450.00 MiB memory in use. Including non-PyTorch memory, this process has 77.41 GiB memory in use. Process 2349152 has 450.00 MiB memory in use. Process 2349154 has 450.00 MiB memory in use. Of the allocated memory 71.15 GiB is allocated by PyTorch, and 2.05 GiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+[rank0]:[W216 17:26:11.392585626 ProcessGroupNCCL.cpp:1524] Warning: WARNING: destroy_process_group() was not called before program exit, which can leak resources. For more info, please see https://pytorch.org/docs/stable/distributed.html#shutdown (function operator())
+Loading required modules:  83%|████████▎ | 5/6 [03:23<00:40, 40.74s/it]
+
+OOM detected. Possible solutions:
+  - If the OOM occurs during loading:
+    1. Enable CPU offload for memory-intensive components, or use `--dit-layerwise-offload` for DiT
+  - If the OOM occurs during runtime:
+    1. Reduce the number of output tokens by lowering resolution or decreasing `--num-frames`
+    2. Enable SP and/or TP
+    3. Enable a sparse-attention backend
+  Or, open an issue on GitHub https://github.com/sgl-project/sglang/issues/new/choose
+
+Process sglang-diffusionWorker-3:
+Traceback (most recent call last):
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/component_loader.py", line 158, in load
+    component = self.load_customized(
+                ^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/component_loader.py", line 728, in load_customized
+    model = maybe_load_fsdp_model(
+            ^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/fsdp_load.py", line 147, in maybe_load_fsdp_model
+    load_model_from_full_model_state_dict(
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/fsdp_load.py", line 259, in load_model_from_full_model_state_dict
+    custom_param_sd, reverse_param_names_mapping = hf_to_custom_state_dict(
+                                                   ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/utils.py", line 80, in hf_to_custom_state_dict
+    for source_param_name, full_tensor in hf_param_sd:  # type: ignore
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/weight_utils.py", line 203, in safetensors_weights_iterator
+    streamer.stream_files(hf_weights_files)
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/runai_model_streamer/safetensors_streamer/safetensors_streamer.py", line 81, in stream_files
+    safetensors_metadatas = safetensors_pytorch.prepare_request(self.file_streamer, paths, s3_credentials)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/runai_model_streamer/safetensors_streamer/safetensors_pytorch.py", line 181, in prepare_request
+    safetensors_metadatas = SafetensorsMetadata.from_files(fs, paths, s3_credentials)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/runai_model_streamer/safetensors_streamer/safetensors_pytorch.py", line 78, in from_files
+    fs.stream_files([FileChunks(i, filenames[i], 0, [SAFETENSORS_HEADER_BUFFER_SIZE]) for i in range(len(filenames))], s3_credentials, "cpu", False)
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/runai_model_streamer/distributed_streamer/distributed_streamer.py", line 127, in stream_files
+    self.params.set_params(file_stream_requests)
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/runai_model_streamer/distributed_streamer/distributed_streamer.py", line 228, in set_params
+    self.num_processes_on_node, self.my_global_rank, self.groups_by_ranks = self.find_local_ranks()
+                                                                            ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/runai_model_streamer/distributed_streamer/distributed_streamer.py", line 192, in find_local_ranks
+    sandbox_global_group = dist.new_group(ranks=list(range(world_size)), timeout=self.broadcast_timeout)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/distributed/c10d_logger.py", line 95, in wrapper
+    func_return = func(*args, **kwargs)
+                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/distributed/distributed_c10d.py", line 5276, in new_group
+    return _new_group_with_tag(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/distributed/distributed_c10d.py", line 5366, in _new_group_with_tag
+    pg, pg_store = _new_process_group_helper(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/distributed/distributed_c10d.py", line 2134, in _new_process_group_helper
+    eager_backend.eager_connect_single_device(device_id)
+torch.distributed.DistBackendError: NCCL error in: /pytorch/torch/csrc/distributed/c10d/NCCLUtils.cpp:230, remote process exited or there was a network error, NCCL version 2.27.5
+ncclRemoteError: A call failed possibly due to a network error or a remote process exiting prematurely.
+Last error:
+socketProgress: Connection closed by remote peer ac041-ib.cluster<54993>
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/managers/gpu_worker.py", line 315, in run_scheduler_process
+    scheduler = Scheduler(
+                ^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/managers/scheduler.py", line 71, in __init__
+    worker = GPUWorker(
+             ^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/managers/gpu_worker.py", line 61, in __init__
+    self.init_device_and_model()
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/managers/gpu_worker.py", line 90, in init_device_and_model
+    self.pipeline = build_pipeline(self.server_args)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/pipelines_core/__init__.py", line 74, in build_pipeline
+    pipeline = pipeline_cls(model_path, server_args)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/pipelines_core/lora_pipeline.py", line 71, in __init__
+    super().__init__(*args, **kwargs)
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/pipelines_core/composed_pipeline_base.py", line 90, in __init__
+    self.modules = self.load_modules(server_args, loaded_modules)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/pipelines_core/composed_pipeline_base.py", line 278, in load_modules
+    module, memory_usage = PipelineComponentLoader.load_module(
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/component_loader.py", line 857, in load_module
+    raise e
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/component_loader.py", line 847, in load_module
+    return loader.load(
+           ^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/component_loader.py", line 178, in load
+    component = component.to(device=target_device)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/diffusers/models/modeling_utils.py", line 1435, in to
+    return super().to(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1371, in to
+    return self._apply(convert)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 930, in _apply
+    module._apply(fn)
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 930, in _apply
+    module._apply(fn)
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 930, in _apply
+    module._apply(fn)
+  [Previous line repeated 1 more time]
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 957, in _apply
+    param_applied = fn(param)
+                    ^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1357, in convert
+    return t.to(
+           ^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 100.00 MiB. GPU 3 has a total capacity of 79.11 GiB of which 48.81 MiB is free. Including non-PyTorch memory, this process has 78.99 GiB memory in use. Of the allocated memory 72.55 GiB is allocated by PyTorch, and 2.24 GiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+[rank3]:[W216 17:26:15.140916866 ProcessGroupNCCL.cpp:1524] Warning: WARNING: destroy_process_group() was not called before program exit, which can leak resources. For more info, please see https://pytorch.org/docs/stable/distributed.html#shutdown (function operator())
+[02-16 17:26:19] Rank 0 scheduler is dead. Please check if there are relevant logs.
+[02-16 17:26:21] [RunAI Streamer] Overall time to stream 0 Bytes of all files to None: 29.63s, 0 Bytes/s
+Traceback (most recent call last):
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/component_loader.py", line 158, in load
+    component = self.load_customized(
+                ^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/component_loader.py", line 728, in load_customized
+    model = maybe_load_fsdp_model(
+            ^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/fsdp_load.py", line 147, in maybe_load_fsdp_model
+    load_model_from_full_model_state_dict(
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/fsdp_load.py", line 259, in load_model_from_full_model_state_dict
+    custom_param_sd, reverse_param_names_mapping = hf_to_custom_state_dict(
+                                                   ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/utils.py", line 80, in hf_to_custom_state_dict
+    for source_param_name, full_tensor in hf_param_sd:  # type: ignore
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/loader/weight_utils.py", line 203, in safetensors_weights_iterator
+    streamer.stream_files(hf_weights_files)
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/runai_model_streamer/safetensors_streamer/safetensors_streamer.py", line 81, in stream_files
+    safetensors_metadatas = safetensors_pytorch.prepare_request(self.file_streamer, paths, s3_credentials)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/runai_model_streamer/safetensors_streamer/safetensors_pytorch.py", line 181, in prepare_request
+    safetensors_metadatas = SafetensorsMetadata.from_files(fs, paths, s3_credentials)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/runai_model_streamer/safetensors_streamer/safetensors_pytorch.py", line 78, in from_files
+    fs.stream_files([FileChunks(i, filenames[i], 0, [SAFETENSORS_HEADER_BUFFER_SIZE]) for i in range(len(filenames))], s3_credentials, "cpu", False)
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/runai_model_streamer/distributed_streamer/distributed_streamer.py", line 127, in stream_files
+    self.params.set_params(file_stream_requests)
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/runai_model_streamer/distributed_streamer/distributed_streamer.py", line 228, in set_params
+    self.num_processes_on_node, self.my_global_rank, self.groups_by_ranks = self.find_local_ranks()
+                                                                            ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/runai_model_streamer/distributed_streamer/distributed_streamer.py", line 192, in find_local_ranks
+    sandbox_global_group = dist.new_group(ranks=list(range(world_size)), timeout=self.broadcast_timeout)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/distributed/c10d_logger.py", line 95, in wrapper
+    func_return = func(*args, **kwargs)
+                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/distributed/distributed_c10d.py", line 5276, in new_group
+    return _new_group_with_tag(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/distributed/distributed_c10d.py", line 5366, in _new_group_with_tag
+    pg, pg_store = _new_process_group_helper(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/distributed/distributed_c10d.py", line 2134, in _new_process_group_helper
+    eager_backend.eager_connect_single_device(device_id)
+torch.distributed.DistBackendError: NCCL error in: /pytorch/torch/csrc/distributed/c10d/NCCLUtils.cpp:230, remote process exited or there was a network error, NCCL version 2.27.5
+ncclRemoteError: A call failed possibly due to a network error or a remote process exiting prematurely.
+Last error:
+socketProgress: Connection closed by remote peer ac041-ib.cluster<35642>
+
+Loading checkpoint shards:   0%|          | 0/12 [00:00<?, ?it/s][ALoading checkpoint shards: 100%|██████████| 12/12 [00:00<00:00, 143.66it/s]
+[rank1]:[W216 17:26:21.519390792 TCPStore.cpp:125] [c10d] recvValue failed on SocketImpl(fd=73, addr=[localhost]:49126, remote=[localhost]:30091): Failed to recv, got 0 bytes. Connection was likely closed. Did the remote server shutdown or crash?
+Exception raised from recvBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:682 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x80 (0x14ac459b3b80 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: <unknown function> + 0x5ffc5b1 (0x14ac87dbc5b1 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #2: <unknown function> + 0x5ffd9ad (0x14ac87dbd9ad in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: <unknown function> + 0x5ffe55a (0x14ac87dbe55a in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x31e (0x14ac87db927e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x3c8 (0x14ac46937868 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #6: <unknown function> + 0xef5e4 (0x14acace145e4 in /scratch/user/u.dl344013/sglang-offload-research/venv/bin/../lib/libstdc++.so.6)
+frame #7: <unknown function> + 0x81ca (0x14acb027c1ca in /lib64/libpthread.so.0)
+frame #8: clone + 0x43 (0x14acaf74d953 in /lib64/libc.so.6)
+
+[rank1]:[W216 17:26:21.563410102 ProcessGroupNCCL.cpp:1771] [PG ID 0 PG GUID 0(default_pg) Rank 1] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Failed to recv, got 0 bytes. Connection was likely closed. Did the remote server shutdown or crash?
+[rank2]:[W216 17:26:21.919120369 TCPStore.cpp:125] [c10d] recvValue failed on SocketImpl(fd=73, addr=[localhost]:49114, remote=[localhost]:30091): Failed to recv, got 0 bytes. Connection was likely closed. Did the remote server shutdown or crash?
+Exception raised from recvBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:682 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x80 (0x152ee33d8b80 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: <unknown function> + 0x5ffc5b1 (0x152f257e15b1 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #2: <unknown function> + 0x5ffd9ad (0x152f257e29ad in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: <unknown function> + 0x5ffe55a (0x152f257e355a in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x31e (0x152f257de27e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x3c8 (0x152ee435c868 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #6: <unknown function> + 0xef5e4 (0x152f4a8395e4 in /scratch/user/u.dl344013/sglang-offload-research/venv/bin/../lib/libstdc++.so.6)
+frame #7: <unknown function> + 0x81ca (0x152f4dc971ca in /lib64/libpthread.so.0)
+frame #8: clone + 0x43 (0x152f4d168953 in /lib64/libc.so.6)
+
+[rank2]:[W216 17:26:21.924053679 ProcessGroupNCCL.cpp:1771] [PG ID 0 PG GUID 0(default_pg) Rank 2] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Failed to recv, got 0 bytes. Connection was likely closed. Did the remote server shutdown or crash?
+[rank1]:[W216 17:26:22.563505735 TCPStore.cpp:106] [c10d] sendBytes failed on SocketImpl(fd=73, addr=[localhost]:49126, remote=[localhost]:30091): Broken pipe
+Exception raised from sendBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:653 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x80 (0x14ac459b3b80 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: <unknown function> + 0x5ffc5b1 (0x14ac87dbc5b1 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #2: <unknown function> + 0x5ffce42 (0x14ac87dbce42 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: <unknown function> + 0x5ffe94e (0x14ac87dbe94e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x30e (0x14ac87db926e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x3c8 (0x14ac46937868 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #6: <unknown function> + 0xef5e4 (0x14acace145e4 in /scratch/user/u.dl344013/sglang-offload-research/venv/bin/../lib/libstdc++.so.6)
+frame #7: <unknown function> + 0x81ca (0x14acb027c1ca in /lib64/libpthread.so.0)
+frame #8: clone + 0x43 (0x14acaf74d953 in /lib64/libc.so.6)
+
+[rank1]:[W216 17:26:22.566882746 ProcessGroupNCCL.cpp:1771] [PG ID 0 PG GUID 0(default_pg) Rank 1] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Broken pipe
+[rank2]:[W216 17:26:22.924149029 TCPStore.cpp:106] [c10d] sendBytes failed on SocketImpl(fd=73, addr=[localhost]:49114, remote=[localhost]:30091): Broken pipe
+Exception raised from sendBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:653 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x80 (0x152ee33d8b80 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: <unknown function> + 0x5ffc5b1 (0x152f257e15b1 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #2: <unknown function> + 0x5ffce42 (0x152f257e1e42 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: <unknown function> + 0x5ffe94e (0x152f257e394e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x30e (0x152f257de26e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x3c8 (0x152ee435c868 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #6: <unknown function> + 0xef5e4 (0x152f4a8395e4 in /scratch/user/u.dl344013/sglang-offload-research/venv/bin/../lib/libstdc++.so.6)
+frame #7: <unknown function> + 0x81ca (0x152f4dc971ca in /lib64/libpthread.so.0)
+frame #8: clone + 0x43 (0x152f4d168953 in /lib64/libc.so.6)
+
+[rank2]:[W216 17:26:22.927456965 ProcessGroupNCCL.cpp:1771] [PG ID 0 PG GUID 0(default_pg) Rank 2] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Broken pipe
+[rank1]:[W216 17:26:23.566962303 TCPStore.cpp:106] [c10d] sendBytes failed on SocketImpl(fd=73, addr=[localhost]:49126, remote=[localhost]:30091): Broken pipe
+Exception raised from sendBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:653 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x80 (0x14ac459b3b80 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: <unknown function> + 0x5ffc5b1 (0x14ac87dbc5b1 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #2: <unknown function> + 0x5ffce42 (0x14ac87dbce42 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: <unknown function> + 0x5ffe94e (0x14ac87dbe94e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x30e (0x14ac87db926e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x3c8 (0x14ac46937868 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #6: <unknown function> + 0xef5e4 (0x14acace145e4 in /scratch/user/u.dl344013/sglang-offload-research/venv/bin/../lib/libstdc++.so.6)
+frame #7: <unknown function> + 0x81ca (0x14acb027c1ca in /lib64/libpthread.so.0)
+frame #8: clone + 0x43 (0x14acaf74d953 in /lib64/libc.so.6)
+
+[rank1]:[W216 17:26:23.570245915 ProcessGroupNCCL.cpp:1771] [PG ID 0 PG GUID 0(default_pg) Rank 1] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Broken pipe
+[rank2]:[W216 17:26:23.927536215 TCPStore.cpp:106] [c10d] sendBytes failed on SocketImpl(fd=73, addr=[localhost]:49114, remote=[localhost]:30091): Broken pipe
+Exception raised from sendBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:653 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x80 (0x152ee33d8b80 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: <unknown function> + 0x5ffc5b1 (0x152f257e15b1 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #2: <unknown function> + 0x5ffce42 (0x152f257e1e42 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: <unknown function> + 0x5ffe94e (0x152f257e394e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x30e (0x152f257de26e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x3c8 (0x152ee435c868 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #6: <unknown function> + 0xef5e4 (0x152f4a8395e4 in /scratch/user/u.dl344013/sglang-offload-research/venv/bin/../lib/libstdc++.so.6)
+frame #7: <unknown function> + 0x81ca (0x152f4dc971ca in /lib64/libpthread.so.0)
+frame #8: clone + 0x43 (0x152f4d168953 in /lib64/libc.so.6)
+
+[rank2]:[W216 17:26:23.930862729 ProcessGroupNCCL.cpp:1771] [PG ID 0 PG GUID 0(default_pg) Rank 2] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Broken pipe
+[rank1]:[W216 17:26:24.570337028 TCPStore.cpp:106] [c10d] sendBytes failed on SocketImpl(fd=73, addr=[localhost]:49126, remote=[localhost]:30091): Broken pipe
+Exception raised from sendBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:653 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x80 (0x14ac459b3b80 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: <unknown function> + 0x5ffc5b1 (0x14ac87dbc5b1 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #2: <unknown function> + 0x5ffce42 (0x14ac87dbce42 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: <unknown function> + 0x5ffe94e (0x14ac87dbe94e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x30e (0x14ac87db926e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x3c8 (0x14ac46937868 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #6: <unknown function> + 0xef5e4 (0x14acace145e4 in /scratch/user/u.dl344013/sglang-offload-research/venv/bin/../lib/libstdc++.so.6)
+frame #7: <unknown function> + 0x81ca (0x14acb027c1ca in /lib64/libpthread.so.0)
+frame #8: clone + 0x43 (0x14acaf74d953 in /lib64/libc.so.6)
+
+[rank1]:[W216 17:26:24.573670926 ProcessGroupNCCL.cpp:1771] [PG ID 0 PG GUID 0(default_pg) Rank 1] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Broken pipe
+[rank2]:[W216 17:26:24.930941779 TCPStore.cpp:106] [c10d] sendBytes failed on SocketImpl(fd=73, addr=[localhost]:49114, remote=[localhost]:30091): Broken pipe
+Exception raised from sendBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:653 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x80 (0x152ee33d8b80 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: <unknown function> + 0x5ffc5b1 (0x152f257e15b1 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #2: <unknown function> + 0x5ffce42 (0x152f257e1e42 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: <unknown function> + 0x5ffe94e (0x152f257e394e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x30e (0x152f257de26e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x3c8 (0x152ee435c868 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #6: <unknown function> + 0xef5e4 (0x152f4a8395e4 in /scratch/user/u.dl344013/sglang-offload-research/venv/bin/../lib/libstdc++.so.6)
+frame #7: <unknown function> + 0x81ca (0x152f4dc971ca in /lib64/libpthread.so.0)
+frame #8: clone + 0x43 (0x152f4d168953 in /lib64/libc.so.6)
+
+[rank2]:[W216 17:26:24.934248176 ProcessGroupNCCL.cpp:1771] [PG ID 0 PG GUID 0(default_pg) Rank 2] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Broken pipe
+[02-16 17:26:25] Exit code: 1
+Traceback (most recent call last):
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/bin/sglang", line 7, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/cli/main.py", line 42, in main
+    args.func(args, extra_argv)
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/cli/generate.py", line 29, in generate
+    generate_cmd(parsed_args)
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/entrypoints/cli/generate.py", line 116, in generate_cmd
+    generator = DiffGenerator.from_pretrained(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/entrypoints/diffusion_generator.py", line 102, in from_pretrained
+    return cls.from_server_args(server_args, local_mode=local_mode)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/entrypoints/diffusion_generator.py", line 122, in from_server_args
+    instance.local_scheduler_process = instance._start_local_server_if_needed()
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/entrypoints/diffusion_generator.py", line 139, in _start_local_server_if_needed
+    processes = launch_server(self.server_args, launch_http_server=False)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/sglang/multimodal_gen/runtime/launch_server.py", line 153, in launch_server
+    data = reader.recv()
+           ^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/multiprocessing/connection.py", line 250, in recv
+    buf = self._recv_bytes()
+          ^^^^^^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/multiprocessing/connection.py", line 430, in _recv_bytes
+    buf = self._recv(4)
+          ^^^^^^^^^^^^^
+  File "/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/multiprocessing/connection.py", line 399, in _recv
+    raise EOFError
+EOFError
+[rank1]:[W216 17:26:25.573752035 TCPStore.cpp:106] [c10d] sendBytes failed on SocketImpl(fd=73, addr=[localhost]:49126, remote=[localhost]:30091): Broken pipe
+Exception raised from sendBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:653 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x80 (0x14ac459b3b80 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: <unknown function> + 0x5ffc5b1 (0x14ac87dbc5b1 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #2: <unknown function> + 0x5ffce42 (0x14ac87dbce42 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: <unknown function> + 0x5ffe94e (0x14ac87dbe94e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x30e (0x14ac87db926e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x3c8 (0x14ac46937868 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #6: <unknown function> + 0xef5e4 (0x14acace145e4 in /scratch/user/u.dl344013/sglang-offload-research/venv/bin/../lib/libstdc++.so.6)
+frame #7: <unknown function> + 0x81ca (0x14acb027c1ca in /lib64/libpthread.so.0)
+frame #8: clone + 0x43 (0x14acaf74d953 in /lib64/libc.so.6)
+
+[rank1]:[W216 17:26:25.577088533 ProcessGroupNCCL.cpp:1771] [PG ID 0 PG GUID 0(default_pg) Rank 1] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Broken pipe
+[rank2]:[W216 17:26:25.934326277 TCPStore.cpp:106] [c10d] sendBytes failed on SocketImpl(fd=73, addr=[localhost]:49114, remote=[localhost]:30091): Broken pipe
+Exception raised from sendBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:653 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x80 (0x152ee33d8b80 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: <unknown function> + 0x5ffc5b1 (0x152f257e15b1 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #2: <unknown function> + 0x5ffce42 (0x152f257e1e42 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: <unknown function> + 0x5ffe94e (0x152f257e394e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x30e (0x152f257de26e in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x3c8 (0x152ee435c868 in /scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #6: <unknown function> + 0xef5e4 (0x152f4a8395e4 in /scratch/user/u.dl344013/sglang-offload-research/venv/bin/../lib/libstdc++.so.6)
+frame #7: <unknown function> + 0x81ca (0x152f4dc971ca in /lib64/libpthread.so.0)
+frame #8: clone + 0x43 (0x152f4d168953 in /lib64/libc.so.6)
+
+[rank2]:[W216 17:26:25.937617732 ProcessGroupNCCL.cpp:1771] [PG ID 0 PG GUID 0(default_pg) Rank 2] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Broken pipe
+/scratch/user/u.dl344013/sglang-offload-research/venv/lib/python3.11/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 4 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+
+real	4m17.778s
+user	3m43.095s
+sys	22m12.371s
+[2026-02-16T17:26:40.271] error: Detected 2 oom_kill events in StepId=1454669.batch. Some of the step tasks have been OOM Killed.

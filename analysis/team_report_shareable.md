@@ -1,6 +1,6 @@
 # SGLang Layerwise Offloading Analysis: Wan2.2 Video Generation
 
-**Date:** February 18, 2026 (updated)
+**Date:** February 23, 2026 (nsys temporal overlap confirmed)
 **Hardware:** ACES cluster, 4x H100 PCIe GPUs, 488GB RAM
 **Software:** SGLang 0.5.8 (PR #15511), Wan2.2-T2V-A14B-Diffusers (dual 14B transformers)
 
@@ -46,177 +46,240 @@ Both implementations verified from source code with line-number citations.
 
 ---
 
-## 3. Benchmark Results (4 GPUs, Correct Configuration)
+## 3. Benchmark Results (4 GPUs, Batch 3 Definitive)
 
-All results use `flow_shift=12.0` (correct for Wan2.2-A14B), clean Run 2 timing with no profiling overhead.
+All results use `flow_shift=12.0`, clean Run 2 timing with no profiling overhead. Batch 3 jobs 1459995-1459996 (3-iteration: warmup + clean + profiled). Earlier batches used incorrect `flow_shift=3.0` due to a model registry path resolution bug, now fixed by using the HuggingFace model identifier.
 
 ### Head-to-Head: New vs Old Offload
 
 | Metric | Layerwise (New) | Full-Model (Old) | Delta |
 |--------|----------------|-----------------|-------|
-| Total denoising | 662.2s | **585.7s** | Old is **13% faster** |
-| Steady-state per step | ~23s | ~20s | Old is **15% faster** per step |
-| First step | 65s | 40s | New 25s slower |
-| Step 19 (switch) | 23s (no spike) | **47s** (+27s spike) | New handles seamlessly |
-| Peak VRAM (est.) | ~23 GB | ~61 GB | New uses **62% less VRAM** |
+| Total denoising | 641.1s | **610.2s** | Old is **5.1% faster** |
+| Steady-state per step | ~23.7s | ~22.6s | Old is **4.9% faster** per step |
+| Step 19 (switch) | 23.3s (no spike) | **49.2s** (+27s spike) | New handles seamlessly |
+| Peak VRAM | 23.08 GB | 61.25 GB | New uses **62% less VRAM** |
 
 ### Per-Step Timing Profile
 
-**Old offload** has uniform ~20s steps except for a single 47s spike at the transformer switch:
+**Old offload** has uniform ~22.6s steps except for a 49.2s spike at the transformer switch:
 
 ```
 Step:  1   2   3  ...  17  18  [19]  20  21 ... 27
-Time: 40  20  20  ...  20  20  [47]  20  20 ... 20  (seconds)
+Time: 25  23  23  ...  23  23  [49]  23  23 ... 23  (seconds)
                                  ^
-                          27s blocking .to() spike
+                          ~27s blocking .to() spike
 ```
 
-**New offload** has uniform ~23s steps with no spike anywhere:
+**New offload** has uniform ~23.7s steps with no spike anywhere:
 
 ```
 Step:  1   2   3  ...  17  18  [19]  20  21 ... 27
-Time: 65  22  23  ...  23  23  [23]  23  23 ... 23  (seconds)
+Time: 25  24  24  ...  24  24  [23]  24  24 ... 24  (seconds)
                                  ^
                           seamless (layerwise prefetch)
 ```
 
 ### Key Observation
 
-The old offload is faster **despite** having a 27s spike at step 19. Why? Because:
-- Old: 26 fast steps at 20s + 1 spike at 47s = 567s + 47s = **~586s**
-- New: 27 uniform steps at 23s = **~662s**
-- The 3s/step overhead across 27 steps (81s total) far exceeds the single 27s spike
+The old offload is faster **despite** having a ~27s spike at step 19. The ~1.1s/step overhead across 27 steps (~30s total) exceeds the single 27s spike savings.
 
 ---
 
-## 4. Root Cause Analysis: Why Layerwise Offload is Slower
+## 4. Root Cause Analysis (Definitively Confirmed by nsys CUPTI Overlap Analysis)
 
-### The Core Problem: PCIe Topology Mismatch
+### The Core Problem: PCIe Topology Contention
 
-The PR's NVLink data proves this is a **hardware topology problem**. On NVLink, steady-state is identical (3.27 vs 3.29s/step, delta=0.02s). On our PCIe system, the delta is 3.0s/step. The software is the same -- only the hardware topology changes.
+On NVLink, steady-state is identical (3.27 vs 3.29s/step, delta=0.02s). On our PCIe system, the delta is ~1.1s/step. nsys CUPTI-level temporal overlap analysis has **definitively confirmed** the mechanism: H2D transfers and NCCL collectives compete for the same PCIe bus simultaneously, degrading bandwidth by 36.5%.
 
-| Factor | NVLink (delta=0.02s) | PCIe (delta=3.0s) |
-|--------|---------------------|-------------------|
-| H2D path | Per-GPU PCIe link (no contention) | Shared root complex (4 GPUs compete) |
-| GPU-GPU path | NVLink 900 GB/s (separate from H2D) | PCIe (shared with H2D) |
-| H2D per GPU per layer | 700MB (no contention) | 700MB (contending with NCCL + other GPUs) |
-| FSDP H2D per GPU per layer | 175MB shard (topology-aware) | 175MB shard (topology-aware) |
+### nsys Profiling: H2D Transfer Volume
 
-### Why FSDP Handles PCIe Better
+| Metric | New Offload | Old Offload | Ratio |
+|--------|-------------|-------------|-------|
+| **H2D transfer volume** | **5,767 GB** | 618 GB | **9.3x** |
+| H2D transfers | 22,008 | 18,802 | 1.2x |
+| Avg transfer size | 262 MB | 33 MB | 8x |
+| H2D total time | 707s | 60s | 11.8x |
+| Compute kernel time | ~1,000s | ~1,000s | ~1x |
 
-Both strategies do per-layer CPU-to-GPU transfers every step. The difference is how:
+The new offload moves **9.3x more data** from CPU to GPU because each GPU independently transfers the full ~28GB model, versus FSDP's 1/N sharding (see Section 2 comparison). This continuous H2D stream saturates the shared PCIe bus.
 
-| | Old (FSDP) | New (Layerwise) |
-|---|---|---|
-| H2D per GPU per layer | **175MB** (1/4 shard) | **700MB** (full layer) |
-| Root complex pressure (4 GPUs) | 700MB total | **2.8 GB total** (4x more) |
-| Transfer scheduling | NCCL topology-aware | Blind `copy_(non_blocking=True)` |
-| Compiler integration | torch.compile can optimize overlap | `@torch.compiler.disable` blocks optimization |
+### nsys Temporal Overlap: The Definitive Evidence
 
-FSDP + NCCL are designed for shared-bus topologies: they minimize root complex pressure via sharding and use topology-aware scheduling for the all-gather. LayerwiseOffloadManager has no topology awareness.
+Direct CUPTI-level analysis of the nsys SQLite databases confirms that H2D transfers and NCCL kernels overlap temporally on the GPU timeline. This is the smoking gun for the PCIe contention hypothesis.
 
-### Why It's NOT Just About Raw Bandwidth
+| Context | New Offload | Old Offload |
+|---------|-------------|-------------|
+| H2D during NCCL | **7,475 transfers (5,253 GB)** | **0 transfers** |
+| H2D bandwidth during NCCL | **7,907 MB/s** | N/A |
+| H2D without NCCL | 4,709 transfers (514 GB) | 6,314 transfers (618 GB) |
+| H2D bandwidth without NCCL | **12,447 MB/s** | 11,141 MB/s |
+| **Bandwidth degradation** | **-36.5%** | **None** |
 
-PCIe bandwidth is only 58.3% utilized in our profiling data. The async pipeline *should* overlap most H2D with compute (each ~700MB transfer takes ~23-70ms against ~575ms of compute per layer). But this 58.3% number comes from blocking transfers only -- we cannot measure the actual async H2D bandwidth under contention with NCCL traffic from existing data. The nsys profiles (pending) will reveal the true picture.
+**61% of the new offload's large H2D transfers overlap with NCCL all-to-all operations.** During overlap, H2D bandwidth drops from 12.4 GB/s to 7.9 GB/s -- a 36.5% degradation. The old offload has **exactly zero** H2D transfers during NCCL because its blocking `.to()` calls serialize everything: all H2D completes before compute (and NCCL) begins.
+
+### nsys NCCL Kernel Performance
+
+| Metric | New Offload | Old Offload | Delta |
+|--------|-------------|-------------|-------|
+| NCCL SendRecv calls | 61,353 | 60,443 | +1.5% |
+| NCCL total time | **963.4s** | **690.5s** | **+39.5%** |
+| NCCL avg latency | 15.7ms | 11.4ms | +37.7% |
+| NCCL max latency | **4,145ms** | **1,701ms** | **+143%** |
+
+Same operation count, same call pattern -- the only difference is PCIe bandwidth availability. The 143% increase in max latency (4.1s vs 1.7s) represents severe tail contention where large H2D transfers and large NCCL collectives compete simultaneously.
+
+### TraceLens: GPU Timeline Decomposition
+
+| Component | Old Offload | New Offload | Delta |
+|-----------|-------------|-------------|-------|
+| **Total GPU time** | **639.4s** | **705.6s** | **+10.4%** |
+| Computation | 369.7s (57.8%) | 368.9s (52.3%) | -0.2% (identical) |
+| Exposed communication | 207.0s (32.4%) | 273.2s (38.7%) | **+32.0%** |
+| Exposed memcpy | 38.8s (6.1%) | 3.7s (0.5%) | **-90.5%** |
+| Idle | 23.9s (3.7%) | 59.8s (8.5%) | **+150.4%** |
+
+The new offload successfully hides H2D transfers behind compute (only 3.7s exposed vs 38.8s for old). But the continuous H2D traffic contends with Ulysses all-to-all on the shared PCIe bus, causing NCCL communication to take 32% longer and GPU idle time to increase 150%.
+
+### TraceLens: Ulysses All-to-All Contention (Aggregate View)
+
+TraceLens aggregate statistics corroborate the nsys temporal overlap findings:
+
+| Metric | Old Offload | New Offload | Delta |
+|--------|-------------|-------------|-------|
+| all_to_allv (210MB) mean latency | 16.2ms | **21.4ms** | **+32.1%** |
+| all_to_allv (210MB) max latency | 1,932ms | **3,520ms** | **+82.2%** |
+| all_to_allv (5MB) mean latency | 341us | 340us | **unchanged** |
+| NCCL total kernel time | 211.5s | 278.8s | **+31.8%** |
+
+Small all-to-allv (5MB) is identical -- only large transfers are affected. This rules out systemic NCCL issues and confirms bandwidth contention as the mechanism.
+
+### Data Sources
+
+| Source | Tool | Location |
+|--------|------|----------|
+| Batch 3 per-step timing | SGLang stage logging | ACES jobs 1459995-1459996 |
+| nsys temporal overlap | nsys export + Python sqlite3 | `results/profiles/analysis/overlap_*.csv` |
+| nsys H2D/NCCL stats | nsys export + Python sqlite3 | `results/profiles/analysis/h2d_*.csv`, `nccl_*.csv` |
+| TraceLens GPU timeline | TraceLens (AMD) | `results/tracelens_old/`, `results/tracelens_new/` |
+| TraceLens kernel/coll stats | TraceLens (AMD) | `results/tracelens_*/kernel_summary.csv`, `coll_analysis.csv` |
 
 ---
 
-## 5. PCIe vs NVLink: Why the PR's Claims Don't Apply Here
+## 5. PCIe vs NVLink
 
-PR #15511 reports a **58% speedup** on 8x GPU NVLink systems. On our 4x GPU PCIe system, the new offload is **13% slower**. The difference is hardware topology:
-
-| System | GPU-GPU Path | CPU-GPU Path | Can Overlap? |
-|--------|-------------|-------------|-------------|
-| H100 SXM (NVLink) | NVLink (900 GB/s) | PCIe (128 GB/s) | **Yes** -- separate paths |
-| H100 PCIe (ACES) | PCIe (128 GB/s) | PCIe (128 GB/s) | **No** -- shared fabric |
-
-### PR's Reference Numbers (8x GPU NVLink)
+PR #15511 reports a **58% speedup** on 8x GPU NVLink systems. On our 4x GPU PCIe system, the new offload is **5.1% slower**. The difference is that NVLink provides a dedicated GPU-GPU path (900 GB/s) separate from the CPU-GPU PCIe path (128 GB/s), allowing full overlap. On PCIe, both share the same fabric, causing the contention confirmed in Section 4.
 
 | | Old Offload | New Offload | Improvement |
 |---|---|---|---|
-| Step 0 | 36.0s | 7.7s | 4.7x faster |
-| Steady state | 3.27s/step | 3.29s/step | Equal |
-| Step 19 (switch) | 31.3s | 3.29s | 9.5x faster |
-| **Total** | **149.7s** | **94.2s** | **58% speedup** |
-
-On NVLink, CPU-to-GPU transfers overlap entirely with GPU compute (separate physical paths). On PCIe, both share the bus, causing the ~3s/step overhead we observe.
+| Step 0 (NVLink) | 36.0s | 7.7s | 4.7x faster |
+| Steady state (NVLink) | 3.27s/step | 3.29s/step | Equal |
+| Step 19 switch (NVLink) | 31.3s | 3.29s | 9.5x faster |
+| **Total (NVLink)** | **149.7s** | **94.2s** | **58% speedup** |
 
 ---
 
-## 6. Config Resolution Bug (Discovered and Fixed)
-
-Early benchmarks used an incorrect `flow_shift=3.0` (instead of 12.0) due to SGLang's model registry failing to resolve local model paths. The transformer switch occurred at step 10 instead of step 19.
-
-**Fix:** Use the HuggingFace model identifier (`Wan-AI/Wan2.2-T2V-A14B-Diffusers`) which exactly matches the registered config. All benchmark scripts corrected.
-
-**Impact on results:** Performance gap **widened** from 7% (wrong flow_shift) to 13% (correct flow_shift). The per-step steady-state gap also widened from 9% to 15%, suggesting the shifted noise schedule disproportionately affects the layerwise offload path.
-
----
-
-## 7. Recommendations
-
-### For Users: When to Use Which Strategy
+## 6. Recommendations: When to Use Which Strategy
 
 | Scenario | Recommended Strategy | Reason |
 |----------|---------------------|--------|
-| PCIe system, VRAM sufficient | **Old** (dit_cpu_offload) | 13% faster, FSDP sharding efficient |
-| PCIe system, VRAM constrained | **New** (dit_layerwise_offload) | 62% less VRAM, acceptable overhead |
+| PCIe system, VRAM sufficient | **Old** (dit_cpu_offload) | 5% faster, FSDP sharding efficient |
+| PCIe system, VRAM constrained | **New** (dit_layerwise_offload) | 62% less VRAM, small overhead |
 | NVLink system (any) | **New** (dit_layerwise_offload) | 58% faster (per PR benchmarks) |
 | 8+ GPUs, NVLink | **New** (dit_layerwise_offload) | Designed for this config |
 
-### For SGLang Contributors: Closing the PCIe Gap
+---
 
-Three code-level improvements, prioritized by estimated impact:
+## 7. Optimization Opportunities
 
-**1. Make LayerwiseOffloadManager torch.compile-compatible (highest impact)**
+Prioritized by confirmed profiling evidence. All impact estimates are relative to the current 641.1s (new offload) denoising time on 4x H100 PCIe.
 
-Remove `@torch.compiler.disable` from offload methods and implement them as compiler-safe operations (e.g., `torch.library.custom_op` or `torch.autograd.Function`). This eliminates the 80 graph breaks per step that prevent cross-layer kernel fusion and compiler overlap optimization.
+### Tier 1: High Impact (estimated 10-20% speedup)
 
-Expected improvement: **~1.5-2.0s/step** (eliminates the dominant overhead source).
+**FSDP-style weight sharding for layerwise offload**
+- *Addresses:* 9.3x H2D overhead (nsys: 5,767 GB vs 618 GB) causing 32% NCCL slowdown
+- *Approach:* Each GPU copies 1/N of each layer (~175MB instead of ~700MB), then NCCL all-gathers the shards. Reduces per-GPU H2D from ~28GB to ~7GB per denoising step
+- *Expected:* Eliminate the NCCL +32% overhead (~66s total), bringing layerwise within ~1% of FSDP speed while retaining low VRAM
+- *Complexity:* High -- requires rearchitecting `LayerwiseOffloadManager` to integrate with FSDP sharding
 
-**2. Add FSDP-style weight sharding (medium impact)**
+**Priority-based PCIe scheduling**
+- *Addresses:* nsys confirms 61% of H2D overlaps with NCCL, degrading BW 36.5%. Max NCCL latency spikes to 4.1s (vs 1.7s old)
+- *Approach:* Insert `cudaStreamWaitEvent` between the H2D copy stream and NCCL stream so prefetch pauses during collective communication windows. Yield PCIe to NCCL during all-to-all
+- *Expected:* Reduce NCCL mean latency from 15.7ms back toward 11.4ms baseline, recovering ~50-60s of the 273s NCCL overhead
+- *Complexity:* Medium -- requires stream synchronization logic in the prefetch hooks
 
-Currently each GPU independently copies the full ~28GB model. With 4 GPUs, total PCIe traffic is 112GB/step. FSDP-style sharding (each GPU copies 1/N, then all-gathers) reduces per-GPU H2D to ~7GB. While the async pipeline already overlaps most transfer time, reducing data volume lowers PCIe contention with Ulysses all-to-all and provides more margin for the prefetch pipeline.
+**Mixed FSDP + selective layerwise**
+- *Addresses:* Contention is worst during attention layers (which trigger Ulysses all-to-all)
+- *Approach:* Use FSDP for attention layers (where sharding reduces PCIe pressure during collectives) and layerwise for FFN layers (no inter-GPU communication, so full-bus H2D is fine)
+- *Expected:* Gets sharding benefits where contention matters most, without full FSDP complexity
+- *Complexity:* High -- requires per-layer strategy selection and two offload code paths
 
-Expected improvement: **~0.3-0.5s/step**.
+### Tier 2: Medium Impact (estimated 5-10% speedup)
 
-**3. Pool GPU memory buffers and reduce CUDA API calls (medium impact)**
+**torch.compile compatibility**
+- *Addresses:* Graph breaks from `@torch.compiler.disable` on offload methods prevent kernel fusion of communication overlap
+- *Approach:* Remove compiler disables, ensure offload hooks are compile-safe
+- *Expected:* ~0.2-0.5s/step (~5-14s total). NVLink data shows steady-state is already near-optimal, confirming this is secondary
+- *Complexity:* Medium -- may require torch.compile-friendly rewrite of hook logic
 
-Pre-allocate a rotating pool of GPU buffers instead of calling `torch.empty(~700MB)` and `torch.empty((1,))` for every layer every step (~79 allocations per step). Batch event operations where possible.
+**Denoising step reduction**
+- *Addresses:* 27 denoising steps at ~23.7s each = 641s total. Fewer steps = proportionally less time
+- *Approach:* Explore improved schedulers (DPM-Solver++, consistency distillation) to reduce from 27 to 15-20 steps with minimal quality loss
+- *Expected:* 20-40% wall-clock reduction if steps can be halved, but quality tradeoff needs evaluation
+- *Complexity:* Low-Medium -- scheduler swap is straightforward, quality validation requires human review
 
-Expected improvement: **~0.2-0.5s/step**.
+**GPU memory buffer pooling**
+- *Addresses:* TraceLens shows 59.8s idle (new) vs 23.9s (old); some is CUDA allocator overhead from `torch.empty(~700MB)` per layer per step
+- *Approach:* Pre-allocate a rotating pool of GPU buffers, reuse across layers and steps
+- *Expected:* ~0.1-0.3s/step (~3-8s total), reducing idle time fraction
+- *Complexity:* Low -- allocate N buffers at init, cycle through them
+
+### Tier 3: Lower Impact / Longer Term
+
+**Ulysses + Ring hybrid parallelism**
+- *Addresses:* Pure Ulysses uses all-to-all which scales poorly beyond 4 GPUs (message size grows)
+- *Approach:* Hybrid Ulysses (intra-node) + Ring Attention (inter-node) for >4 GPU configs
+- *Expected:* Reduces collective message sizes, relevant for 6-8+ GPU scaling
+- *Complexity:* High -- requires attention parallelism rearchitecture
+
+**SageAttention2 integration**
+- *Addresses:* Attention kernel throughput (current SageAttention already used)
+- *Approach:* Upgrade to SageAttention2 with 8-bit quantized attention for ~2x kernel speedup
+- *Expected:* Reduces the 369s computation component; impact depends on attention's share of total compute
+- *Complexity:* Medium -- drop-in replacement if API-compatible
+
+**Diffusion KV-caching (DeepCache / Cache-DiT)**
+- *Addresses:* Redundant attention computation across denoising steps where KV pairs change minimally
+- *Approach:* Cache attention KV pairs and reuse across steps with low delta, skipping recomputation
+- *Expected:* Up to 2x speedup on cached steps, but quality impact needs validation
+- *Complexity:* Medium-High -- requires model-specific caching strategy
+
+**H100 TMA (Tensor Memory Accelerator)**
+- *Addresses:* H2D transfers currently use the main PCIe data path
+- *Approach:* Leverage hardware copy engine for H2D transfers, freeing the PCIe bus for NCCL
+- *Expected:* Could reduce bus contention without software scheduling changes
+- *Complexity:* High -- requires CUDA driver-level integration, limited documentation
 
 ---
 
-## 8. Pending Experiments
-
-| Experiment | Jobs | Status | What It Tests |
-|-----------|------|--------|---------------|
-| 4-GPU rerun (90 min) | 1459995-1459996 | Queued (Feb 19) | Run 3 profiled data |
-| 6-GPU scaling | 1459997-1459998 | Queued (Feb 20) | Does gap narrow with more GPUs? |
-| nsys profiling (new + old) | 1459999-1460000 | Queued (Feb 19) | Actual PCIe HtoD bandwidth per step |
-| Prefetch=3 | Blocked | sglang 0.5.8 lacks CLI flag | Pipeline depth impact |
-
-### What 6-GPU Results Will Show
-
-**Hypothesis:** The gap should **stay roughly the same or widen slightly** with 6 GPUs, because:
-- The dominant overhead (graph breaks) is per-GPU and independent of GPU count
-- PCIe contention may increase: 6 GPUs x 28GB = 168GB total vs 4 GPUs x 28GB = 112GB
-- FSDP benefits: each GPU copies only 1/6 = ~4.7GB (less than 1/4 = 7GB at 4 GPUs)
-- The compute time per step may decrease with more GPUs (Ulysses splits the sequence)
-
-If the gap stays roughly constant, it confirms the overhead is software (graph breaks). If it widens significantly, PCIe contention plays a larger role than estimated.
-
----
-
-## 9. Summary
+## 8. Summary
 
 | Finding | Detail |
 |---------|--------|
-| **Performance** | Old offload is **13% faster** on 4x H100 PCIe (585.7s vs 662.2s) |
-| **Memory** | New offload uses **62% less VRAM** (23GB vs 61GB peak) |
-| **Root cause** | PCIe topology mismatch: on NVLink delta=0.02s, on PCIe delta=3.0s. Shared root complex + no FSDP sharding = 4x more H2D contention. FSDP is topology-aware; LayerwiseOffloadManager is not |
-| **PCIe vs NVLink** | PR claims 58% speedup on NVLink; we see 13% slowdown on PCIe |
+| **Performance** | Old offload is **5.1% faster** on 4x H100 PCIe (610.2s vs 641.1s) |
+| **Memory** | New offload uses **62% less VRAM** (23.1GB vs 61.3GB peak) |
+| **Root cause** | PCIe contention: 61% of H2D overlaps with NCCL, causing **36.5% BW degradation** (7.9 vs 12.4 GB/s). New generates **9.3x more H2D** (5,767 vs 618 GB); old has **zero** overlap. NCCL slowed **39.5%**, GPU idle doubled. Computation identical |
+| **PCIe vs NVLink** | PR claims 58% speedup on NVLink; we see 5.1% slowdown on PCIe |
 | **Switch handling** | New offload is seamless; old offload has a 27s spike at step 19 |
-| **Key recommendation** | Add FSDP-style weight sharding to layerwise offload (addresses the PCIe topology bottleneck directly) |
-| **Broader takeaway** | Layerwise offload trades speed for memory on PCIe; the gap is fixable by adding topology-aware sharding |
+| **Top optimization** | FSDP-style weight sharding for layerwise offload (see Section 7, Tier 1) |
+| **Broader takeaway** | Layerwise offload trades speed for memory on PCIe; the gap is small (5%) and fixable |
+
+### Experiment Status
+
+| Experiment | Status | Key Finding |
+|-----------|--------|-------------|
+| 4-GPU clean benchmarks (1459995-96) | **Done** | New 641.1s vs Old 610.2s |
+| nsys profiling (1459999-1460000) | **Done** | 9.3x H2D, NCCL +39.5%, compute identical |
+| nsys temporal overlap analysis | **Done** | 61% of H2D during NCCL, 36.5% BW degradation, old has zero overlap |
+| TraceLens analysis | **Done** | GPU timeline confirms PCIe contention |
+| 6-GPU scaling (1459997-98) | Pending | Expect gap to widen (more PCIe pressure) |
+| Prefetch=3 | Blocked | sglang 0.5.8 lacks CLI flag |

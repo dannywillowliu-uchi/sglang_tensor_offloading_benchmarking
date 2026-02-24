@@ -1,0 +1,4 @@
+kernel_name,count,total_time_s,avg_dur_ms,min_dur_ms,max_dur_ms
+ncclDevKernel_SendRecv(ncclDevKernelArgsStorage<(unsigned long)4096>),60443,690.498649183,11.42396388635574,0.14285,1701.015165
+ncclDevKernel_AllGather_RING_LL(ncclDevKernelArgsStorage<(unsigned long)4096>),24,0.002769564,0.1153985,0.006592,0.69172
+ncclDevKernel_AllReduce_Sum_f32_RING_LL(ncclDevKernelArgsStorage<(unsigned long),8,0.000291298,0.03641225,0.009728,0.111489

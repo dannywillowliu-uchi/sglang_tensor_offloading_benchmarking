@@ -1,0 +1,4 @@
+rank,Process Group Name,Process Group Ranks,Collective name,Group size,dtype,In msg nelems,Out msg nelems,In split size,Out split size,stream,In msg size (MB)_first,Out msg size (MB)_first,dur_sum,dur_mean,dur_std,dur_min,dur_max,operation_count
+0,39,"[0, 1, 2, 3]",all_to_allv,4,BFloat16,110592000,110592000,"[27648000, 27648000, 27648000, 27648000]","[27648000, 27648000, 27648000, 27648000]",47,210.9375,210.9375,210034499.629,16206.365712114199,25227.888660683657,7075.879,1932603.1,12960
+0,39,"[0, 1, 2, 3]",all_to_allv,4,BFloat16,2621440,2621440,"[655360, 655360, 655360, 655360]","[655360, 655360, 655360, 655360]",47,5.0,5.0,1471180.39,340.5510162037037,78.46480306748857,188.898,712.231,4320
+0,44,"[0, 1, 2, 3]",_allgather_base,4,Float,1382400,5529600,[],[],7,5.2734375,21.09375,1589.144,1589.144,,1589.144,1589.144,1
