@@ -1,0 +1,342 @@
+{
+  "baseline": {
+    "name": "no_offload",
+    "h2d_summary": {
+      "num_transfers": 49072,
+      "total_gb": 276.413963276,
+      "total_time_s": 13.95156216,
+      "effective_bw_gbps": 19.812402375161692,
+      "avg_size_mb": 5.632824488017606,
+      "max_size_mb": 2100.297728,
+      "avg_dur_ms": 0.2843079996739485,
+      "max_dur_ms": 102.189458
+    },
+    "h2d_buckets": [
+      {
+        "size_bucket": "10-100MB",
+        "count": 3376,
+        "total_gb": 174.347255808,
+        "total_time_s": 9.025307306,
+        "avg_bw_mbps": 21875.44271959259
+      },
+      {
+        "size_bucket": "100-500MB",
+        "count": 648,
+        "total_gb": 93.1135488,
+        "total_time_s": 4.501325765,
+        "avg_bw_mbps": 21554.310314475922
+      },
+      {
+        "size_bucket": ">500MB",
+        "count": 4,
+        "total_gb": 8.401190912,
+        "total_time_s": 0.348205184,
+        "avg_bw_mbps": 24760.71324357487
+      },
+      {
+        "size_bucket": "1-10MB",
+        "count": 104,
+        "total_gb": 0.389021696,
+        "total_time_s": 0.024734481,
+        "avg_bw_mbps": 18607.725624350853
+      },
+      {
+        "size_bucket": "10KB-1MB",
+        "count": 5668,
+        "total_gb": 0.15653824,
+        "total_time_s": 0.010066304,
+        "avg_bw_mbps": 9558.279739070977
+      },
+      {
+        "size_bucket": "<10KB",
+        "count": 39272,
+        "total_gb": 0.00640782,
+        "total_time_s": 0.04192312,
+        "avg_bw_mbps": 154.66824645743793
+      }
+    ],
+    "h2d_nccl_overlap": [
+      {
+        "context": "during_nccl",
+        "h2d_count": 0,
+        "total_gb": null,
+        "avg_bw_mbps": null
+      },
+      {
+        "context": "no_nccl",
+        "h2d_count": 4132,
+        "total_gb": 276.251017216,
+        "avg_bw_mbps": 21745.627788729853
+      }
+    ],
+    "h2d_compute_overlap": [
+      {
+        "context": "during_compute",
+        "h2d_count": 0,
+        "total_gb": null
+      },
+      {
+        "context": "no_compute",
+        "h2d_count": 4132,
+        "total_gb": 276.251017216
+      }
+    ],
+    "kernel_gaps": {
+      "deviceId": 0,
+      "total_gaps": 166261,
+      "gaps_over_100us": 9079,
+      "gaps_over_1ms": 329,
+      "gaps_over_10ms": 90,
+      "total_gap_s": 58.729458083,
+      "significant_gap_s": 58.255479528,
+      "avg_gap_us": 353.23652620277755,
+      "max_gap_ms": 19080.912736
+    },
+    "cuda_malloc": [
+      {
+        "api_name": "cudaMalloc_v3020",
+        "call_count": 3816,
+        "total_time_s": 2.29213739,
+        "avg_dur_us": 600.6649344863732,
+        "max_dur_us": 69963.633
+      },
+      {
+        "api_name": "cudaFree_v3020",
+        "call_count": 195,
+        "total_time_s": 0.067902317,
+        "avg_dur_us": 348.2170102564102,
+        "max_dur_us": 1415.568
+      },
+      {
+        "api_name": "cudaFreeHost_v3020",
+        "call_count": 240,
+        "total_time_s": 0.022385386,
+        "avg_dur_us": 93.27244166666667,
+        "max_dur_us": 991.794
+      }
+    ],
+    "nccl_kernels": [
+      {
+        "kernel_name": "ncclDevKernel_SendRecv(ncclDevKernelArgsStorage<(unsigned long)4096>)",
+        "count": 72288,
+        "total_time_s": 29.499757481,
+        "avg_dur_ms": 0.40808650787129264,
+        "max_dur_ms": 435.26377
+      },
+      {
+        "kernel_name": "ncclDevKernel_AllGather_RING_LL(ncclDevKernelArgsStorage<(unsigned long)4096>)",
+        "count": 220,
+        "total_time_s": 0.030472265,
+        "avg_dur_ms": 0.13851029545454546,
+        "max_dur_ms": 6.68216
+      },
+      {
+        "kernel_name": "ncclDevKernel_AllReduce_Sum_f32_RING_LL(ncclDevKernelArgsStorage<(unsigned long)",
+        "count": 8,
+        "total_time_s": 0.005082991,
+        "avg_dur_ms": 0.635373875,
+        "max_dur_ms": 1.175154
+      }
+    ],
+    "gpu_utilization": [
+      {
+        "deviceId": 0,
+        "num_kernels": 197348,
+        "total_kernel_time_s": 327.633414588,
+        "wall_time_s": 381.915282085,
+        "utilization": 0.8578693494519057
+      },
+      {
+        "deviceId": 1,
+        "num_kernels": 196169,
+        "total_kernel_time_s": 327.825746525,
+        "wall_time_s": 381.912416676,
+        "utilization": 0.8583793880760754
+      },
+      {
+        "deviceId": 2,
+        "num_kernels": 190524,
+        "total_kernel_time_s": 328.258322524,
+        "wall_time_s": 381.912474552,
+        "utilization": 0.85951191541743
+      },
+      {
+        "deviceId": 3,
+        "num_kernels": 191316,
+        "total_kernel_time_s": 327.838764912,
+        "wall_time_s": 381.909508691,
+        "utilization": 0.8584200116820129
+      }
+    ]
+  },
+  "offload": {
+    "name": "offload_default",
+    "h2d_summary": {
+      "num_transfers": 62075,
+      "total_gb": 6372.08497904,
+      "total_time_s": 127.342173637,
+      "effective_bw_gbps": 50.039078154925996,
+      "avg_size_mb": 102.65138911059202,
+      "max_size_mb": 4200.595456,
+      "avg_dur_ms": 2.0514244645509465,
+      "max_dur_ms": 143.516088
+    },
+    "h2d_buckets": [
+      {
+        "size_bucket": ">500MB",
+        "count": 8359,
+        "total_gb": 5916.583656448,
+        "total_time_s": 112.203026528,
+        "avg_bw_mbps": 53304.36570333769
+      },
+      {
+        "size_bucket": "100-500MB",
+        "count": 1808,
+        "total_gb": 298.567335936,
+        "total_time_s": 8.904721705,
+        "avg_bw_mbps": 38812.788899313986
+      },
+      {
+        "size_bucket": "10-100MB",
+        "count": 2941,
+        "total_gb": 156.610527232,
+        "total_time_s": 6.160671938,
+        "avg_bw_mbps": 26839.28644411049
+      },
+      {
+        "size_bucket": "1-10MB",
+        "count": 52,
+        "total_gb": 0.179961856,
+        "total_time_s": 0.005502273,
+        "avg_bw_mbps": 34384.16343156132
+      },
+      {
+        "size_bucket": "10KB-1MB",
+        "count": 6281,
+        "total_gb": 0.136837376,
+        "total_time_s": 0.011333783,
+        "avg_bw_mbps": 9039.018344190927
+      },
+      {
+        "size_bucket": "<10KB",
+        "count": 42634,
+        "total_gb": 0.006660192,
+        "total_time_s": 0.05691741,
+        "avg_bw_mbps": 107.50994542815013
+      }
+    ],
+    "h2d_nccl_overlap": [
+      {
+        "context": "during_nccl",
+        "h2d_count": 8331,
+        "total_gb": 5854.931893248,
+        "avg_bw_mbps": 53303.363166065064
+      },
+      {
+        "context": "no_nccl",
+        "h2d_count": 4829,
+        "total_gb": 517.009588224,
+        "avg_bw_mbps": 31558.64871365531
+      }
+    ],
+    "h2d_compute_overlap": [
+      {
+        "context": "during_compute",
+        "h2d_count": 8331,
+        "total_gb": 5854.931893248
+      },
+      {
+        "context": "no_compute",
+        "h2d_count": 4829,
+        "total_gb": 517.009588224
+      }
+    ],
+    "kernel_gaps": {
+      "deviceId": 0,
+      "total_gaps": 133708,
+      "gaps_over_100us": 8756,
+      "gaps_over_1ms": 450,
+      "gaps_over_10ms": 237,
+      "total_gap_s": 117.957631164,
+      "significant_gap_s": 117.535569797,
+      "avg_gap_us": 882.2032426182427,
+      "max_gap_ms": 40964.084905
+    },
+    "cuda_malloc": [
+      {
+        "api_name": "cudaFree_v3020",
+        "call_count": 194,
+        "total_time_s": 4.751777995,
+        "avg_dur_us": 24493.70100515464,
+        "max_dur_us": 1010719.369
+      },
+      {
+        "api_name": "cudaMalloc_v3020",
+        "call_count": 259,
+        "total_time_s": 1.293757482,
+        "avg_dur_us": 4995.2026332046335,
+        "max_dur_us": 121920.625
+      },
+      {
+        "api_name": "cudaFreeHost_v3020",
+        "call_count": 216,
+        "total_time_s": 0.023277071,
+        "avg_dur_us": 107.76421759259259,
+        "max_dur_us": 1488.848
+      }
+    ],
+    "nccl_kernels": [
+      {
+        "kernel_name": "ncclDevKernel_SendRecv(ncclDevKernelArgsStorage<(unsigned long)4096>)",
+        "count": 70787,
+        "total_time_s": 47.047025642,
+        "avg_dur_ms": 0.6646280481161795,
+        "max_dur_ms": 501.603068
+      },
+      {
+        "kernel_name": "ncclDevKernel_AllGather_RING_LL(ncclDevKernelArgsStorage<(unsigned long)4096>)",
+        "count": 171,
+        "total_time_s": 0.024915017,
+        "avg_dur_ms": 0.1457018538011696,
+        "max_dur_ms": 5.432685
+      },
+      {
+        "kernel_name": "ncclDevKernel_AllReduce_Sum_f32_RING_LL(ncclDevKernelArgsStorage<(unsigned long)",
+        "count": 8,
+        "total_time_s": 0.009997723,
+        "avg_dur_ms": 1.249715375,
+        "max_dur_ms": 4.310333
+      }
+    ],
+    "gpu_utilization": [
+      {
+        "deviceId": 0,
+        "num_kernels": 165221,
+        "total_kernel_time_s": 318.351544471,
+        "wall_time_s": 430.249934356,
+        "utilization": 0.739922354543784
+      },
+      {
+        "deviceId": 1,
+        "num_kernels": 187198,
+        "total_kernel_time_s": 333.746187852,
+        "wall_time_s": 446.392351725,
+        "utilization": 0.747652119401912
+      },
+      {
+        "deviceId": 2,
+        "num_kernels": 188258,
+        "total_kernel_time_s": 333.61324853,
+        "wall_time_s": 446.391979392,
+        "utilization": 0.7473549345227748
+      },
+      {
+        "deviceId": 3,
+        "num_kernels": 188893,
+        "total_kernel_time_s": 333.460889954,
+        "wall_time_s": 446.39230527,
+        "utilization": 0.7470130779971811
+      }
+    ]
+  }
+}
