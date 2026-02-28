@@ -1,0 +1,204 @@
+diff --git a/python/sglang/multimodal_gen/runtime/models/dits/wanvideo.py b/python/sglang/multimodal_gen/runtime/models/dits/wanvideo.py
+index 9522652..36891df 100644
+--- a/python/sglang/multimodal_gen/runtime/models/dits/wanvideo.py
++++ b/python/sglang/multimodal_gen/runtime/models/dits/wanvideo.py
+@@ -673,6 +673,7 @@ class WanTransformerBlock_VSA(nn.Module):
+ 
+ 
+ class WanTransformer3DModel(CachableDiT, OffloadableDiTMixin):
++    ffn_attr_names = {"blocks": "ffn"}
+     _fsdp_shard_conditions = WanVideoConfig()._fsdp_shard_conditions
+     _compile_conditions = WanVideoConfig()._compile_conditions
+     _supported_attention_backends = WanVideoConfig()._supported_attention_backends
+diff --git a/python/sglang/multimodal_gen/runtime/server_args.py b/python/sglang/multimodal_gen/runtime/server_args.py
+index cc998e1..b9adf5c 100644
+--- a/python/sglang/multimodal_gen/runtime/server_args.py
++++ b/python/sglang/multimodal_gen/runtime/server_args.py
+@@ -291,6 +291,7 @@ class ServerArgs:
+     dit_cpu_offload: bool | None = None
+     dit_layerwise_offload: bool | None = None
+     dit_offload_prefetch_size: float = 0.0
++    dit_offload_pcie_aware: bool = False
+     text_encoder_cpu_offload: bool | None = None
+     image_encoder_cpu_offload: bool | None = None
+     vae_cpu_offload: bool | None = None
+@@ -652,6 +653,14 @@ class ServerArgs:
+             default=ServerArgs.dit_offload_prefetch_size,
+             help="The size of prefetch for dit-layerwise-offload. If the value is between 0.0 and 1.0, it is treated as a ratio of the total number of layers. If the value is >= 1, it is treated as the absolute number of layers. 0.0 means prefetch 1 layer (lowest memory). Values above 0.5 might have peak memory close to no offload but worse performance.",
+         )
++        parser.add_argument(
++            "--dit-offload-pcie-aware",
++            action="store_true",
++            default=ServerArgs.dit_offload_pcie_aware,
++            help="Use PCIe-aware H2D scheduling for layerwise offload. Moves prefetch to FFN "
++            "compute window to avoid contention with NCCL all-to-all on shared PCIe bus. "
++            "Recommended for PCIe-connected GPUs (e.g. H100 PCIe) with sequence parallelism.",
++        )
+         parser.add_argument(
+             "--use-fsdp-inference",
+             action=StoreBoolean,
+diff --git a/python/sglang/multimodal_gen/runtime/utils/layerwise_offload.py b/python/sglang/multimodal_gen/runtime/utils/layerwise_offload.py
+index 8af6ad1..1842bb8 100644
+--- a/python/sglang/multimodal_gen/runtime/utils/layerwise_offload.py
++++ b/python/sglang/multimodal_gen/runtime/utils/layerwise_offload.py
+@@ -34,17 +34,36 @@ class LayerwiseOffloadManager:
+         enabled: bool,
+         pin_cpu_memory: bool = True,
+         prefetch_size: int = 1,
++        pcie_aware: bool = False,
+     ) -> None:
+         self.model = model
+         self.layers_attr_str = layers_attr_str
+         self.num_layers = num_layers
+         self.pin_cpu_memory = pin_cpu_memory
+         self.prefetch_size = min(max(1, prefetch_size), self.num_layers)
++        self.pcie_aware = pcie_aware
+         self.enabled = bool(enabled and torch.cuda.is_available())
+         if not self.enabled:
+             return
++        if self.pcie_aware and self.prefetch_size > 1:
++            logger.warning(
++                "pcie_aware double-buffer pool only supports prefetch_size=1; "
++                "clamping prefetch_size from %d to 1.", self.prefetch_size
++            )
++            self.prefetch_size = 1
+         self.device = torch.device("cuda", torch.cuda.current_device())
+-        self.copy_stream = torch.cuda.Stream()
++        low_prio, _ = torch.cuda.Stream.priority_range()
++        self.copy_stream = torch.cuda.Stream(priority=low_prio)
++
++        self.ffn_attr_name = None
++        if self.pcie_aware:
++            if hasattr(model, "ffn_attr_names") and layers_attr_str in model.ffn_attr_names:
++                self.ffn_attr_name = model.ffn_attr_names[layers_attr_str]
++            else:
++                logger.warning(
++                    "pcie_aware=True but no FFN attribute mapping for '%s'; "
++                    "falling back to block-level prefetch scheduling.", layers_attr_str
++                )
+ 
+         self._layer_name_re = re.compile(
+             rf"(^|\.){re.escape(layers_attr_str)}\.(\d+)(\.|$)"
+@@ -129,12 +148,30 @@ class LayerwiseOffloadManager:
+ 
+                 self._consolidated_cpu_weights[layer_idx][dtype] = cpu_buffer
+ 
++        # Pre-allocate GPU double-buffer pool to avoid per-step allocator churn
++        if self.pcie_aware:
++            max_sizes: Dict[torch.dtype, int] = {}
++            for layer_idx, dtype_buffers in self._consolidated_cpu_weights.items():
++                for dtype, cpu_buf in dtype_buffers.items():
++                    if dtype not in max_sizes or cpu_buf.numel() > max_sizes[dtype]:
++                        max_sizes[dtype] = cpu_buf.numel()
++            self._gpu_pool: Dict[torch.dtype, List[torch.Tensor]] = {}
++            for dtype, numel in max_sizes.items():
++                self._gpu_pool[dtype] = [
++                    torch.empty(numel, dtype=dtype, device=self.device),
++                    torch.empty(numel, dtype=dtype, device=self.device),
++                ]
++            self._pool_idx = 0
++
+         # prefetch the first layer for warm-up
+         self.prepare_for_next_req(non_blocking=False)
+ 
+         self.register_forward_hooks()
++        pcie_msg = ""
++        if self.pcie_aware:
++            pcie_msg = f", pcie_aware=True (ffn_attr={self.ffn_attr_name}, pool_bufs={len(self._gpu_pool)})"
+         logger.info(
+-            f"LayerwiseOffloadManager initialized with num prefetched layer: {self.prefetch_size}, total num layers: {self.num_layers}"
++            f"LayerwiseOffloadManager initialized with num prefetched layer: {self.prefetch_size}, total num layers: {self.num_layers}{pcie_msg}"
+         )
+ 
+     def prepare_for_next_req(self, non_blocking=True):
+@@ -173,9 +210,12 @@ class LayerwiseOffloadManager:
+         gpu_buffers: Dict[torch.dtype, torch.Tensor] = {}
+         with torch.cuda.stream(self.copy_stream):
+             for dtype, cpu_buffer in self._consolidated_cpu_weights[layer_idx].items():
+-                gpu_buffer = torch.empty(
+-                    cpu_buffer.shape, dtype=dtype, device=self.device
+-                )
++                if self.pcie_aware and dtype in self._gpu_pool:
++                    gpu_buffer = self._gpu_pool[dtype][self._pool_idx][: cpu_buffer.numel()]
++                else:
++                    gpu_buffer = torch.empty(
++                        cpu_buffer.shape, dtype=dtype, device=self.device
++                    )
+                 gpu_buffer.copy_(cpu_buffer, non_blocking=non_blocking)
+                 gpu_buffers[dtype] = gpu_buffer
+ 
+@@ -184,6 +224,10 @@ class LayerwiseOffloadManager:
+         event.record(self.copy_stream)
+         self._prefetch_events[layer_idx] = event
+ 
++        # Flip pool index for double-buffering
++        if self.pcie_aware:
++            self._pool_idx ^= 1
++
+         # restore model's weights by their metadata using gpu buffer
+         for name, meta in self._weight_metadata[layer_idx].items():
+             dtype = meta["dtype"]
+@@ -281,16 +325,25 @@ class LayerwiseOffloadManager:
+             return
+ 
+         layers = getattr(self.model, self.layers_attr_str)
++        use_ffn_scheduling = self.pcie_aware and self.ffn_attr_name
+ 
+         def make_pre_hook(i):
+             def hook(module, input):
+-                # wait only for the current layer if it's being prefetched
+                 if i == 0:
+                     self.prepare_for_next_req(non_blocking=False)
+                 if i in self._prefetch_events:
+                     torch.cuda.current_stream().wait_event(self._prefetch_events[i])
++                # When PCIe-aware, prefetch moves to FFN pre-hook
++                if not use_ffn_scheduling:
++                    if i % self.prefetch_size == 0:
++                        for j in range(i + self.prefetch_size, i + 2 * self.prefetch_size):
++                            layer_to_prefetch = j % self.num_layers
++                            self.prefetch_layer(layer_to_prefetch, non_blocking=True)
++
++            return hook
+ 
+-                # trigger batch prefetch (i + prefetch_size ~ i + 2 * prefetch_size) if needed
++        def make_ffn_pre_hook(i):
++            def hook(module, input):
+                 if i % self.prefetch_size == 0:
+                     for j in range(i + self.prefetch_size, i + 2 * self.prefetch_size):
+                         layer_to_prefetch = j % self.num_layers
+@@ -300,19 +353,24 @@ class LayerwiseOffloadManager:
+ 
+         def make_post_hook(i):
+             def hook(module, input, output):
+-                # previous, we wait here, until the copy stream for next layer is finished,
+-                # now with any prefetch_size, only wait for the copy stream, when the copy stream is for the next layer
+                 self.release_layer(i)
+ 
+             return hook
+ 
+-        # register prefetch & release hooks for each layer
+         self._forward_hooks.clear()
+         for i, layer in enumerate(layers):
+             pre_hook_handle = layer.register_forward_pre_hook(make_pre_hook(i))
+             post_hook_handle = layer.register_forward_hook(make_post_hook(i))
+             self._forward_hooks.extend([pre_hook_handle, post_hook_handle])
+ 
++            if use_ffn_scheduling:
++                ffn_submodule = getattr(layer, self.ffn_attr_name, None)
++                if ffn_submodule is not None:
++                    ffn_hook_handle = ffn_submodule.register_forward_pre_hook(
++                        make_ffn_pre_hook(i)
++                    )
++                    self._forward_hooks.append(ffn_hook_handle)
++
+     def remove_forward_hooks(self) -> None:
+         """Remove all registered forward hooks."""
+         for hook_handle in self._forward_hooks:
+@@ -352,6 +410,7 @@ class OffloadableDiTMixin:
+                 enabled=True,
+                 pin_cpu_memory=server_args.pin_cpu_memory,
+                 prefetch_size=prefetch_size,
++                pcie_aware=getattr(server_args, "dit_offload_pcie_aware", False),
+             )
+             self.layerwise_offload_managers.append(manager)
+ 

@@ -1,12 +1,17 @@
 # macOS
 .DS_Store
+.Rhistory
 
 # Workflow state
 .work/
+.claude/
+
+# Python
+__pycache__/
+*.pyc
 
 # SSH keys/certs (should never be in repo)
-id_aces_tamu
-id_aces_tamu-cert.pub
+id_aces_tamu*
 *.pem
 *.key
 
@@ -19,9 +24,17 @@ outputs/
 docs_*.pdf
 
 # Profiling results (large binaries)
-results/.Rhistory
-results/*.nsys-rep
-results/traces/
+results/aces/*.nsys-rep
+results/aces/traces/
+results/b200/traces/
+results/b200/nsys/
+*.nsys-rep
+*.sqlite
 
-# Cloned repos
-sglang-src/
+# Original working directories (superseded by reorganized structure)
+/b200/
+/b200_workspace/
+/sglang-src/
+
+# TraceLens Excel files (too large)
+*.xlsx
