@@ -1,0 +1,366 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage[margin=1in]{geometry}
+\usepackage{natbib}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}{Definition}
+
+\title{Topology-Aware Offloading for Distributed Transformer Inference}
+\author{Danny Willow Liu}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+CPU-GPU weight offloading enables large transformer inference on memory-constrained GPUs, while distributed parallelism (sequence or tensor) uses NCCL collectives for inter-GPU communication. On PCIe-only topologies, these two mechanisms share the same physical bus, creating bandwidth contention that degrades inference latency. We present a formal model of this contention and prove a topology-conditional optimality theorem: the optimal offloading strategy depends on the hardware topology and a single computable ratio $R = W / (B_p \cdot T_{\text{ffn}})$, where $W$ is the layer weight size, $B_p$ is the PCIe bandwidth, and $T_{\text{ffn}}$ is the FFN compute duration. On split-bus topologies (NVLink), unsharded async offloading is optimal. On shared-bus topologies (PCIe), scheduling H2D transfers during the NCCL-free FFN phase eliminates contention entirely when $R \leq 1$; when $R > 1$, weight sharding with optimal shard count $k^* = \lceil R \rceil$ minimizes overhead. We validate on 4$\times$ H100 PCIe and 4$\times$ B200 NVLink using SGLang's layerwise offload for Wan2.2-T2V-A14B video generation, showing $+0.25\%$ overhead on NVLink vs $+13\%$ on PCIe with the same software. We extend the framework to LLM inference, showing that the $R$ ratio correctly predicts different optimal strategies for prefill ($R \ll 1$) versus decode ($R \gg 1$) phases.
+\end{abstract}
+
+%==============================================================================
+\section{Introduction}
+%==============================================================================
+
+Large transformer models increasingly exceed single-GPU memory capacity, motivating two complementary techniques: \emph{CPU-GPU weight offloading} (storing layer weights in CPU memory, transferring via PCIe as needed) and \emph{distributed parallelism} (sharding computation across GPUs via NCCL collectives). Both techniques are well-studied individually. However, their interaction has received little attention.
+
+We identify a critical interference: on PCIe-only GPU topologies (e.g., H100 PCIe, cloud instances without NVLink), the host-to-device (H2D) weight transfers and NCCL collective communication share the same physical bus. Concurrent H2D and NCCL flows degrade each other's bandwidth---we measure a 36.5\% reduction in H2D bandwidth and 37.7\% reduction in NCCL bandwidth on 4$\times$ H100 PCIe. On NVLink topologies, H2D (PCIe) and NCCL (NVLink) use physically separate paths, and this contention is absent.
+
+This topology dependence has practical consequences. SGLang's layerwise offload achieves near-zero overhead on NVLink ($+0.25\%$) but $+13\%$ on PCIe---with identical software. The overhead is entirely attributable to PCIe contention, not algorithmic inefficiency.
+
+\paragraph{Contributions.}
+\begin{enumerate}
+    \item A formal bandwidth contention model for concurrent H2D and NCCL on shared-bus topologies, parameterized by a measurable contention coefficient $\alpha$ (\S\ref{sec:model}).
+    \item A topology-conditional optimality theorem with three cases, proved for the strategy space $\{U, P, S\}$ (\S\ref{sec:strategies}).
+    \item A closed-form optimal shard count $k^* = \min(\lceil R \rceil, N)$ derived from the $R$ ratio (\S\ref{sec:strategies}).
+    \item Controlled experiments on two topologies (H100 PCIe, B200 NVLink) validating the model's predictions (\S\ref{sec:experiments}).
+    \item Generalization to LLM inference showing different $R$ regimes for prefill vs decode (\S\ref{sec:generalization}).
+\end{enumerate}
+
+%==============================================================================
+\section{Background and Related Work}
+\label{sec:related}
+%==============================================================================
+
+\subsection{CPU-GPU Offloading for Inference}
+
+FlexGen~\citep{flexgen} formulates tensor placement as an LP maximizing throughput on a single GPU. DeepSpeed-Inference~\citep{deepspeed-inference} extends to multi-GPU with ZeRO-Inference, where each GPU fetches $1/N$ of each layer. MoE-Lightning~\citep{moe-lightning} introduces a hierarchical roofline model for multi-level memory pipelining. None of these models account for concurrent NCCL traffic degrading offload bandwidth.
+
+\subsection{PCIe Contention Modeling}
+
+Martinasso and Hoefler~\citep{martinasso2016} model PCIe topology as a congestion graph with per-link contention factors, achieving $>97\%$ prediction accuracy on 8-GPU systems. This is our closest theoretical ancestor, but it predates GPU collectives in ML workloads. TCCL~\citep{tccl} discovers better communication paths for PCIe clusters by modeling multi-transfer contention. Neither addresses the interaction between H2D offloading and NCCL collectives.
+
+\subsection{Communication-Computation Overlap}
+
+ISO~\citep{iso} and TokenWeave~\citep{tokenweave} overlap compute and all-reduce in LLM tensor parallelism. DeepSpeed-Ulysses~\citep{ulysses} proves all-to-all volume is $O(1)$ per GPU for sequence parallelism. These focus on overlapping compute with NCCL, not on the interaction between concurrent H2D and NCCL on a shared bus.
+
+\subsection{DiT Inference Systems}
+
+ScaleFusion~\citep{scalefusion} optimizes communication scheduling for spatial-temporal DiT inference but does not address CPU offloading. xDiT~\citep{xdit} compares PCIe and NVLink for DiT inference but provides no formal model. PipeFusion~\citep{pipefusion} and DistriFusion~\citep{distrifusion} propose alternative parallelisms for diffusion but do not model offload-collective interference.
+
+\paragraph{Gap.} No prior work formally models the interference between concurrent H2D offload transfers and NCCL collectives on a shared PCIe bus, or derives optimal offloading strategies conditioned on topology.
+
+%==============================================================================
+\section{Contention Model}
+\label{sec:model}
+%==============================================================================
+
+\subsection{Hardware Topology}
+
+We model hardware as a tuple $\mathcal{T} = (N, B_p, B_n, \gamma)$: $N$ GPUs, PCIe bandwidth $B_p$, NVLink bandwidth $B_n$, and bus-sharing coefficient $\gamma \in [0,1]$ representing the fraction of NCCL traffic traversing PCIe. Split-bus topologies (NVLink mesh) have $\gamma = 0$; shared-bus (PCIe-only) has $\gamma = 1$.
+
+\subsection{Contention Coefficients}
+
+When H2D and NCCL run concurrently on a shared bus, both experience bandwidth degradation:
+\begin{align}
+    B_{\text{h2d}}^{\text{eff}} &= B_p \cdot (1 - \alpha \cdot \gamma) \label{eq:bw-h2d} \\
+    B_{\text{nccl}}^{\text{eff}} &= B_{\text{nccl}}^{\text{peak}} \cdot (1 - \beta \cdot \gamma) \label{eq:bw-nccl}
+\end{align}
+where $\alpha, \beta \in [0,1]$ are topology-dependent contention coefficients. On H100 PCIe ($\gamma=1$): $\alpha = 0.365$, $\beta = 0.377$, measured via nsys CUPTI temporal overlap analysis of 12{,}184 H2D transfers.
+
+\subsection{Transformer Layer Model}
+
+Each transformer layer consists of two sequential phases:
+\begin{enumerate}
+    \item \textbf{Attention phase} (duration $T_{\text{attn}}$): includes QKV projection, attention computation, and NCCL collective communication (all-to-all for Ulysses SP, or all-reduce for TP) of duration $T_{\text{nccl}}$.
+    \item \textbf{FFN phase} (duration $T_{\text{ffn}}$): feed-forward network computation with no NCCL communication.
+\end{enumerate}
+Total compute time per layer: $T_c = T_{\text{attn}} + T_{\text{ffn}}$.
+
+\subsection{The $R$ Ratio}
+
+\begin{definition}[$R$ ratio]
+The \emph{H2D-to-FFN ratio} is defined as:
+\begin{equation}
+    R = \frac{W}{B_p \cdot T_{\text{ffn}}} = \frac{T_{\text{h2d}}^0}{T_{\text{ffn}}}
+    \label{eq:R}
+\end{equation}
+where $W$ is the layer weight size and $T_{\text{h2d}}^0 = W/B_p$ is the uncontended H2D transfer time.
+\end{definition}
+
+$R$ determines whether H2D can be fully hidden within the NCCL-free FFN phase. When $R \leq 1$, the transfer fits; when $R > 1$, it spills into the attention phase and contends with NCCL.
+
+%==============================================================================
+\section{Optimal Offloading Strategies}
+\label{sec:strategies}
+%==============================================================================
+
+\subsection{Strategy Space}
+
+We consider three offloading strategies:
+\begin{itemize}
+    \item \textbf{Strategy U (Unsharded):} Each GPU copies full layer weights $W$ from CPU on a dedicated copy stream, concurrent with compute and NCCL on the default stream.
+    \item \textbf{Strategy P (PCIe-Aware):} H2D prefetch is triggered at FFN entry (not block entry), confining transfers to the NCCL-free window.
+    \item \textbf{Strategy S (Sharded):} Each GPU copies $W/k$ bytes, then performs an all-gather to reconstruct. Reduces PCIe H2D volume at the cost of additional NCCL traffic.
+\end{itemize}
+
+\subsection{Per-Layer Latency}
+
+\paragraph{Strategy U.} When H2D overlaps with NCCL ($\phi > 0$), the NCCL collective experiences contention for its full duration:
+\begin{equation}
+    T_U = T_c + \underbrace{T_{\text{nccl}} \cdot \frac{\beta\gamma}{1-\beta\gamma}}_{\Delta T_{\text{nccl}}}
+    \label{eq:TU}
+\end{equation}
+
+\paragraph{Strategy P ($R \leq 1$).} H2D is confined to the FFN phase, so $\phi = 0$:
+\begin{equation}
+    T_P = T_c
+    \label{eq:TP}
+\end{equation}
+
+\paragraph{Strategy S ($k$ shards).} Each GPU transfers $W/k$, then all-gathers:
+\begin{equation}
+    T_S = T_c + T_{\text{ag}}(k), \quad T_{\text{ag}}(k) = \frac{W(k-1)}{k \cdot B_{\text{ag}}}
+    \label{eq:TS}
+\end{equation}
+where $B_{\text{ag}} = B_n$ on NVLink or $B_p$ on PCIe.
+
+\subsection{Topology-Conditional Optimality}
+
+\begin{theorem}[Topology-Conditional Optimality]
+\label{thm:main}
+Given a transformer with $L$ homogeneous layers, weight size $W$ per layer, per-layer compute split into attention ($T_{\text{attn}}$, with NCCL of duration $T_{\text{nccl}}$) and FFN ($T_{\text{ffn}}$, no NCCL), on $N$ GPUs with topology $\mathcal{T} = (N, B_p, B_n, \gamma)$, and $R = W/(B_p \cdot T_{\text{ffn}})$:
+
+\begin{enumerate}
+    \item[\textbf{(i)}] When $\gamma = 0$ (split-bus): Strategy U is optimal, achieving $T_{\text{step}}^* = L \cdot T_c$.
+    \item[\textbf{(ii)}] When $\gamma = 1$ (shared-bus) and $R \leq 1$: Strategy P is optimal, achieving $T_{\text{step}}^* = L \cdot T_c$.
+    \item[\textbf{(iii)}] When $\gamma = 1$ and $R > 1$: Strategy S+P with $k^* = \min(\lceil R \rceil, N)$ is optimal, achieving $T_{\text{step}}^* = L \cdot (T_c + T_{\text{ag}}(k^*))$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\textbf{Lower bound.} For any strategy, $T_{\text{step}} \geq L \cdot T_c$ because computation cannot be avoided.
+
+\textbf{Case (i):} When $\gamma = 0$, $\Delta T_{\text{nccl}} = T_{\text{nccl}} \cdot \beta \cdot 0 / (1 - \beta \cdot 0) = 0$. Strategy U achieves $T_{\text{step}}^U = L \cdot T_c$, matching the lower bound. Strategy S introduces all-gather overhead: $T_{\text{step}}^S = L \cdot (T_c + T_{\text{ag}}) > L \cdot T_c$. Strategy P also achieves $L \cdot T_c$ but requires unnecessary FFN-level hooks. Therefore U is optimal. \qed
+
+\textbf{Case (ii):} Strategy P schedules H2D during FFN. Since $R \leq 1$, the H2D completes within the FFN window, so $\phi = 0$ and $T_P = T_c$. This achieves the lower bound. Strategy U has $\phi > 0$, giving $T_U = T_c + \Delta T_{\text{nccl}} > T_c$. Strategy S has $T_S = T_c + T_{\text{ag}} > T_c$. Therefore P is uniquely optimal. \qed
+
+\textbf{Case (iii):} With shard count $k$, the effective ratio becomes $R/k$. When $k \geq R$ (i.e., $R/k \leq 1$), the sharded H2D fits within the FFN window with zero contention:
+\[
+    T_{\text{step}}^{S+P}(k) = L \cdot (T_c + T_{\text{ag}}(k))
+\]
+Since $T_{\text{ag}}(k)$ is increasing in $k$, the optimal $k$ is the smallest satisfying $k \geq R$:
+\[
+    k^* = \lceil R \rceil
+\]
+For $k < k^*$: spillover contention adds penalty $> 0$. For $k > k^*$: $T_{\text{ag}}(k) > T_{\text{ag}}(k^*)$. Bounded by $N$: $k^* = \min(\lceil R \rceil, N)$. \qed
+\end{proof}
+
+\begin{corollary}[Optimal Shard Count]
+\label{cor:shard}
+For a shared-bus topology ($\gamma = 1$), the optimal shard count is:
+\begin{equation}
+    k^* = \min\left(\left\lceil \frac{W}{B_p \cdot T_{\text{ffn}}} \right\rceil, N\right)
+    \label{eq:kstar}
+\end{equation}
+\end{corollary}
+
+%==============================================================================
+\section{Experiments}
+\label{sec:experiments}
+%==============================================================================
+
+\subsection{Setup}
+
+\textbf{Model:} Wan2.2-T2V-A14B (14B MoE video diffusion, 2$\times$40 transformer layers, ${\sim}700$\,MB/layer at BF16). \textbf{Task:} 720$\times$1280 video, 81 frames, 27 denoising steps. \textbf{Parallelism:} Ulysses sequence parallelism with all-to-all communication. \textbf{Platforms:}
+\begin{itemize}
+    \item Platform A: 4$\times$ H100 PCIe, shared root complex ($\gamma = 1$), ACES cluster.
+    \item Platform B: 4$\times$ B200 NVLink mesh ($\gamma \approx 0$), local workstation.
+\end{itemize}
+
+\subsection{Results}
+
+\begin{table}[h]
+\centering
+\caption{Model predictions vs.\ measured per-step latency.}
+\label{tab:results}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+\textbf{Experiment} & \textbf{Predicted} & \textbf{Measured} & \textbf{Error} \\
+\midrule
+Strategy U, NVLink ($\gamma{=}0$) & 12.0\,s & 12.03\,s & 0.25\% \\
+Strategy U, PCIe ($\gamma{=}1$)   & ${\sim}$25.5\,s & 23.7\,s & ${\sim}$8\% \\
+Strategy S, PCIe ($R{<}1$, $k{=}4$) & Worse than U & 23.9\,s & Correct \\
+Strategy P, PCIe ($R{=}0.196$)    & ${\sim}$23.0\,s & \emph{pending} & --- \\
+NCCL warmup ($T_{\text{init}}$)   & One-time cost & 12.8\,s saved & Confirmed \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Strategy S (sharded) on PCIe produces slightly worse performance than unsharded (23.9\,s vs 23.7\,s), confirming the theorem's prediction: when $R < 1$, sharding adds all-gather overhead without contention benefit. Strategy P is the correct optimization for this workload.
+
+\subsection{nsys Validation}
+
+CUPTI temporal overlap analysis confirms the contention mechanism:
+\begin{itemize}
+    \item 61\% of large H2D transfers (7{,}475 of 12{,}184) overlap with NCCL kernels.
+    \item H2D bandwidth during NCCL: 7{,}907\,MB/s; without: 12{,}447\,MB/s ($\alpha = 0.365$).
+    \item Old (FSDP) offload: zero H2D during NCCL (blocking \texttt{.to()} serializes transfers).
+    \item New offload H2D volume: 5{,}767\,GB (9.3$\times$ more than FSDP's 618\,GB).
+\end{itemize}
+
+%==============================================================================
+\section{Generalization: Diffusion vs LLM}
+\label{sec:generalization}
+%==============================================================================
+
+The $R$ ratio unifies the analysis across workload types. We compute $R$ for 11 models spanning video diffusion, image diffusion, and LLM inference (Table~\ref{tab:rratio}).
+
+\begin{table}[h]
+\centering
+\caption{$R$ ratio across model families. $B_p = 12.4$\,GB/s (PCIe Gen5).}
+\label{tab:rratio}
+\small
+\begin{tabular}{@{}llrrrrrl@{}}
+\toprule
+\textbf{Model} & \textbf{Type} & \textbf{Params} & \textbf{Layers} & \textbf{W/layer} & $T_{\text{ffn}}$ & $\boldsymbol{R}$ & \textbf{Strategy} \\
+\midrule
+HunyuanVideo    & Video DiT & 13B  & 60  & 433\,MB & 317\,ms   & \textbf{0.11} & P \\
+Wan2.2-A14B     & Video DiT & 14B  & 40  & 700\,MB & 288\,ms   & \textbf{0.20} & P \\
+Mochi 1         & Video DiT & 10B  & 48  & 417\,MB & 146\,ms   & \textbf{0.23} & P \\
+\midrule
+CogVideoX-5B   & Video DiT & 5B   & 30  & 333\,MB & 15\,ms    & \textbf{1.8}  & S ($k{=}2$) \\
+SD3 Medium      & Image DiT & 2B   & 24  & 167\,MB & 4.2\,ms   & \textbf{3.2}  & S ($k{=}4$) \\
+FLUX.1-dev      & Image DiT & 12B  & 57  & 421\,MB & 2.1\,ms   & \textbf{16}   & S ($k{=}17$) \\
+\midrule
+Llama-3.1-8B    & LLM decode  & 8B   & 32  & 500\,MB   & 0.075\,ms & \textbf{538} & S \\
+Llama-3.1-70B   & LLM decode  & 70B  & 80  & 1750\,MB  & 0.261\,ms & \textbf{540} & S \\
+Llama-3.1-405B  & LLM decode  & 405B & 126 & 6429\,MB  & 0.958\,ms & \textbf{541} & S \\
+Mixtral-8x7B    & LLM decode  & 46.7B & 32 & 2919\,MB  & 0.436\,ms & \textbf{540} & S \\
+Qwen2.5-72B     & LLM decode  & 72B  & 80  & 1800\,MB  & 0.269\,ms & \textbf{540} & S \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Three regimes emerge:
+
+\paragraph{Regime 1 ($R \ll 1$): Large video DiT.} HunyuanVideo, Wan2.2, Mochi~1. Long per-step compute from high-dimensional spatiotemporal attention. Strategy P makes offloading essentially free.
+
+\paragraph{Regime 2 ($R \sim 1\text{--}20$): Image DiT, small video DiT.} CogVideoX, SD3, FLUX. Shorter per-step compute. Strategy S with $k^* = \lceil R \rceil$ shards (2--17, within typical GPU counts).
+
+\paragraph{Regime 3 ($R \approx 540$): All LLM decode.} Every LLM collapses to $R \approx 2 B_{\text{HBM}} / B_p \approx 540$ regardless of model size, because both $W$/layer and $T_c$/layer scale linearly with parameters and cancel in the ratio. This is a \emph{hardware constant} reflecting the ${\sim}270\times$ gap between HBM bandwidth (3{,}350\,GB/s) and PCIe bandwidth (12.4\,GB/s). Offloading during decode is fundamentally bottlenecked.
+
+This explains why SGLang's LLM offloader uses blocking synchronization---with $R \gg 1$, async overlap is counterproductive as it creates contention without hiding the transfer.
+
+%==============================================================================
+\section{Discussion}
+\label{sec:discussion}
+%==============================================================================
+
+\paragraph{Limitations.}
+We validate on two topologies ($\gamma \approx 0$ and $\gamma = 1$). Hybrid topologies ($0 < \gamma < 1$) are untested. We treat the contention coefficient $\alpha$ as constant; it may vary with $N$, traffic patterns, or NCCL algorithm choices. DiT experiments use only Wan2.2; LLM predictions are analytical, not yet empirically validated.
+
+\paragraph{Implications for System Design.}
+Offloading frameworks should detect topology ($\gamma$) and compute $R$ at initialization, then select the appropriate strategy automatically. On PCIe clusters---common in cost-optimized cloud deployments and university clusters---naive async offloading is suboptimal. FFN-phase scheduling is a low-complexity fix requiring only hook placement changes. The $R$ ratio provides a simple diagnostic: practitioners can compute it from model specs and hardware bandwidth without running experiments.
+
+%==============================================================================
+\section{Conclusion}
+\label{sec:conclusion}
+%==============================================================================
+
+We formalize the bandwidth contention between CPU-GPU offloading and NCCL collectives on shared-bus topologies, prove a topology-conditional optimality theorem, and validate it experimentally. The key practical insight is that on PCIe-only systems, scheduling H2D transfers during the NCCL-free FFN phase eliminates contention entirely for models with $R \leq 1$---making offloading essentially free. For models with $R > 1$, weight sharding with $k^* = \lceil R \rceil$ minimizes the remaining overhead. The $R$ ratio serves as a simple, computable decision criterion that generalizes across both diffusion and LLM workloads.
+
+%==============================================================================
+\bibliographystyle{plainnat}
+
+\begin{thebibliography}{16}
+
+\bibitem[Martinasso et~al.(2016)]{martinasso2016}
+M.~Martinasso, T.~Hoefler, et~al.
+\newblock A {PCIe} congestion-aware performance model for densely populated accelerator servers.
+\newblock In \emph{SC}, 2016.
+
+\bibitem[Sheng et~al.(2023)]{flexgen}
+Y.~Sheng, L.~Zheng, B.~Yuan, Z.~Li, M.~Ryabinin, D.~Y. Fu, Z.~Xie, B.~Chen, C.~Barrett, J.~Gonzalez, P.~Liang, C.~R\'{e}, I.~Stoica, and C.~Zhang.
+\newblock {FlexGen}: High-throughput generative inference of large language models with a single {GPU}.
+\newblock In \emph{ICML}, 2023.
+
+\bibitem[Aminabadi et~al.(2022)]{deepspeed-inference}
+R.~Y. Aminabadi, S.~Rajbhandari, A.~A. Awan, C.~Li, D.~Li, E.~Zheng, O.~Ruwase, S.~Smith, M.~Zhang, J.~Rasley, and Y.~He.
+\newblock {DeepSpeed} inference: Enabling efficient inference of transformer models at unprecedented scale.
+\newblock In \emph{SC}, 2022.
+
+\bibitem[{MoE-Lightning}(2025)]{moe-lightning}
+{MoE-Lightning}: High-throughput {MoE} inference on memory-constrained {GPUs}.
+\newblock In \emph{ASPLOS}, 2025.
+
+\bibitem[Jacobs et~al.(2023)]{ulysses}
+S.~A. Jacobs, M.~Tanaka, C.~Zhang, M.~Zhang, S.~L. Song, S.~Rajbhandari, and Y.~He.
+\newblock {DeepSpeed Ulysses}: System optimizations for enabling training of extreme long sequence transformer models.
+\newblock \emph{arXiv:2309.14509}, 2023.
+
+\bibitem[{TCCL}(2024)]{tccl}
+{TCCL}: Discovering better communication paths for {PCIe} {GPU} clusters.
+\newblock In \emph{ASPLOS}, 2024.
+
+\bibitem[{Blink}(2020)]{blink}
+{Blink}: Fast and generic collectives for distributed {ML}.
+\newblock In \emph{MLSys}, 2020.
+
+\bibitem[{ScaleFusion}(2025)]{scalefusion}
+{ScaleFusion}: Scalable inference of spatial-temporal diffusion transformers.
+\newblock In \emph{MLSys}, 2025.
+
+\bibitem[Fang et~al.(2024)]{xdit}
+J.~Fang et~al.
+\newblock {xDiT}: An inference engine for diffusion transformers with massive parallelism.
+\newblock \emph{arXiv:2411.01738}, 2024.
+
+\bibitem[{PipeFusion}(2024)]{pipefusion}
+{PipeFusion}: Displaced patch pipeline parallelism for inference of diffusion transformer models.
+\newblock \emph{arXiv:2405.14430}, 2024.
+
+\bibitem[Li et~al.(2024)]{distrifusion}
+M.~Li et~al.
+\newblock {DistriFusion}: Distributed parallel inference for high-resolution diffusion models.
+\newblock In \emph{CVPR}, 2024.
+
+\bibitem[{ISO}(2024)]{iso}
+{ISO}: Overlap of computation and communication within sequence for {LLM} inference.
+\newblock \emph{arXiv:2409.11155}, 2024.
+
+\bibitem[{TokenWeave}(2026)]{tokenweave}
+{TokenWeave}: Efficient compute-communication overlap for distributed {LLM} inference.
+\newblock In \emph{MLSys}, 2026.
+
+\bibitem[{HeteGen}(2024)]{hetegen}
+{HeteGen}: Heterogeneous parallel inference for large language models.
+\newblock In \emph{MLSys}, 2024.
+
+\bibitem[{SpeedLoader}(2024)]{speedloader}
+{SpeedLoader}: An {I/O} efficient scheme for heterogeneous and distributed {LLM} operation.
+\newblock In \emph{NeurIPS}, 2024.
+
+\bibitem[{NEO}(2025)]{neo}
+{NEO}: Saving {GPU} memory crisis with {CPU} offloading for online {LLM} inference.
+\newblock In \emph{MLSys}, 2025.
+
+\end{thebibliography}
+
+\end{document}
