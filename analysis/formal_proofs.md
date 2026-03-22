@@ -9,16 +9,7 @@
 
 ### A.1 Definition
 
-We model PCIe bandwidth as a shared resource with capacity $B_p$ (per-GPU peak unidirectional bandwidth). When $n$ concurrent data flows share the bus, each flow receives an effective bandwidth governed by the **fair-share contention model**:
-
-$$B_{eff}(n) = \frac{B_p}{1 + (n-1) \cdot \rho}$$
-
-where $\rho \in [0, 1]$ is the **interference coefficient** capturing the overhead beyond ideal fair-sharing. When $\rho = 0$, flows share perfectly ($B_{eff} = B_p / n$... wait, that's $B_{eff} = B_p$ which is wrong). Let me reformulate.
-
-**Reformulation.** We use an additive degradation model (following Martinasso et al., SC 2016):
-
-When a single flow uses the bus: $B_{eff} = B_p$.
-When a second flow (NCCL) activates concurrently: both flows experience degradation.
+We model PCIe bandwidth degradation under concurrent traffic using an **additive degradation model** (following Martinasso et al., SC 2016). When a single data flow uses the bus, it achieves peak bandwidth $B_p$. When a second flow activates concurrently, both flows experience degradation proportional to topology-dependent contention coefficients.
 
 For two concurrent flows (H2D and NCCL) on a shared bus:
 $$B_{h2d}^{eff} = B_p \cdot (1 - \alpha)$$
@@ -94,11 +85,7 @@ $$T_U = T_c + \Delta T_{nccl}$$
 
 where $\Delta T_{nccl}$ is the additional NCCL time due to contention:
 
-$$\Delta T_{nccl} = T_{nccl} \cdot \frac{\beta \cdot \gamma}{1 - \beta \cdot \gamma} \cdot \phi$$
-
-**Derivation:** Contended NCCL time is $T_{nccl} / (1 - \beta\gamma)$. The penalty is $T_{nccl}/(1-\beta\gamma) - T_{nccl} = T_{nccl} \cdot \beta\gamma / (1-\beta\gamma)$. This penalty applies only during the fraction $\phi$ of time when H2D and NCCL overlap. But since NCCL is on the critical path, any slowdown to NCCL directly extends the layer time by the full penalty.
-
-Actually, let me reconsider. The penalty to NCCL applies during the entire NCCL execution if H2D is running during it. The fraction $\phi$ tells us what fraction of H2D time overlaps with NCCL, but what matters is whether NCCL is contended at all. If H2D runs during NCCL (which it does, since $\phi > 0$), then NCCL experiences the full contention for its duration:
+**Key observation:** If any H2D transfer overlaps temporally with NCCL ($\phi > 0$), NCCL experiences contention for its full duration because the copy stream remains active throughout:
 
 $$T_{nccl}^{contended} = \frac{T_{nccl}}{1 - \beta \cdot \gamma}$$
 
