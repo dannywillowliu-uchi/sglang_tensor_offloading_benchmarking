@@ -144,17 +144,31 @@ CUPTI temporal overlap analysis confirms the contention mechanism:
 
 ## 6. Generalization: Diffusion vs LLM
 
-The $R$ ratio unifies the analysis across workload types:
+The $R$ ratio unifies the analysis across workload types. We compute $R$ for 11 models spanning video diffusion, image diffusion, and LLM inference:
 
-| Workload | $W$/layer | $T_{ffn}$ | $R$ | Optimal Strategy |
-|---|---|---|---|---|
-| DiT inference (Wan2.2, 4xGPU) | 700 MB | ~288 ms | 0.20 | P (PCIe-aware) |
-| LLM prefill (70B, batch=512) | 500 MB | ~250 ms | 0.16 | P (PCIe-aware) |
-| LLM decode (70B, batch=1) | 500 MB | ~1 ms | 40.3 | S+P ($k^* = N$), still bottlenecked |
+| Model | Type | Params | W/layer | $T_{ffn}$ | **R** | Strategy |
+|---|---|---|---|---|---|---|
+| HunyuanVideo | Video DiT | 13B | 433 MB | 317 ms | **0.11** | P |
+| **Wan2.2-T2V-A14B** | Video DiT | 14B | 700 MB | 288 ms | **0.20** | **P (validated)** |
+| Mochi 1 | Video DiT | 10B | 417 MB | 146 ms | **0.23** | P |
+| CogVideoX-5B | Video DiT | 5B | 333 MB | 15 ms | **1.8** | S ($k$=2) |
+| SD3 Medium | Image DiT | 2B | 167 MB | 4.2 ms | **3.2** | S ($k$=4) |
+| FLUX.1-dev | Image DiT | 12B | 421 MB | 2.1 ms | **16** | S ($k$=17) |
+| Llama-3.1-8B (decode) | LLM | 8B | 500 MB | 0.075 ms | **538** | S |
+| Llama-3.1-70B (decode) | LLM | 70B | 1,750 MB | 0.261 ms | **540** | S |
+| Llama-3.1-405B (decode) | LLM | 405B | 6,429 MB | 0.958 ms | **541** | S |
+| Mixtral-8x7B (decode) | LLM MoE | 46.7B | 2,919 MB | 0.436 ms | **540** | S |
+| Qwen2.5-72B (decode) | LLM | 72B | 1,800 MB | 0.269 ms | **540** | S |
 
-**[R-ratio table for additional models: PENDING]**
+Three regimes emerge cleanly:
 
-For diffusion and LLM prefill, $R \ll 1$: the large compute window easily hides H2D, and Strategy P eliminates contention. For LLM decode, $R \gg 1$: per-token compute is too small to hide any H2D. This explains why SGLang's LLM offloader uses blocking synchronization -- with $R \gg 1$, async overlap is counterproductive (it creates contention without hiding the transfer).
+**Regime 1 ($R \ll 1$): Large video DiT.** HunyuanVideo, Wan2.2, Mochi 1. Long per-step compute (seconds) from high-dimensional spatiotemporal attention. Strategy P makes offloading essentially free.
+
+**Regime 2 ($R \sim 1\text{--}20$): Image DiT, small video DiT.** CogVideoX, SD3, FLUX. Shorter per-step compute. Strategy S with $k^* = \lceil R \rceil$ shards (2--17, within typical GPU counts).
+
+**Regime 3 ($R \approx 540$): All LLM decode.** Every LLM collapses to $R \approx 2 \cdot B_{HBM} / B_p \approx 540$ regardless of model size, because both $W$/layer and $T_c$/layer scale linearly with parameters and cancel in the ratio. This is a **hardware constant** reflecting the ~270x gap between HBM bandwidth (3,350 GB/s) and PCIe bandwidth (12.4 GB/s). Offloading during decode is fundamentally bottlenecked; only extreme sharding or prefill-phase offloading is viable.
+
+This explains why SGLang's LLM offloader uses blocking synchronization -- with $R \gg 1$, async overlap is counterproductive (it creates contention without hiding the transfer).
 
 ---
 
